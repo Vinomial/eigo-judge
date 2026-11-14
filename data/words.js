@@ -1,0 +1,468 @@
+// 単語データ
+// AFFIX: 接頭辞・接尾辞(定義), ROOT: 語根(定義)
+// WORDS: 各単語は p(部品)で語根・接辞から「導出」される.
+//   p: [[表記, "r"(語根) | "a"(接辞), 元の形(変化形のときだけ)], ...]
+//      例: ["ac", "a", "ad"] は接辞 ad の変化形 ac.部品の表記をつなげると単語になる.
+//   m: 意味, n: 導出の説明, ex: 例文, ja: 例文の訳, d: 難易度(レートと同じ尺度)
+window.AFFIX = {
+  // 接頭辞
+  "in": "中へ・中を・上に",
+  "ex": "外へ",
+  "pro": "前へ・前を",
+  "pre": "前もって・前に",
+  "trans": "越えて・向こうへ",
+  "sub": "下へ・下から・近くに",
+  "per": "通して・完全に",
+  "re": "再び・後ろへ・元へ",
+  "ob": "向かって・逆らって",
+  "de": "離して・下へ",
+  "main": "手(manu)",
+  "con": "共に・完全に",
+  "ad": "〜へ・〜に向かって",
+  "dis": "離れて・別々に",
+  "inter": "間に",
+  "intro": "中へ",
+  "post": "後に",
+  "super": "上から・超えて",
+  "contra": "反対に",
+  "uni": "1つの",
+  "du": "2つの",
+  "se": "離して・分けて",
+  "ab": "離れて",
+  "un": "〜でない(否定)",
+  "neg": "〜しない(否定)",
+  // 接尾辞
+  "able": "〜できる",
+  "ive": "〜の性質をもつ(形容詞)",
+  "ion": "〜すること・したもの(名詞)",
+  "ance": "〜すること・状態(名詞)",
+  "ure": "〜すること・したもの(名詞)",
+  "ue": "〜するもの・場所(名詞)",
+  "ory": "〜するもの・場所(名詞)",
+  "ent": "〜している(形容詞)・〜するもの(名詞)",
+  "ate": "〜させる・〜にする(動詞)",
+  "ize": "〜にする(動詞)",
+  "ify": "〜にする・〜化する(動詞)",
+  "ment": "〜すること・もの(名詞)",
+  "or": "〜する人",
+  "al": "〜の(形容詞)",
+  "ly": "〜に(副詞)"
+};
+
+window.ROOT = {
+  "spect": "見る",
+  "port": "運ぶ",
+  "dict": "言う",
+  "mit": "送る",
+  "tain": "保つ",
+  "ceed": "行く",
+  "fer": "運ぶ・持っていく",
+  "ject": "投げる",
+  "duc": "導く",
+  "scrib": "書く",
+  "struct": "積み上げる",
+  "vis": "見る",
+  "pend": "つるす・量る・支払う",
+  "press": "押す",
+  "tract": "引く",
+  "ven": "来る",
+  "pos": "置く",
+  "cur": "走る",
+  "sist": "立つ",
+  "cept": "取る",
+  "mot": "動かす",
+  "quir": "求める",
+  "tend": "伸ばす",
+  "clud": "閉じる",
+  "sume": "取る",
+  "nov": "新しい",
+  "rupt": "壊す・破る",
+  "vert": "向ける・回す",
+  "fin": "終わり・決着",
+  "grad": "歩む・段階",
+  "sign": "印・しるし",
+  "labor": "働く",
+  "form": "形・形づくる",
+  "plic": "折る・重ねる",
+  "fac": "作る・する",
+  "lect": "選ぶ・集める",
+  "cid": "切る",
+  "mand": "命じる・委ねる",
+  "cred": "信じる",
+  "dur": "続く・固い",
+  "medi": "中間",
+  "pet": "求める・向かう",
+  "sequ": "後に続く",
+  "prehend": "つかむ",
+  "fid": "信頼する",
+  "loc": "場所",
+  "spir": "息をする",
+  "lat": "運ぶ(fer の過去分詞形)",
+  "ple": "満たす",
+  "tribut": "割り当てる・与える",
+  "volv": "回す・巻く",
+  "mod": "型・尺度",
+  "merc": "商い",
+  "nounce": "告げる",
+  "hibit": "持つ・保つ"
+};
+
+window.WORDS = [
+  // spect(見る)
+  { id: "w1", w: "inspect", p: [["in", "a"], ["spect", "r"]], m: "検査する", n: "中をよく見る,から「検査する」.", ex: "The technician will inspect the equipment tomorrow.", ja: "技術者が明日その機器を点検する.", d: 400 },
+  { id: "w2", w: "prospect", p: [["pro", "a"], ["spect", "r"]], m: "見込み・見通し", n: "前を見る,から「将来の見込み」.", ex: "The prospects for growth are good this year.", ja: "今年の成長の見通しは良い.", d: 700 },
+  { id: "w3", w: "perspective", p: [["per", "a"], ["spect", "r"], ["ive", "a"]], m: "観点・見方", n: "通して見る性質,から「ものの見方」.", ex: "Let's look at the problem from a different perspective.", ja: "違う観点から問題を見てみよう.", d: 800 },
+  { id: "w21", w: "expect", p: [["ex", "a"], ["pect", "r", "spect"]], m: "期待する・見込む", n: "外を見て(来るものを)待つ,から「期待する・見込む」.", ex: "We expect the shipment to arrive on Monday.", ja: "荷物は月曜日に届く見込みだ.", d: 300 },
+
+  // port(運ぶ)
+  { id: "w4", w: "export", p: [["ex", "a"], ["port", "r"]], m: "輸出する", n: "外へ運ぶ,から「輸出する」.", ex: "The company exports its products to Asia.", ja: "その会社は製品をアジアに輸出している.", d: 300 },
+  { id: "w5", w: "transport", p: [["trans", "a"], ["port", "r"]], m: "輸送する", n: "向こうへ運ぶ,から「輸送する」.", ex: "The goods will be transported by truck.", ja: "商品はトラックで輸送される.", d: 300 },
+  { id: "w6", w: "portable", p: [["port", "r"], ["able", "a"]], m: "持ち運べる", n: "運ぶことができる,から「携帯用の」.", ex: "This portable charger fits in your pocket.", ja: "この携帯充電器はポケットに入る.", d: 400 },
+  { id: "w22", w: "import", p: [["im", "a", "in"], ["port", "r"]], m: "輸入する", n: "中へ運ぶ,から「輸入する」.export(外へ運ぶ)と対になる.", ex: "Our store imports coffee beans from Brazil.", ja: "当店はブラジルからコーヒー豆を輸入している.", d: 300 },
+  { id: "w23", w: "report", p: [["re", "a"], ["port", "r"]], m: "報告(書)・報告する", n: "(情報を)元へ運び返す,から「報告する」.", ex: "Please report any problems to the front desk.", ja: "問題があればフロントに報告してください.", d: 300 },
+  { id: "w24", w: "support", p: [["sup", "a", "sub"], ["port", "r"]], m: "支える・支持する", n: "下から運ぶ(持ち上げる),から「支える」.", ex: "The new software supports several languages.", ja: "新しいソフトは複数の言語に対応している.", d: 300 },
+
+  // dict(言う)
+  { id: "w7", w: "predict", p: [["pre", "a"], ["dict", "r"]], m: "予測する", n: "前もって言う,から「予測する」.", ex: "Analysts predict that sales will rise.", ja: "アナリストは売上が伸びると予測している.", d: 400 },
+  { id: "w20", w: "dictate", p: [["dict", "r"], ["ate", "a"]], m: "書き取らせる・命じる", n: "言わせる,から「口述する・命じる」.", ex: "The manager dictated a letter to her assistant.", ja: "部長は秘書に手紙を口述した.", d: 800 },
+  { id: "w25", w: "indicate", p: [["in", "a"], ["dic", "r", "dict"], ["ate", "a"]], m: "示す・示唆する", n: "(指して)中身を言い表す,から「示す」.Part 7 の設問 What is indicated about ...? で頻出.", ex: "The survey indicates that customers want faster delivery.", ja: "調査は顧客がより速い配送を望んでいることを示している.", d: 500 },
+
+  // mit(送る)
+  { id: "w8", w: "submit", p: [["sub", "a"], ["mit", "r"]], m: "提出する", n: "下から(相手の前に)送る,から「提出する」.", ex: "Please submit the form by Friday.", ja: "金曜日までに用紙を提出してください.", d: 300 },
+  { id: "w9", w: "permit", p: [["per", "a"], ["mit", "r"]], m: "許可する", n: "通して送る(通す),から「許可する」.", ex: "Smoking is not permitted in the building.", ja: "建物内での喫煙は許可されていない.", d: 500 },
+  { id: "w10", w: "transmit", p: [["trans", "a"], ["mit", "r"]], m: "送信する・伝える", n: "向こうへ送る,から「送信する」.", ex: "The data is transmitted every hour.", ja: "データは1時間ごとに送信される.", d: 600 },
+  { id: "w26", w: "commit", p: [["com", "a", "con"], ["mit", "r"]], m: "約束する・専念する", n: "(自分を)完全に送り込む,から「身をささげる・約束する」.be committed to 〜 で「〜に全力を注ぐ」.", ex: "We are committed to protecting the environment.", ja: "当社は環境保護に全力で取り組んでいる.", d: 800 },
+  { id: "w27", w: "admit", p: [["ad", "a"], ["mit", "r"]], m: "(事実を)認める・入れる", n: "中へ送り入れる,から「入場させる・(事実を)受け入れて認める」.", ex: "The company admitted that the delay was its fault.", ja: "会社は遅延が自社の責任だと認めた.", d: 700 },
+
+  // tain(保つ)
+  { id: "w11", w: "maintain", p: [["main", "a"], ["tain", "r"]], m: "維持する", n: "手で保つ,から「維持する・整備する」.", ex: "We need to maintain good relationships with clients.", ja: "顧客と良い関係を維持する必要がある.", d: 500 },
+  { id: "w12", w: "obtain", p: [["ob", "a"], ["tain", "r"]], m: "得る・入手する", n: "向かって保つ(手元に保つ),から「得る」.", ex: "You must obtain approval before starting.", ja: "始める前に承認を得なければならない.", d: 500 },
+  { id: "w13", w: "retain", p: [["re", "a"], ["tain", "r"]], m: "保持する・保つ", n: "後ろに保つ(手放さない),から「保持する」.", ex: "The firm wants to retain its best employees.", ja: "その会社は優秀な社員を引き留めたい.", d: 700 },
+  { id: "w14", w: "contain", p: [["con", "a"], ["tain", "r"]], m: "含む", n: "共に保つ(中にまとめて保つ),から「含む」.", ex: "The package contains a user manual.", ja: "その荷物には取扱説明書が入っている.", d: 400 },
+  { id: "w28", w: "entertain", p: [["enter", "a", "inter"], ["tain", "r"]], m: "楽しませる・もてなす", n: "(人を)間に保つ(引き留めておく),から「もてなす・楽しませる」.", ex: "The musicians entertained the guests during dinner.", ja: "夕食の間,演奏家たちが客を楽しませた.", d: 600 },
+
+  // ceed / cess / ced(行く)
+  { id: "w15", w: "proceed", p: [["pro", "a"], ["ceed", "r"]], m: "進む・続行する", n: "前へ行く,から「進む」.", ex: "Please proceed to Gate 12.", ja: "12番ゲートへお進みください.", d: 600 },
+  { id: "w16", w: "exceed", p: [["ex", "a"], ["ceed", "r"]], m: "超える", n: "外へ行く(枠をはみ出す),から「超える」.", ex: "Sales exceeded our expectations.", ja: "売上は予想を上回った.", d: 700 },
+  { id: "w29", w: "succeed", p: [["suc", "a", "sub"], ["ceed", "r"]], m: "成功する・後を継ぐ", n: "すぐ下(後)に続いて行く,から「後を継ぐ」.うまく続いて行く,から「成功する」.", ex: "Ms. Grant will succeed Mr. Hall as director next year.", ja: "来年,グラントさんがホールさんの後任として部長になる.", d: 600 },
+  { id: "w30", w: "process", p: [["pro", "a"], ["cess", "r", "ceed"]], m: "過程・処理する", n: "前へ進むこと,から「過程」.動詞では「(手順に沿って)処理する」.", ex: "Your order will be processed within 24 hours.", ja: "ご注文は24時間以内に処理されます.", d: 400 },
+  { id: "w31", w: "access", p: [["ac", "a", "ad"], ["cess", "r", "ceed"]], m: "利用(する権利)・接近", n: "〜へ行くこと,から「近づくこと・利用できること」.", ex: "All employees have access to the online database.", ja: "全社員がオンラインのデータベースを利用できる.", d: 500 },
+  { id: "w32", w: "procedure", p: [["pro", "a"], ["ced", "r", "ceed"], ["ure", "a"]], m: "手続き", n: "前へ進むやり方,から「(決まった)手順・手続き」.", ex: "Please follow the safety procedures at all times.", ja: "常に安全手順に従ってください.", d: 700 },
+
+  // fer(運ぶ)
+  { id: "w17", w: "transfer", p: [["trans", "a"], ["fer", "r"]], m: "移す・転勤させる", n: "向こうへ運ぶ,から「移す」.", ex: "She was transferred to the Osaka office.", ja: "彼女は大阪支社に転勤になった.", d: 500 },
+  { id: "w18", w: "refer", p: [["re", "a"], ["fer", "r"]], m: "参照する・言及する", n: "元へ持っていく,から「参照する」.", ex: "Please refer to the manual for details.", ja: "詳細はマニュアルを参照してください.", d: 600 },
+  { id: "w19", w: "defer", p: [["de", "a"], ["fer", "r"]], m: "延期する・先送りする", n: "離して(先へ)運ぶ,から「延期する」.", ex: "The decision was deferred until next month.", ja: "決定は来月まで延期された.", d: 900 },
+  { id: "w33", w: "offer", p: [["of", "a", "ob"], ["fer", "r"]], m: "申し出る・提供する", n: "(相手に)向かって運ぶ,から「差し出す・提供する」.", ex: "The hotel offers free breakfast to all guests.", ja: "そのホテルは全宿泊客に無料の朝食を提供している.", d: 300 },
+  { id: "w34", w: "prefer", p: [["pre", "a"], ["fer", "r"]], m: "より好む", n: "(他より)前に運ぶ,から「より好む」.", ex: "Many customers prefer to pay online.", ja: "多くの客はオンラインでの支払いを好む.", d: 500 },
+  { id: "w35", w: "conference", p: [["con", "a"], ["fer", "r"], ["ence", "a", "ance"]], m: "会議・協議会", n: "(意見を)共に持ち寄ること,から「会議」.", ex: "The annual sales conference will be held in Chicago.", ja: "年次営業会議はシカゴで開かれる.", d: 400 },
+
+  // ject(投げる)
+  { id: "w36", w: "project", p: [["pro", "a"], ["ject", "r"]], m: "計画・事業", n: "前へ投げる(案を前に出す),から「計画」.", ex: "The construction project will take two years.", ja: "その建設計画には2年かかる.", d: 300 },
+  { id: "w37", w: "reject", p: [["re", "a"], ["ject", "r"]], m: "却下する・断る", n: "投げ返す,から「却下する」.", ex: "The board rejected the proposal.", ja: "役員会はその提案を却下した.", d: 600 },
+  { id: "w38", w: "object", p: [["ob", "a"], ["ject", "r"]], m: "反対する", n: "逆らって投げる,から「反対する」(object to 〜).名詞では「物・目的」.", ex: "Several residents objected to the new parking rules.", ja: "何人かの住民が新しい駐車規則に反対した.", d: 800 },
+  { id: "w39", w: "subject", p: [["sub", "a"], ["ject", "r"]], m: "(be subject to で)〜の対象となる・〜を受けやすい", n: "下に投げられている(支配下にある),から「〜を受ける立場にある」.TOEIC では be subject to change(変更されることがある)が頻出.", ex: "Prices are subject to change without notice.", ja: "価格は予告なく変更される場合がある.", d: 1000 },
+
+  // duc / duce / duct(導く)
+  { id: "w40", w: "produce", p: [["pro", "a"], ["duce", "r", "duc"]], m: "生産する", n: "前へ導き出す,から「生み出す・生産する」.", ex: "The factory produces 500 cars a day.", ja: "その工場は1日に500台の車を生産する.", d: 300 },
+  { id: "w41", w: "reduce", p: [["re", "a"], ["duce", "r", "duc"]], m: "減らす", n: "元へ(小さく)導き戻す,から「減らす」.", ex: "The new system will reduce costs by 20 percent.", ja: "新システムによりコストが20%削減される.", d: 400 },
+  { id: "w42", w: "introduce", p: [["intro", "a"], ["duce", "r", "duc"]], m: "導入する・紹介する", n: "中へ導く,から「導入する・(人を)紹介する」.", ex: "The company introduced a new uniform policy.", ja: "その会社は新しい制服規定を導入した.", d: 400 },
+  { id: "w43", w: "conduct", p: [["con", "a"], ["duct", "r", "duc"]], m: "実施する・行う", n: "(人を)共に導く,から「指揮する・実施する」.", ex: "We conducted a survey of 300 customers.", ja: "顧客300人を対象に調査を実施した.", d: 500 },
+  { id: "w44", w: "deduct", p: [["de", "a"], ["duct", "r", "duc"]], m: "差し引く", n: "(全体から)下へ・離して導く,から「差し引く」.", ex: "The fee will be deducted from your account.", ja: "手数料はあなたの口座から差し引かれる.", d: 1000 },
+
+  // scrib / scribe / script(書く)
+  { id: "w45", w: "describe", p: [["de", "a"], ["scribe", "r", "scrib"]], m: "(様子を)説明する・描写する", n: "下に書き写す,から「描写する・説明する」.", ex: "Please describe the problem in detail.", ja: "問題を詳しく説明してください.", d: 400 },
+  { id: "w46", w: "subscribe", p: [["sub", "a"], ["scribe", "r", "scrib"]], m: "定期購読する・(サービスに)登録する", n: "(書類の)下に名前を書く,から「申し込む・定期購読する」.", ex: "Over 10,000 people subscribe to our newsletter.", ja: "1万人以上が当社のニュースレターを購読している.", d: 700 },
+  { id: "w47", w: "prescription", p: [["pre", "a"], ["script", "r", "scrib"], ["ion", "a"]], m: "処方箋", n: "前もって書かれたもの(指示書),から「処方箋」.", ex: "You need a prescription to buy this medicine.", ja: "この薬を買うには処方箋が必要だ.", d: 800 },
+
+  // struct(積み上げる)
+  { id: "w48", w: "construction", p: [["con", "a"], ["struct", "r"], ["ion", "a"]], m: "建設・工事", n: "共に積み上げること,から「建設」.", ex: "The road is closed due to construction.", ja: "その道路は工事のため通行止めだ.", d: 300 },
+  { id: "w49", w: "instruct", p: [["in", "a"], ["struct", "r"]], m: "指示する・教える", n: "(知識を)中に積み上げる,から「教える・指示する」.", ex: "Staff were instructed to lock all doors at night.", ja: "職員は夜間すべての扉を施錠するよう指示された.", d: 600 },
+
+  // vis / vise / vide / vid(見る)
+  { id: "w50", w: "revise", p: [["re", "a"], ["vise", "r", "vis"]], m: "修正する・改訂する", n: "再び見る(見直す),から「修正する」.", ex: "Please revise the budget and send it back to me.", ja: "予算を修正して送り返してください.", d: 500 },
+  { id: "w51", w: "supervisor", p: [["super", "a"], ["vis", "r"], ["or", "a"]], m: "上司・監督者", n: "上から見る人,から「監督者・上司」.", ex: "Ask your supervisor before taking a day off.", ja: "休みを取る前に上司に相談してください.", d: 400 },
+  { id: "w52", w: "provide", p: [["pro", "a"], ["vide", "r", "vis"]], m: "供給する・用意する", n: "前もって見る(先を見て備える),から「用意する・供給する」.", ex: "Lunch will be provided for all participants.", ja: "参加者全員に昼食が用意される.", d: 300 },
+  { id: "w53", w: "evident", p: [["e", "a", "ex"], ["vid", "r", "vis"], ["ent", "a"]], m: "明らかな", n: "外から見えている,から「明らかな」.", ex: "It was evident that the plan needed more time.", ja: "その計画にもっと時間が必要なのは明らかだった.", d: 900 },
+
+  // pend / pense / pens(つるす・量る・支払う)
+  { id: "w54", w: "depend", p: [["de", "a"], ["pend", "r"]], m: "頼る・〜次第である", n: "下にぶら下がる,から「頼る・〜次第である」(depend on 〜).", ex: "The schedule depends on the weather.", ja: "日程は天気次第だ.", d: 400 },
+  { id: "w55", w: "suspend", p: [["sus", "a", "sub"], ["pend", "r"]], m: "一時停止する", n: "下につるす(宙ぶらりんにする),から「一時停止する」.", ex: "Train service was suspended because of the storm.", ja: "嵐のため列車の運行が一時停止された.", d: 900 },
+  { id: "w56", w: "expense", p: [["ex", "a"], ["pense", "r", "pend"]], m: "費用・経費", n: "(お金を)量って外へ払い出すもの,から「費用」.", ex: "Travel expenses will be paid by the company.", ja: "出張費は会社が負担する.", d: 500 },
+  { id: "w57", w: "compensate", p: [["com", "a", "con"], ["pens", "r", "pend"], ["ate", "a"]], m: "補償する・埋め合わせる", n: "共に量ってつり合わせる,から「埋め合わせる・補償する」.", ex: "Customers will be compensated for the delay.", ja: "顧客には遅延の補償が行われる.", d: 1000 },
+
+  // press(押す)
+  { id: "w58", w: "express", p: [["ex", "a"], ["press", "r"]], m: "表現する・述べる", n: "(考えを)外へ押し出す,から「表現する」.", ex: "Several employees expressed interest in the program.", ja: "何人かの社員がそのプログラムに関心を示した.", d: 400 },
+  { id: "w59", w: "impress", p: [["im", "a", "in"], ["press", "r"]], m: "感銘を与える", n: "(心の)中に押しつける,から「印象づける・感銘を与える」.", ex: "The interviewers were impressed by her experience.", ja: "面接官たちは彼女の経験に感心した.", d: 500 },
+
+  // tract(引く)
+  { id: "w60", w: "attract", p: [["at", "a", "ad"], ["tract", "r"]], m: "引きつける", n: "〜へ引く,から「引きつける」.", ex: "The festival attracts thousands of visitors every year.", ja: "その祭りは毎年何千人もの観光客を引きつける.", d: 400 },
+  { id: "w61", w: "contract", p: [["con", "a"], ["tract", "r"]], m: "契約(書)", n: "(双方が)共に引き合って結ぶもの,から「契約」.", ex: "Please sign the contract and return it by Friday.", ja: "契約書に署名して金曜日までに返送してください.", d: 400 },
+  { id: "w62", w: "distract", p: [["dis", "a"], ["tract", "r"]], m: "気をそらす", n: "(注意を)別の方へ引く,から「気をそらす」.", ex: "Loud music can distract workers from their tasks.", ja: "大きな音楽は作業者の気を散らすことがある.", d: 1000 },
+
+  // ven / vent(来る)
+  { id: "w63", w: "prevent", p: [["pre", "a"], ["vent", "r", "ven"]], m: "防ぐ", n: "前もって来る(先回りする),から「防ぐ」.", ex: "Regular checks prevent serious accidents.", ja: "定期点検が重大な事故を防ぐ.", d: 400 },
+  { id: "w64", w: "event", p: [["e", "a", "ex"], ["vent", "r", "ven"]], m: "出来事・催し", n: "外へ出て来るもの,から「出来事・行事」.", ex: "The charity event raised over $5,000.", ja: "その慈善行事で5,000ドル以上が集まった.", d: 300 },
+  { id: "w65", w: "revenue", p: [["re", "a"], ["ven", "r"], ["ue", "a"]], m: "収益・収入", n: "(お金が)戻って来るもの,から「収入・収益」.", ex: "The company's revenue rose by 8 percent last year.", ja: "その会社の収益は昨年8%増えた.", d: 900 },
+  { id: "w66", w: "venue", p: [["ven", "r"], ["ue", "a"]], m: "会場", n: "(人が)来る場所,から「会場」.", ex: "The venue for the awards ceremony has been changed.", ja: "授賞式の会場が変更された.", d: 600 },
+  { id: "w67", w: "inventory", p: [["in", "a"], ["vent", "r", "ven"], ["ory", "a"]], m: "在庫(目録)", n: "中に入って来たもの(の一覧),から「在庫・在庫目録」.", ex: "We check our inventory at the end of every month.", ja: "毎月末に在庫を確認している.", d: 800 },
+
+  // pos / pose / pone / posit / pon(置く)
+  { id: "w68", w: "propose", p: [["pro", "a"], ["pose", "r", "pos"]], m: "提案する", n: "(案を)前に置く,から「提案する」.", ex: "The manager proposed a new marketing strategy.", ja: "部長は新しい販売戦略を提案した.", d: 400 },
+  { id: "w69", w: "postpone", p: [["post", "a"], ["pone", "r", "pos"]], m: "延期する", n: "後に置く,から「延期する」.", ex: "The meeting has been postponed until Thursday.", ja: "会議は木曜日に延期された.", d: 600 },
+  { id: "w70", w: "deposit", p: [["de", "a"], ["posit", "r", "pos"]], m: "預金・手付金", n: "下に置いた(預けた)もの,から「預金・手付金」.", ex: "A deposit of $100 is required to reserve the room.", ja: "部屋の予約には100ドルの手付金が必要だ.", d: 700 },
+  { id: "w71", w: "component", p: [["com", "a", "con"], ["pon", "r", "pos"], ["ent", "a"]], m: "部品・構成要素", n: "共に置かれて(組み合わさって)いるもの,から「部品」.", ex: "The factory makes electronic components for cars.", ja: "その工場は車の電子部品を作っている.", d: 800 },
+
+  // cur(走る)
+  { id: "w72", w: "occur", p: [["oc", "a", "ob"], ["cur", "r"]], m: "起こる", n: "(目の前に)向かって走って来る,から「起こる」.", ex: "The power outage occurred at 3 P.M.", ja: "停電は午後3時に起きた.", d: 500 },
+  { id: "w73", w: "current", p: [["curr", "r", "cur"], ["ent", "a"]], m: "現在の", n: "(今まさに)走っている,から「現在の」.", ex: "Please update your current address.", ja: "現住所を更新してください.", d: 400 },
+
+  // sist(立つ)
+  { id: "w74", w: "consist", p: [["con", "a"], ["sist", "r"]], m: "(of を伴って)〜から成る", n: "(部分が)共に立つ,から「〜から成り立つ」(consist of 〜).", ex: "The team consists of five engineers.", ja: "そのチームは5人の技術者で構成されている.", d: 800 },
+  { id: "w75", w: "insist", p: [["in", "a"], ["sist", "r"]], m: "主張する・言い張る", n: "(その上に)立ち続ける,から「主張して譲らない」.", ex: "The client insisted on meeting in person.", ja: "顧客は直接会うことを強く求めた.", d: 700 },
+
+  // cept / ceive(取る)
+  { id: "w76", w: "accept", p: [["ac", "a", "ad"], ["cept", "r"]], m: "受け入れる・承諾する", n: "〜へ(自分の方へ)取る,から「受け入れる」.", ex: "We accept all major credit cards.", ja: "主要なクレジットカードはすべて使えます.", d: 300 },
+  { id: "w77", w: "receive", p: [["re", "a"], ["ceive", "r", "cept"]], m: "受け取る", n: "(送られたものを)取り戻す,から「受け取る」.", ex: "Did you receive my e-mail yesterday?", ja: "昨日私のメールを受け取りましたか.", d: 300 },
+  { id: "w78", w: "except", p: [["ex", "a"], ["cept", "r"]], m: "〜を除いて", n: "外へ取り出す,から「〜を除いて」.", ex: "The office is open every day except Sunday.", ja: "事務所は日曜日以外毎日開いている.", d: 600 },
+  { id: "w79", w: "reception", p: [["re", "a"], ["cept", "r"], ["ion", "a"]], m: "受付・歓迎会", n: "(客を)受け取ること,から「受付・歓迎会」.", ex: "A reception will be held after the ceremony.", ja: "式典の後に歓迎会が開かれる.", d: 500 },
+
+  // mot / mote / move(動かす)
+  { id: "w80", w: "promote", p: [["pro", "a"], ["mote", "r", "mot"]], m: "昇進させる・販売促進する", n: "前へ動かす,から「昇進させる・促進する」.", ex: "Mr. Chen was promoted to sales manager.", ja: "チェンさんは営業部長に昇進した.", d: 500 },
+  { id: "w81", w: "remote", p: [["re", "a"], ["mote", "r", "mot"]], m: "遠隔の・へんぴな", n: "後ろへ(遠くへ)動かされた,から「遠い・遠隔の」.remote work は「在宅勤務」.", ex: "Many employees now do remote work two days a week.", ja: "今では多くの社員が週2日在宅勤務をしている.", d: 600 },
+  { id: "w82", w: "remove", p: [["re", "a"], ["move", "r", "mot"]], m: "取り除く", n: "(元の場所から)後ろへ動かす,から「取り除く」.", ex: "Please remove your shoes before entering.", ja: "入る前に靴を脱いでください.", d: 400 },
+
+  // quir / quire / quest(求める)
+  { id: "w83", w: "require", p: [["re", "a"], ["quire", "r", "quir"]], m: "必要とする・要求する", n: "繰り返し求める,から「必要とする」.", ex: "This position requires two years of experience.", ja: "この職には2年の経験が必要だ.", d: 400 },
+  { id: "w84", w: "inquire", p: [["in", "a"], ["quire", "r", "quir"]], m: "問い合わせる", n: "中を求めて尋ねる,から「問い合わせる」.名詞 inquiry(問い合わせ)も頻出.", ex: "I am writing to inquire about your catering services.", ja: "御社のケータリングサービスについてお問い合わせします.", d: 600 },
+  { id: "w85", w: "request", p: [["re", "a"], ["quest", "r", "quir"]], m: "依頼(する)", n: "再び求める,から「依頼する・頼むこと」.", ex: "Brochures are available upon request.", ja: "パンフレットはご依頼に応じてお渡しします.", d: 300 },
+  { id: "w86", w: "acquire", p: [["ac", "a", "ad"], ["quire", "r", "quir"]], m: "(会社を)買収する・身につける", n: "〜へ求めて(自分のものに)する,から「獲得する」.ビジネスでは「(会社を)買収する」.", ex: "The company acquired a small software firm last year.", ja: "その会社は昨年小さなソフトウェア会社を買収した.", d: 800 },
+
+  // tend / tens(伸ばす)
+  { id: "w87", w: "extend", p: [["ex", "a"], ["tend", "r"]], m: "延長する・広げる", n: "外へ伸ばす,から「延長する」.", ex: "The store has extended its opening hours.", ja: "その店は営業時間を延長した.", d: 500 },
+  { id: "w88", w: "attend", p: [["at", "a", "ad"], ["tend", "r"]], m: "出席する", n: "(心・足を)〜へ伸ばす,から「出席する」.", ex: "About 200 people attended the seminar.", ja: "約200人がセミナーに出席した.", d: 300 },
+  { id: "w89", w: "extensive", p: [["ex", "a"], ["tens", "r", "tend"], ["ive", "a"]], m: "広範囲の・大規模な", n: "外へ伸びた性質,から「広範囲の」.", ex: "The hotel underwent extensive renovations.", ja: "そのホテルは大規模な改装を行った.", d: 900 },
+
+  // clud / clude(閉じる)
+  { id: "w90", w: "include", p: [["in", "a"], ["clude", "r", "clud"]], m: "含める・含む", n: "中に閉じ込める,から「含める」.", ex: "The price includes tax and delivery.", ja: "価格には税と配送料が含まれる.", d: 300 },
+  { id: "w91", w: "exclude", p: [["ex", "a"], ["clude", "r", "clud"]], m: "除外する", n: "外に閉め出す,から「除外する」.", ex: "Sale items are excluded from this offer.", ja: "セール品はこの特典の対象外だ.", d: 700 },
+  { id: "w92", w: "conclude", p: [["con", "a"], ["clude", "r", "clud"]], m: "結論づける・締めくくる", n: "完全に閉じる,から「終える・結論づける」.", ex: "The meeting concluded with a short speech.", ja: "会議は短いスピーチで締めくくられた.", d: 600 },
+
+  // sume(取る)
+  { id: "w93", w: "consume", p: [["con", "a"], ["sume", "r"]], m: "消費する", n: "完全に取る(使い尽くす),から「消費する」.", ex: "The new model consumes less electricity.", ja: "新型は消費電力が少ない.", d: 500 },
+  { id: "w94", w: "assume", p: [["as", "a", "ad"], ["sume", "r"]], m: "想定する・(職務を)引き受ける", n: "自分へ取る,から「(役目を)引き受ける・(本当だと)思い込む」.", ex: "Ms. Lee will assume the role of team leader.", ja: "リーさんがチームリーダーの役を引き受ける.", d: 700 },
+  { id: "w95", w: "resume", p: [["re", "a"], ["sume", "r"]], m: "再開する", n: "再び取る(取りかかる),から「再開する」.名詞 résumé(履歴書)とつづりは同じ.", ex: "Work on the bridge will resume next week.", ja: "橋の工事は来週再開される.", d: 800 },
+
+  // nov(新しい)
+  { id: "w96", w: "renovate", p: [["re", "a"], ["nov", "r"], ["ate", "a"]], m: "改装する", n: "再び新しくする,から「改装する」.", ex: "The lobby was renovated last spring.", ja: "ロビーは昨春改装された.", d: 600 },
+  { id: "w97", w: "innovation", p: [["in", "a"], ["nov", "r"], ["ation", "a", "ion"]], m: "革新・新しい工夫", n: "中に新しいものを入れること,から「革新」.", ex: "The company is known for its innovation in design.", ja: "その会社はデザインの革新で知られている.", d: 700 },
+
+  // rupt(壊す・破る)
+  { id: "w98", w: "interrupt", p: [["inter", "a"], ["rupt", "r"]], m: "中断させる・(話を)さえぎる", n: "間を破る,から「中断させる・さえぎる」.", ex: "Sorry to interrupt, but you have a phone call.", ja: "お話し中失礼します,お電話が入っています.", d: 600 },
+
+  // vert(向ける・回す)
+  { id: "w99", w: "advertise", p: [["ad", "a"], ["vert", "r"], ["ise", "a", "ize"]], m: "広告する・宣伝する", n: "(人の注意を)〜へ向けさせる,から「広告する」.", ex: "We advertise our products on social media.", ja: "当社は SNS で製品を宣伝している.", d: 300 },
+  { id: "w100", w: "convert", p: [["con", "a"], ["vert", "r"]], m: "転換する・作り変える", n: "完全に向きを変える,から「(別の形・用途に)変える」.", ex: "The old factory was converted into apartments.", ja: "古い工場はアパートに改築された.", d: 800 },
+
+  // fin(終わり・決着)
+  { id: "w101", w: "finance", p: [["fin", "r"], ["ance", "a"]], m: "財務・資金", n: "(支払いの)決着をつけること,から「お金のやりくり・財務」.", ex: "She has worked in finance for ten years.", ja: "彼女は10年間財務の仕事をしてきた.", d: 500 },
+
+  // grad / gress(歩む・段階)
+  { id: "w102", w: "progress", p: [["pro", "a"], ["gress", "r", "grad"]], m: "進歩・進捗", n: "前へ歩むこと,から「進歩・進み具合」.", ex: "The manager asked for a progress report.", ja: "部長は進捗報告を求めた.", d: 500 },
+  { id: "w103", w: "gradually", p: [["grad", "r"], ["ual", "a", "al"], ["ly", "a"]], m: "徐々に", n: "段階を追って,から「徐々に」.", ex: "Sales have gradually increased since April.", ja: "4月以降,売上は徐々に増えている.", d: 700 },
+
+  // sign(印・しるし)
+  { id: "w104", w: "assign", p: [["as", "a", "ad"], ["sign", "r"]], m: "割り当てる", n: "〜へ印をつける(担当を決める),から「割り当てる」.", ex: "Each new employee is assigned a mentor.", ja: "新入社員にはそれぞれ指導役が割り当てられる.", d: 600 },
+  { id: "w105", w: "signature", p: [["sign", "r"], ["ature", "a", "ure"]], m: "署名", n: "しるしをつけたもの,から「署名」.", ex: "Please put your signature at the bottom of the page.", ja: "ページの下に署名してください.", d: 400 },
+
+  // labor(働く)
+  { id: "w106", w: "collaborate", p: [["col", "a", "con"], ["labor", "r"], ["ate", "a"]], m: "協力する・共同で取り組む", n: "共に働く,から「協力する」.", ex: "The two firms collaborated on the new app.", ja: "2社は新しいアプリで協力した.", d: 800 },
+
+  // ---- 追加分(既存の語根) ----
+  // spect
+  { id: "w107", w: "respect", p: [["re", "a"], ["spect", "r"]], m: "尊重する・敬意", n: "振り返って見る(よく考えて見る),から「尊重する」.with respect to 〜 は「〜に関して」.", ex: "We respect your privacy and will not share your information.", ja: "当社はお客様のプライバシーを尊重し,情報を共有しません.", d: 500 },
+  { id: "w108", w: "spectator", p: [["spect", "r"], ["at", "a", "ate"], ["or", "a"]], m: "観客", n: "見る人,から「観客」.", ex: "More than 3,000 spectators watched the final match.", ja: "3,000人以上の観客が決勝戦を観戦した.", d: 600 },
+  { id: "w109", w: "suspect", p: [["sus", "a", "sub"], ["pect", "r", "spect"]], m: "疑う・〜ではないかと思う", n: "下から(こっそり)見る,から「疑う」.", ex: "We suspect that the error was caused by a software update.", ja: "その誤りはソフトの更新が原因ではないかと考えている.", d: 800 },
+  { id: "w110", w: "specify", p: [["spec", "r", "spect"], ["ify", "a"]], m: "明記する・詳しく述べる", n: "(はっきり)見えるようにする,から「明記する」.", ex: "Please specify the size and color when you order.", ja: "ご注文の際はサイズと色を明記してください.", d: 1000 },
+  // dict
+  { id: "w111", w: "contradict", p: [["contra", "a"], ["dict", "r"]], m: "矛盾する・反論する", n: "反対に言う,から「反論する・矛盾する」.", ex: "The two reports contradict each other.", ja: "その2つの報告書は互いに矛盾している.", d: 1200 },
+  { id: "w112", w: "dedicate", p: [["de", "a"], ["dic", "r", "dict"], ["ate", "a"]], m: "ささげる・(be dedicated to で)〜に打ち込む", n: "(神に)言って差し出す,から「ささげる」.", ex: "Our staff are dedicated to providing excellent service.", ja: "当社の職員は優れたサービスの提供に打ち込んでいる.", d: 1000 },
+  // mit
+  { id: "w113", w: "omit", p: [["o", "a", "ob"], ["mit", "r"]], m: "省略する・抜かす", n: "(脇へ)送り出して手放す,から「省く」.", ex: "Your name was omitted from the list by mistake.", ja: "あなたの名前は誤って名簿から抜けていた.", d: 1100 },
+  { id: "w114", w: "emit", p: [["e", "a", "ex"], ["mit", "r"]], m: "排出する・放つ", n: "外へ送る,から「排出する」.", ex: "The new engine emits less carbon dioxide.", ja: "新しいエンジンは二酸化炭素の排出が少ない.", d: 1200 },
+  // tain
+  { id: "w115", w: "sustain", p: [["sus", "a", "sub"], ["tain", "r"]], m: "持続させる", n: "下から支えて保つ,から「持続させる」.sustainable(持続可能な)も頻出.", ex: "The company must sustain its growth in the coming years.", ja: "会社は今後数年,成長を持続させなければならない.", d: 1100 },
+  { id: "w116", w: "attain", p: [["at", "a", "ad"], ["tain", "r"]], m: "達成する・到達する", n: "〜まで手を伸ばして保つ,から「到達する・達成する」.", ex: "The team attained its sales goal in September.", ja: "チームは9月に販売目標を達成した.", d: 1200 },
+  // ceed
+  { id: "w117", w: "precede", p: [["pre", "a"], ["cede", "r", "ceed"]], m: "先行する・〜より前に起こる", n: "前に行く,から「先行する」.", ex: "A short reception will precede the awards ceremony.", ja: "授賞式の前に短い歓迎会がある.", d: 1200 },
+  { id: "w118", w: "excessive", p: [["ex", "a"], ["cess", "r", "ceed"], ["ive", "a"]], m: "過度の", n: "外へ行き過ぎた性質,から「過度の」.", ex: "Excessive noise is not allowed after 10 P.M.", ja: "午後10時以降,過度な騒音は禁止されている.", d: 1000 },
+  { id: "w119", w: "recession", p: [["re", "a"], ["cess", "r", "ceed"], ["ion", "a"]], m: "景気後退・不況", n: "後ろへ行くこと,から「(景気の)後退」.", ex: "Many companies cut costs during the recession.", ja: "多くの会社が不況の間に経費を削減した.", d: 1300 },
+  // fer
+  { id: "w120", w: "infer", p: [["in", "a"], ["fer", "r"]], m: "推論する・推し量る", n: "(結論を)中へ運び込む,から「推論する」.Part 7 の設問 What can be inferred ...? で頻出.", ex: "What can be inferred about the company?", ja: "その会社について何が推測できるか.", d: 1200 },
+  { id: "w121", w: "differ", p: [["dif", "a", "dis"], ["fer", "r"]], m: "異なる", n: "別々の方へ運ぶ,から「異なる」.", ex: "Prices differ from store to store.", ja: "価格は店によって異なる.", d: 500 },
+  { id: "w122", w: "suffer", p: [["suf", "a", "sub"], ["fer", "r"]], m: "苦しむ・(損害を)被る", n: "下で(重荷を)運ぶ,から「苦しむ・被る」.", ex: "The region suffered heavy damage from the storm.", ja: "その地域は嵐で大きな被害を受けた.", d: 700 },
+  // duc
+  { id: "w123", w: "educate", p: [["e", "a", "ex"], ["duc", "r"], ["ate", "a"]], m: "教育する", n: "(能力を)外へ導き出す,から「教育する」.", ex: "The campaign aims to educate customers about recycling.", ja: "そのキャンペーンは顧客にリサイクルについて知ってもらうことが目的だ.", d: 500 },
+  { id: "w124", w: "productive", p: [["pro", "a"], ["duct", "r", "duc"], ["ive", "a"]], m: "生産的な・実りのある", n: "前へ導き出す性質,から「生産的な」.", ex: "Thank you all for a very productive meeting.", ja: "皆さん,とても実りのある会議をありがとうございました.", d: 700 },
+  // scrib
+  { id: "w125", w: "manuscript", p: [["manu", "a", "main"], ["script", "r", "scrib"]], m: "原稿", n: "手で書かれたもの,から「原稿」.", ex: "Please send us your manuscript by e-mail.", ja: "原稿はメールでお送りください.", d: 1100 },
+  // struct
+  { id: "w126", w: "structure", p: [["struct", "r"], ["ure", "a"]], m: "構造・組織", n: "積み上げたもの,から「構造」.", ex: "The company changed its management structure.", ja: "その会社は経営組織を変えた.", d: 600 },
+  { id: "w127", w: "obstruct", p: [["ob", "a"], ["struct", "r"]], m: "ふさぐ・妨げる", n: "(行く手に)向かって積み上げる,から「ふさぐ」.", ex: "Please do not obstruct the emergency exits.", ja: "非常口をふさがないでください.", d: 1300 },
+  // vis
+  { id: "w128", w: "visible", p: [["vis", "r"], ["ible", "a", "able"]], m: "目に見える", n: "見ることができる,から「目に見える」.", ex: "Your parking permit must be clearly visible.", ja: "駐車許可証ははっきり見えるようにしておくこと.", d: 500 },
+  { id: "w129", w: "advise", p: [["ad", "a"], ["vise", "r", "vis"]], m: "助言する・(正式に)知らせる", n: "〜へ(よく)見て伝える,から「助言する」.be advised that 〜 は「〜をご承知おきください」.", ex: "Passengers are advised to arrive two hours early.", ja: "乗客は2時間前に到着するよう勧められている.", d: 600 },
+  { id: "w130", w: "provision", p: [["pro", "a"], ["vis", "r"], ["ion", "a"]], m: "(契約の)条項・備え", n: "前もって見て備えること,から「備え」.契約で前もって定めたもの,から「条項」.", ex: "The contract includes a provision for early cancellation.", ja: "契約には早期解約の条項が含まれている.", d: 1300 },
+  // pend
+  { id: "w131", w: "pension", p: [["pens", "r", "pend"], ["ion", "a"]], m: "年金", n: "(定期的に)支払われるもの,から「年金」.", ex: "Employees can join the company pension plan after one year.", ja: "社員は1年後から会社の年金制度に加入できる.", d: 900 },
+  { id: "w132", w: "independent", p: [["in", "a", "un"], ["de", "a"], ["pend", "r"], ["ent", "a"]], m: "独立した・自立した", n: "(他に)ぶら下がっていない,から「独立した」.", ex: "The survey was conducted by an independent research firm.", ja: "その調査は独立系の調査会社が実施した.", d: 700 },
+  { id: "w133", w: "dispense", p: [["dis", "a"], ["pense", "r", "pend"]], m: "(機械が)出す・分配する", n: "量って別々に分ける,から「分配する」.dispenser は「(飲み物などの)自動供給機」.", ex: "This machine dispenses hot and cold drinks.", ja: "この機械は温かい飲み物と冷たい飲み物を出す.", d: 1300 },
+  // press
+  { id: "w134", w: "pressure", p: [["press", "r"], ["ure", "a"]], m: "圧力・重圧", n: "押すこと,から「圧力」.", ex: "Staff are under pressure to finish the project on time.", ja: "職員は計画を期限内に終えるよう重圧を受けている.", d: 500 },
+  // tract
+  { id: "w135", w: "extract", p: [["ex", "a"], ["tract", "r"]], m: "抽出する・抜き出す", n: "外へ引く,から「抜き出す」.", ex: "The software extracts data from customer forms.", ja: "そのソフトは顧客の用紙からデータを抽出する.", d: 1100 },
+  { id: "w136", w: "subtract", p: [["sub", "a"], ["tract", "r"]], m: "引き算する", n: "下から引く(取り去る),から「引き算する」.", ex: "Subtract the discount from the total price.", ja: "合計金額から割引額を引いてください.", d: 900 },
+  // ven
+  { id: "w137", w: "convenient", p: [["con", "a"], ["veni", "r", "ven"], ["ent", "a"]], m: "便利な・都合のよい", n: "(条件が)共に来ている,から「都合のよい」.", ex: "Please let me know a convenient time for the meeting.", ja: "会議に都合のよい時間を教えてください.", d: 300 },
+  { id: "w138", w: "intervene", p: [["inter", "a"], ["vene", "r", "ven"]], m: "介入する・仲裁する", n: "間に来る,から「介入する」.", ex: "The manager intervened to settle the dispute.", ja: "部長が争いを収めるために間に入った.", d: 1300 },
+  { id: "w139", w: "avenue", p: [["a", "a", "ad"], ["ven", "r"], ["ue", "a"]], m: "大通り", n: "〜へ来る道,から「大通り」.", ex: "The new office is on Fifth Avenue.", ja: "新しい事務所は5番街にある.", d: 500 },
+  // pos
+  { id: "w140", w: "position", p: [["posit", "r", "pos"], ["ion", "a"]], m: "職・地位・位置", n: "置かれていること,から「位置・(組織の中の)職」.", ex: "She applied for the position of sales manager.", ja: "彼女は営業部長の職に応募した.", d: 300 },
+  { id: "w141", w: "purpose", p: [["pur", "a", "pro"], ["pose", "r", "pos"]], m: "目的", n: "前に置いたもの(目標),から「目的」.", ex: "What is the purpose of the e-mail?", ja: "このメールの目的は何か.", d: 300 },
+  { id: "w142", w: "dispose", p: [["dis", "a"], ["pose", "r", "pos"]], m: "(dispose of で)処分する", n: "別々に置く(片づける),から「処分する」.", ex: "Please dispose of used batteries properly.", ja: "使用済みの電池は適切に処分してください.", d: 1100 },
+  { id: "w143", w: "expose", p: [["ex", "a"], ["pose", "r", "pos"]], m: "さらす", n: "外に置く,から「さらす」.", ex: "Do not expose the device to direct sunlight.", ja: "その機器を直射日光にさらさないでください.", d: 900 },
+  { id: "w144", w: "impose", p: [["im", "a", "in"], ["pose", "r", "pos"]], m: "(税・規則を)課す", n: "上に置く,から「課す」.", ex: "The city imposed a new tax on hotel stays.", ja: "市はホテルの宿泊に新しい税を課した.", d: 1200 },
+  // cur
+  { id: "w145", w: "currency", p: [["curr", "r", "cur"], ["ency", "a", "ance"]], m: "通貨", n: "(世の中を)走り回っているもの,から「通貨」.", ex: "You can exchange currency at the airport.", ja: "空港で両替できる.", d: 700 },
+  { id: "w146", w: "excursion", p: [["ex", "a"], ["cur", "r"], ["sion", "a", "ion"]], m: "小旅行・遠足", n: "外へ走り出ること,から「小旅行」.", ex: "The tour includes an excursion to a nearby island.", ja: "そのツアーには近くの島への小旅行が含まれる.", d: 1000 },
+  // sist
+  { id: "w147", w: "assist", p: [["as", "a", "ad"], ["sist", "r"]], m: "手伝う・補佐する", n: "そばに立つ,から「手伝う」.", ex: "Our staff will be happy to assist you.", ja: "スタッフが喜んでお手伝いします.", d: 300 },
+  { id: "w148", w: "resist", p: [["re", "a"], ["sist", "r"]], m: "抵抗する・耐える", n: "逆らって(後ろに)立つ,から「抵抗する」.", ex: "This jacket resists water and wind.", ja: "この上着は水と風に強い.", d: 900 },
+  { id: "w149", w: "persist", p: [["per", "a"], ["sist", "r"]], m: "(問題が)続く・粘り強く続ける", n: "最後まで通して立ち続ける,から「続く・やり抜く」.", ex: "If the problem persists, please contact technical support.", ja: "問題が続く場合は技術サポートにご連絡ください.", d: 1200 },
+  { id: "w150", w: "consistent", p: [["con", "a"], ["sist", "r"], ["ent", "a"]], m: "一貫した・安定した", n: "(いつも)共に立っている,から「一貫した」.", ex: "The restaurant is known for its consistent quality.", ja: "そのレストランは品質が安定していることで知られている.", d: 1000 },
+  // cept
+  { id: "w151", w: "concept", p: [["con", "a"], ["cept", "r"]], m: "概念・構想", n: "(考えを)完全に取り込んだもの,から「概念・構想」.", ex: "The designer explained the concept behind the new logo.", ja: "デザイナーは新しいロゴの構想を説明した.", d: 700 },
+  { id: "w152", w: "perceive", p: [["per", "a"], ["ceive", "r", "cept"]], m: "知覚する・(〜と)とらえる", n: "完全に取る(つかむ),から「知覚する」.", ex: "The brand is perceived as reliable.", ja: "そのブランドは信頼できるととらえられている.", d: 1300 },
+  { id: "w153", w: "receipt", p: [["re", "a"], ["ceipt", "r", "cept"]], m: "領収書・受領", n: "受け取ったこと(の証明),から「領収書」.", ex: "Please keep your receipt for returns.", ja: "返品の際に必要なので領収書を保管してください.", d: 400 },
+  { id: "w154", w: "capable", p: [["cap", "r", "cept"], ["able", "a"]], m: "能力がある・〜できる", n: "つかむことができる,から「能力がある」(be capable of 〜).", ex: "The new printer is capable of printing 50 pages a minute.", ja: "新しいプリンターは1分に50枚印刷できる.", d: 700 },
+  // mot
+  { id: "w155", w: "motivate", p: [["mot", "r"], ["iv", "a", "ive"], ["ate", "a"]], m: "やる気にさせる", n: "動かす性質を与える,から「やる気にさせる」.", ex: "Good managers know how to motivate their staff.", ja: "良い管理職は部下のやる気を引き出す方法を知っている.", d: 700 },
+  { id: "w156", w: "mobile", p: [["mob", "r", "mot"], ["ile", "a", "able"]], m: "移動式の・携帯の", n: "動かすことができる,から「移動できる」.", ex: "Download our mobile app to order faster.", ja: "モバイルアプリをダウンロードすると,より速く注文できます.", d: 400 },
+  // tend
+  { id: "w157", w: "intend", p: [["in", "a"], ["tend", "r"]], m: "〜するつもりである・意図する", n: "(心を)中へ向けて伸ばす,から「意図する」.", ex: "We intend to open a new branch next year.", ja: "来年新しい支店を開くつもりだ.", d: 600 },
+  { id: "w158", w: "pretend", p: [["pre", "a"], ["tend", "r"]], m: "ふりをする", n: "前に(見せかけを)伸ばす,から「ふりをする」.", ex: "He pretended not to notice the mistake.", ja: "彼は誤りに気づかないふりをした.", d: 900 },
+  { id: "w159", w: "extension", p: [["ex", "a"], ["tens", "r", "tend"], ["ion", "a"]], m: "内線・延長", n: "外へ伸ばすこと,から「延長」.(電話線を伸ばした)「内線」.", ex: "Please call me at extension 214.", ja: "内線214にお電話ください.", d: 700 },
+  // clud
+  { id: "w160", w: "exclusive", p: [["ex", "a"], ["clus", "r", "clud"], ["ive", "a"]], m: "独占的な・限定の", n: "外に閉め出す性質,から「他を締め出した・独占的な」.", ex: "Members receive exclusive discounts.", ja: "会員は限定の割引を受けられる.", d: 1000 },
+  // sume
+  { id: "w161", w: "consumer", p: [["con", "a"], ["sum", "r", "sume"], ["er", "a", "or"]], m: "消費者", n: "消費する人.", ex: "Consumers are spending more on travel.", ja: "消費者は旅行により多くのお金を使っている.", d: 500 },
+  // rupt
+  { id: "w162", w: "disrupt", p: [["dis", "a"], ["rupt", "r"]], m: "混乱させる・(流れを)乱す", n: "ばらばらに壊す,から「混乱させる」.", ex: "The strike disrupted train service for two days.", ja: "ストで2日間列車の運行が乱れた.", d: 1100 },
+  { id: "w163", w: "abrupt", p: [["ab", "a"], ["rupt", "r"]], m: "突然の・急な", n: "離れて壊れた(ぷつりと切れた),から「突然の」.", ex: "The meeting came to an abrupt end.", ja: "会議は突然終わった.", d: 1300 },
+  // vert
+  { id: "w164", w: "reverse", p: [["re", "a"], ["verse", "r", "vert"]], m: "逆にする・裏の", n: "後ろへ向ける,から「逆にする・裏側」.", ex: "Write your name on the reverse side of the card.", ja: "カードの裏面に名前を書いてください.", d: 800 },
+  { id: "w165", w: "diverse", p: [["di", "a", "dis"], ["verse", "r", "vert"]], m: "多様な", n: "別々の方へ向いている,から「多様な」.", ex: "We have a diverse team of employees from 12 countries.", ja: "当社には12か国出身の多様な社員がいる.", d: 1000 },
+  { id: "w166", w: "version", p: [["vers", "r", "vert"], ["ion", "a"]], m: "版・バージョン", n: "(形を)変えたもの,から「版」.", ex: "Please download the latest version of the software.", ja: "ソフトの最新版をダウンロードしてください.", d: 400 },
+  // fin
+  { id: "w167", w: "final", p: [["fin", "r"], ["al", "a"]], m: "最終の・最後の", n: "終わりの,から「最終の」.", ex: "The final decision will be made on Friday.", ja: "最終決定は金曜日に下される.", d: 300 },
+  { id: "w168", w: "define", p: [["de", "a"], ["fine", "r", "fin"]], m: "定義する・明確に定める", n: "境界(終わり)をはっきり決める,から「定義する」.", ex: "The contract clearly defines each person's role.", ja: "契約は各人の役割を明確に定めている.", d: 800 },
+  { id: "w169", w: "refine", p: [["re", "a"], ["fine", "r", "fin"]], m: "改良する・磨きをかける", n: "再び仕上げる,から「洗練する」.", ex: "We are refining the design based on customer feedback.", ja: "顧客の意見をもとにデザインに磨きをかけている.", d: 1200 },
+  // grad
+  { id: "w170", w: "graduate", p: [["grad", "r"], ["uate", "a", "ate"]], m: "卒業する・卒業生", n: "段階を(上まで)進む,から「卒業する」.", ex: "She graduated from university in 2020.", ja: "彼女は2020年に大学を卒業した.", d: 400 },
+  { id: "w171", w: "aggressive", p: [["ag", "a", "ad"], ["gress", "r", "grad"], ["ive", "a"]], m: "積極的な・攻撃的な", n: "〜へ向かって進む性質,から「積極的な」.", ex: "The company has an aggressive plan to expand overseas.", ja: "その会社は海外展開の積極的な計画を持っている.", d: 1100 },
+  // sign
+  { id: "w172", w: "designate", p: [["de", "a"], ["sign", "r"], ["ate", "a"]], m: "指定する・任命する", n: "印をつけて示す,から「指定する」.", ex: "Smoking is allowed only in designated areas.", ja: "喫煙は指定区域でのみ許可されている.", d: 1100 },
+  { id: "w173", w: "significant", p: [["sign", "r"], ["ific", "a", "ify"], ["ant", "a", "ent"]], m: "かなりの・重要な", n: "印(意味)をつくっている,から「意味のある・重要な」.", ex: "There has been a significant increase in sales.", ja: "売上が大幅に増加した.", d: 600 },
+  // labor
+  { id: "w174", w: "laboratory", p: [["labor", "r"], ["at", "a", "ate"], ["ory", "a"]], m: "研究所・実験室", n: "働く(作業する)場所,から「研究所」.", ex: "The samples were sent to the laboratory for testing.", ja: "検体は検査のため研究所へ送られた.", d: 700 },
+  { id: "w175", w: "elaborate", p: [["e", "a", "ex"], ["labor", "r"], ["ate", "a"]], m: "念入りな・手の込んだ", n: "働いて(手を加えて)作り出した,から「念入りな」.", ex: "The hotel prepared an elaborate dinner for the guests.", ja: "ホテルは客のために手の込んだ夕食を用意した.", d: 1300 },
+
+  // ---- 追加分(新しい語根) ----
+  // form(形)
+  { id: "w176", w: "inform", p: [["in", "a"], ["form", "r"]], m: "知らせる", n: "(心の)中に形づくる,から「知らせる」.", ex: "Please inform us of any changes to your address.", ja: "住所に変更があればお知らせください.", d: 300 },
+  { id: "w177", w: "perform", p: [["per", "a"], ["form", "r"]], m: "行う・演じる", n: "完全に形にする,から「やり遂げる・演じる」.", ex: "The band will perform at the festival on Saturday.", ja: "そのバンドは土曜日に祭りで演奏する.", d: 400 },
+  { id: "w178", w: "reform", p: [["re", "a"], ["form", "r"]], m: "改革(する)", n: "形を作り直す,から「改革する」.", ex: "The government announced a reform of the tax system.", ja: "政府は税制の改革を発表した.", d: 900 },
+  { id: "w179", w: "uniform", p: [["uni", "a"], ["form", "r"]], m: "制服・均一の", n: "1つの形,から「制服・そろった」.", ex: "All staff must wear a uniform at work.", ja: "職員は全員勤務中に制服を着用しなければならない.", d: 400 },
+  { id: "w180", w: "conform", p: [["con", "a"], ["form", "r"]], m: "(基準に)適合する", n: "(基準と)共に同じ形になる,から「適合する」.", ex: "All products must conform to safety standards.", ja: "すべての製品は安全基準に適合しなければならない.", d: 1300 },
+  // plic / ply(折る・重ねる)
+  { id: "w181", w: "apply", p: [["ap", "a", "ad"], ["ply", "r", "plic"]], m: "申し込む・応募する", n: "〜へ重ねて当てる,から「当てはめる・申し込む」.", ex: "Over 100 people applied for the job.", ja: "100人以上がその仕事に応募した.", d: 300 },
+  { id: "w182", w: "reply", p: [["re", "a"], ["ply", "r", "plic"]], m: "返信(する)・返事", n: "折り返す,から「返事をする」.", ex: "Thank you for your quick reply.", ja: "早速のご返信ありがとうございます.", d: 300 },
+  { id: "w183", w: "supply", p: [["sup", "a", "sub"], ["ply", "r", "plic"]], m: "備品・供給", n: "下から重ねて満たす,から「供給する」.複数形 supplies は「備品・用品」.", ex: "Office supplies are kept in the storage room.", ja: "事務用品は倉庫に保管されている.", d: 400 },
+  { id: "w184", w: "comply", p: [["com", "a", "con"], ["ply", "r", "plic"]], m: "(規則に)従う", n: "完全に(要求に)重なる,から「従う」(comply with 〜).", ex: "All visitors must comply with the safety rules.", ja: "来訪者は全員安全規則に従わなければならない.", d: 1100 },
+  { id: "w185", w: "duplicate", p: [["du", "a"], ["plic", "r"], ["ate", "a"]], m: "複製(する)・写し", n: "2つに重ねる,から「複製する」.", ex: "Please make a duplicate of this key.", ja: "この鍵の合い鍵を作ってください.", d: 1100 },
+  // fac / fact / fect / fic(作る)
+  { id: "w186", w: "factory", p: [["fact", "r", "fac"], ["ory", "a"]], m: "工場", n: "作る場所,から「工場」.", ex: "The factory operates 24 hours a day.", ja: "その工場は24時間稼働している.", d: 300 },
+  { id: "w187", w: "affect", p: [["af", "a", "ad"], ["fect", "r", "fac"]], m: "影響する", n: "〜に作用する,から「影響する」.", ex: "The weather may affect flight schedules.", ja: "天候が航空便の運航に影響する可能性がある.", d: 700 },
+  { id: "w188", w: "effective", p: [["ef", "a", "ex"], ["fect", "r", "fac"], ["ive", "a"]], m: "効果的な・(規則が)有効な", n: "(結果を)外に作り出す性質,から「効果的な」.effective + 日付 で「〜から有効」.", ex: "The new rules will be effective from April 1.", ja: "新しい規則は4月1日から有効になる.", d: 600 },
+  { id: "w189", w: "efficient", p: [["ef", "a", "ex"], ["fici", "r", "fac"], ["ent", "a"]], m: "効率的な", n: "(結果を)外に作り出している,から「効率的な」.effective(効果的な)と区別する.", ex: "The new system is more efficient than the old one.", ja: "新システムは旧システムより効率的だ.", d: 700 },
+  { id: "w190", w: "manufacture", p: [["manu", "a", "main"], ["fact", "r", "fac"], ["ure", "a"]], m: "製造する", n: "手で作ること,から「製造する」.", ex: "The company manufactures kitchen appliances.", ja: "その会社は台所用の電化製品を製造している.", d: 600 },
+  { id: "w191", w: "sufficient", p: [["suf", "a", "sub"], ["fici", "r", "fac"], ["ent", "a"]], m: "十分な", n: "下から作って満たしている,から「十分な」.", ex: "We do not have sufficient time to finish the report.", ja: "報告書を仕上げるのに十分な時間がない.", d: 1000 },
+  { id: "w192", w: "defect", p: [["de", "a"], ["fect", "r", "fac"]], m: "欠陥", n: "(作るべきものから)離れていること,から「欠陥」.", ex: "The item was returned because of a defect.", ja: "その商品は欠陥のため返品された.", d: 1100 },
+  { id: "w193", w: "profit", p: [["pro", "a"], ["fit", "r", "fac"]], m: "利益", n: "前へ作り出すもの(得),から「利益」.", ex: "The company made a record profit this year.", ja: "その会社は今年過去最高の利益を上げた.", d: 400 },
+  // lect / lig(選ぶ・集める)
+  { id: "w194", w: "collect", p: [["col", "a", "con"], ["lect", "r"]], m: "集める・回収する", n: "共に集める,から「集める」.", ex: "The bins are collected every Monday.", ja: "ごみ箱は毎週月曜日に回収される.", d: 300 },
+  { id: "w195", w: "select", p: [["se", "a"], ["lect", "r"]], m: "選ぶ・選び抜かれた", n: "分けて選ぶ,から「選ぶ」.", ex: "Please select a seat from the list.", ja: "一覧から座席を選んでください.", d: 300 },
+  { id: "w196", w: "neglect", p: [["neg", "a"], ["lect", "r"]], m: "怠る・おろそかにする", n: "選ばない(拾い上げない),から「おろそかにする」.", ex: "Do not neglect regular maintenance of the machines.", ja: "機械の定期整備を怠らないように.", d: 1200 },
+  { id: "w197", w: "eligible", p: [["e", "a", "ex"], ["lig", "r", "lect"], ["ible", "a", "able"]], m: "資格がある・対象となる", n: "選び出されることができる,から「資格がある」(be eligible for 〜).", ex: "Full-time employees are eligible for the bonus.", ja: "常勤社員はボーナスの対象となる.", d: 1200 },
+  // cid / cis(切る)
+  { id: "w198", w: "decide", p: [["de", "a"], ["cide", "r", "cid"]], m: "決める", n: "切り離す(迷いを断つ),から「決める」.", ex: "The committee will decide on the venue next week.", ja: "委員会は来週会場を決める.", d: 300 },
+  { id: "w199", w: "precise", p: [["pre", "a"], ["cise", "r", "cid"]], m: "正確な・精密な", n: "前もって(端を)切りそろえた,から「正確な」.", ex: "We need precise measurements before ordering the furniture.", ja: "家具を注文する前に正確な寸法が必要だ.", d: 800 },
+  { id: "w200", w: "concise", p: [["con", "a"], ["cise", "r", "cid"]], m: "簡潔な", n: "完全に切り詰めた,から「簡潔な」.", ex: "Please keep your presentation concise.", ja: "発表は簡潔にしてください.", d: 1200 },
+  // mand / mend(命じる・委ねる)
+  { id: "w201", w: "demand", p: [["de", "a"], ["mand", "r"]], m: "需要・強く求める", n: "(相手に)命じて求める,から「要求する」.ビジネスでは「需要」.", ex: "Demand for electric cars is growing.", ja: "電気自動車の需要が伸びている.", d: 500 },
+  { id: "w202", w: "recommend", p: [["re", "a"], ["com", "a", "con"], ["mend", "r", "mand"]], m: "勧める・推薦する", n: "(強く)委ねる,から「推薦する」.", ex: "I recommend booking your tickets early.", ja: "チケットは早めの予約をおすすめします.", d: 400 },
+  { id: "w203", w: "mandatory", p: [["mand", "r"], ["at", "a", "ate"], ["ory", "a"]], m: "義務的な・必須の", n: "命じられたもの,から「義務的な」.", ex: "Attendance at the safety meeting is mandatory.", ja: "安全会議への出席は必須だ.", d: 1100 },
+  // cred(信じる)
+  { id: "w204", w: "credible", p: [["cred", "r"], ["ible", "a", "able"]], m: "信用できる", n: "信じることができる,から「信用できる」.", ex: "The report is based on credible sources.", ja: "その報告は信用できる情報源に基づいている.", d: 1200 },
+  { id: "w205", w: "incredible", p: [["in", "a", "un"], ["cred", "r"], ["ible", "a", "able"]], m: "信じられないほどの・すばらしい", n: "信じることができない,から「信じられないほどの」.", ex: "The view from the hotel was incredible.", ja: "ホテルからの眺めはすばらしかった.", d: 600 },
+  // dur(続く)
+  { id: "w206", w: "durable", p: [["dur", "r"], ["able", "a"]], m: "耐久性のある・丈夫な", n: "続くことができる,から「長持ちする」.", ex: "These boots are light but durable.", ja: "このブーツは軽いが丈夫だ.", d: 900 },
+  { id: "w207", w: "duration", p: [["dur", "r"], ["ation", "a", "ion"]], m: "(継続)期間", n: "続くこと,から「期間」.", ex: "Please remain seated for the duration of the flight.", ja: "飛行中はずっとお座りください.", d: 1100 },
+  // medi(中間)
+  { id: "w208", w: "immediate", p: [["im", "a", "un"], ["medi", "r"], ["ate", "a"]], m: "即座の・直接の", n: "間に入るものがない,から「即座の」.", ex: "The new policy takes immediate effect.", ja: "新方針は即座に発効する.", d: 500 },
+  { id: "w209", w: "intermediate", p: [["inter", "a"], ["medi", "r"], ["ate", "a"]], m: "中級の・中間の", n: "間のさらに中間にある,から「中級の」.", ex: "The course is designed for intermediate learners.", ja: "その講座は中級者向けだ.", d: 900 },
+  // pet(求める)
+  { id: "w210", w: "compete", p: [["com", "a", "con"], ["pete", "r", "pet"]], m: "競争する", n: "共に(同じものを)求める,から「競争する」.", ex: "Small shops find it hard to compete with large chains.", ja: "小さな店は大手チェーンと競争するのが難しい.", d: 500 },
+  { id: "w211", w: "competent", p: [["com", "a", "con"], ["pet", "r"], ["ent", "a"]], m: "有能な", n: "(求められる水準に)共に達している,から「有能な」.", ex: "We are looking for a competent accountant.", ja: "有能な会計士を探している.", d: 1100 },
+  // sequ / secut(後に続く)
+  { id: "w212", w: "consequence", p: [["con", "a"], ["sequ", "r"], ["ence", "a", "ance"]], m: "結果・影響", n: "共に後に続いて起こるもの,から「結果」.", ex: "The delay had serious consequences for the project.", ja: "その遅れは計画に深刻な影響を及ぼした.", d: 900 },
+  { id: "w213", w: "subsequent", p: [["sub", "a"], ["sequ", "r"], ["ent", "a"]], m: "その後の・次の", n: "すぐ下(後)に続く,から「その後の」.", ex: "Subsequent meetings will be held online.", ja: "以降の会議はオンラインで行われる.", d: 1300 },
+  { id: "w214", w: "consecutive", p: [["con", "a"], ["secut", "r", "sequ"], ["ive", "a"]], m: "連続した", n: "共に後に続いていく,から「連続した」.", ex: "Sales have risen for three consecutive months.", ja: "売上は3か月連続で伸びている.", d: 1200 },
+  // prehend / pris(つかむ)
+  { id: "w215", w: "comprehensive", p: [["com", "a", "con"], ["prehens", "r", "prehend"], ["ive", "a"]], m: "包括的な・総合的な", n: "完全につかむ性質,から「包括的な」.", ex: "The report gives a comprehensive overview of the market.", ja: "その報告書は市場を包括的に概観している.", d: 1000 },
+  { id: "w216", w: "enterprise", p: [["enter", "a", "inter"], ["prise", "r", "prehend"]], m: "企業・事業", n: "(仕事を)間に手でつかむこと(引き受けること),から「事業・企業」.", ex: "The program supports small and medium-sized enterprises.", ja: "その制度は中小企業を支援する.", d: 900 },
+  // fid(信頼する)
+  { id: "w217", w: "confident", p: [["con", "a"], ["fid", "r"], ["ent", "a"]], m: "自信がある・確信している", n: "完全に信頼している,から「確信している」.", ex: "We are confident that the new product will sell well.", ja: "新製品はよく売れると確信している.", d: 500 },
+  { id: "w218", w: "confidential", p: [["con", "a"], ["fid", "r"], ["ent", "a"], ["ial", "a", "al"]], m: "機密の・内密の", n: "信頼して(他に)打ち明けない,から「機密の」.", ex: "This document is strictly confidential.", ja: "この書類は極秘だ.", d: 1000 },
+  // loc(場所)
+  { id: "w219", w: "locate", p: [["loc", "r"], ["ate", "a"]], m: "(be located で)位置する・見つける", n: "場所に置く,から「位置する・場所を突き止める」.", ex: "The hotel is located near the station.", ja: "ホテルは駅の近くにある.", d: 500 },
+  { id: "w220", w: "relocate", p: [["re", "a"], ["loc", "r"], ["ate", "a"]], m: "移転する", n: "再び場所に置く,から「移転する」.", ex: "The company will relocate its headquarters to Osaka.", ja: "その会社は本社を大阪に移転する.", d: 1000 },
+  { id: "w221", w: "allocate", p: [["al", "a", "ad"], ["loc", "r"], ["ate", "a"]], m: "(予算・資源を)配分する", n: "〜へ場所を割り振る,から「配分する」.", ex: "More money will be allocated to marketing.", ja: "マーケティングにより多くの資金が配分される.", d: 1200 },
+  // spir(息をする)
+  { id: "w222", w: "expire", p: [["ex", "a"], ["pire", "r", "spir"]], m: "期限が切れる", n: "息を吐き出す(息が尽きる),から「期限が切れる」.", ex: "Your membership will expire at the end of May.", ja: "会員資格は5月末で期限が切れる.", d: 800 },
+  { id: "w223", w: "inspire", p: [["in", "a"], ["spire", "r", "spir"]], m: "着想を与える・奮い立たせる", n: "息を吹き込む,から「着想を与える・鼓舞する」.", ex: "The design was inspired by traditional Japanese houses.", ja: "そのデザインは日本の伝統家屋に着想を得た.", d: 900 },
+  // lat(運ぶ)
+  { id: "w224", w: "translate", p: [["trans", "a"], ["late", "r", "lat"]], m: "翻訳する", n: "向こうへ運ぶ(言葉を移す),から「翻訳する」.", ex: "The manual has been translated into five languages.", ja: "マニュアルは5か国語に翻訳されている.", d: 400 },
+  { id: "w225", w: "relate", p: [["re", "a"], ["late", "r", "lat"]], m: "関係づける・(related で)関連した", n: "元へ運び戻す(結びつける),から「関係づける」.", ex: "Please send any questions related to the event to me.", ja: "イベントに関する質問は私までお送りください.", d: 500 },
+  // ple / plete(満たす)
+  { id: "w226", w: "complete", p: [["com", "a", "con"], ["plete", "r", "ple"]], m: "完成させる・(用紙に)記入する", n: "完全に満たす,から「完成させる」.complete a form で「用紙に記入する」.", ex: "Please complete the form and return it to the front desk.", ja: "用紙に記入してフロントに戻してください.", d: 300 },
+  { id: "w227", w: "implement", p: [["im", "a", "in"], ["ple", "r"], ["ment", "a"]], m: "(計画を)実行に移す", n: "中を満たす(仕上げる),から「(計画を)実行する」.", ex: "The new procedures will be implemented next month.", ja: "新しい手順は来月実施される.", d: 1100 },
+  { id: "w228", w: "supplement", p: [["sup", "a", "sub"], ["ple", "r"], ["ment", "a"]], m: "補足・補うもの", n: "下から満たすもの,から「補足するもの」.", ex: "The vitamins are sold as a dietary supplement.", ja: "そのビタミンは栄養補助食品として売られている.", d: 1200 },
+  // tribut(与える)
+  { id: "w229", w: "distribute", p: [["dis", "a"], ["tribute", "r", "tribut"]], m: "配布する・流通させる", n: "別々に与える,から「配る」.", ex: "Flyers were distributed at the station.", ja: "駅でチラシが配られた.", d: 600 },
+  { id: "w230", w: "contribute", p: [["con", "a"], ["tribute", "r", "tribut"]], m: "貢献する・寄付する", n: "共に与える,から「貢献する」.", ex: "Everyone contributed to the success of the project.", ja: "全員が計画の成功に貢献した.", d: 700 },
+  // volv(巻く)
+  { id: "w231", w: "involve", p: [["in", "a"], ["volve", "r", "volv"]], m: "伴う・関わらせる", n: "中に巻き込む,から「伴う・関わらせる」.", ex: "The job involves some travel.", ja: "その仕事には出張がいくらか伴う.", d: 700 },
+  // mod(型)
+  { id: "w232", w: "modify", p: [["mod", "r"], ["ify", "a"]], m: "(一部を)変更する", n: "型に合わせる,から「(一部を)変更する」.", ex: "You can modify your order before it is shipped.", ja: "発送前なら注文を変更できる.", d: 1000 },
+  { id: "w233", w: "accommodate", p: [["ac", "a", "ad"], ["com", "a", "con"], ["mod", "r"], ["ate", "a"]], m: "収容する・宿泊させる", n: "〜に(ぴったり)型を合わせる,から「受け入れる・収容する」.", ex: "The hall can accommodate up to 500 people.", ja: "そのホールは最大500人を収容できる.", d: 1200 },
+  // merc(商い)
+  { id: "w234", w: "commercial", p: [["com", "a", "con"], ["merc", "r"], ["ial", "a", "al"]], m: "商業の・コマーシャル", n: "共に商いをする,から「商業の」.", ex: "The building will be used for commercial purposes.", ja: "その建物は商業目的で使われる.", d: 700 },
+  { id: "w235", w: "merchant", p: [["merch", "r", "merc"], ["ant", "a", "ent"]], m: "商人・小売業者", n: "商いをする人.", ex: "Local merchants are preparing for the holiday sale.", ja: "地元の商店主たちが休日セールの準備をしている.", d: 900 },
+  // nounce(告げる)
+  { id: "w236", w: "announce", p: [["an", "a", "ad"], ["nounce", "r"]], m: "発表する", n: "〜へ告げる,から「発表する」.", ex: "The company announced a new partnership.", ja: "その会社は新しい提携を発表した.", d: 300 },
+  { id: "w237", w: "pronounce", p: [["pro", "a"], ["nounce", "r"]], m: "発音する", n: "前へ(声に出して)告げる,から「発音する」.", ex: "How do you pronounce this name?", ja: "この名前はどう発音しますか.", d: 700 },
+  // hibit(持つ)
+  { id: "w238", w: "exhibit", p: [["ex", "a"], ["hibit", "r"]], m: "展示する・展示品", n: "外に持ち出して見せる,から「展示する」.", ex: "The museum will exhibit works by local artists.", ja: "その美術館は地元の芸術家の作品を展示する.", d: 700 },
+  { id: "w239", w: "prohibit", p: [["pro", "a"], ["hibit", "r"]], m: "禁止する", n: "前に(立ちはだかって)保つ,から「禁止する」.", ex: "Photography is prohibited inside the theater.", ja: "劇場内での撮影は禁止されている.", d: 1000 }
+];

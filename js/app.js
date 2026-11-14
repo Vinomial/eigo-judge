@@ -1,0 +1,857 @@
+"use strict";
+/* 英語ジャッジ 本体
+ * 問題データは data/*.js が window に置く(WORDS, AFFIX, ROOT, THM, GRAM, READING).
+ * レート計算は js/rating.js(window.Rating).
+ * 進捗はこの端末の localStorage に保存する.
+ */
+
+const DOMAINS = { word: "単語", grammar: "文法", reading: "長文" };
+const SERIES = { all: "総合", word: "単語", grammar: "文法", reading: "長文" };
+const CONTEST = { word: 4, grammar: 4, sec: 720 }; // 単語4問 + 文法4問 + 長文1題(3問),12分
+const DAY = 86400000;
+const { tierOf, TIERS } = Rating;
+
+/* ---------------- 状態と保存 ---------------- */
+// v2: res[id] = { ac, wa, last: "AC" | "WA", t }(表示する状態は最後の結果)
+//     contests = [{ t, items: [{ id, dom, d, ok }], perf: { all, word, grammar, reading } }]
+//     レートは contests から毎回計算する(保存しない)
+const LS_KEY = "eigo-judge-v1";
+function freshState() {
+  // live: 解答中の本番(再読み込みやタブが閉じられても続きから再開・採点するため)
+  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, live: null, legacy: null, updatedAt: 0 };
+}
+function migrate(o) {
+  const s = freshState();
+  if (!o || typeof o !== "object") return s;
+  for (const k of Object.keys(s)) if (o[k] != null && k !== "ver") s[k] = o[k];
+  if (!o.ver) { // v1(Elo 方式)からの移行.問題ごとの成績は引き継ぎ,旧レートは記録として残す
+    for (const [id, st] of Object.entries(o.stats || {})) {
+      if (st && (st.ac || st.wa)) s.res[id] = { ac: st.ac || 0, wa: st.wa || 0, last: st.ac ? "AC" : "WA", t: o.updatedAt || 0 };
+    }
+    if (o.history && o.history.length) s.legacy = { ratings: o.ratings || {}, history: o.history };
+  }
+  return s;
+}
+let S = freshState();
+try { const raw = localStorage.getItem(LS_KEY); if (raw) S = migrate(JSON.parse(raw)); } catch (e) { /* 保存領域が使えない環境では毎回初期状態 */ }
+function save() {
+  S.updatedAt = Date.now();
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* noop */ }
+}
+
+/* ---------------- 共通 ---------------- */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function fmtSec(s) { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
+function signed(d) { return d >= 0 ? `<span class="up">+${d}</span>` : `<span class="down">${d}</span>`; }
+function dateKey(t) { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function fmtDate(t) { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}`; }
+const rc = r => `--rc:var(${tierOf(r).color})`;
+const rateSpan = r => (r == null ? `<span class="muted">-</span>` : `<b class="rate" style="${rc(r)}">${r}</b>`);
+const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+
+const WORD_BY = new Map(WORDS.map(w => [w.id, w]));
+const GRAM_BY = new Map(GRAM.map(g => [g.id, g]));
+const PASS_BY = new Map(READING.map(p => [p.id, p]));
+const passageD = p => Math.round(avg(p.qs.map(q => q.d)));
+
+/* 問題ごとの状態(最後の結果) */
+function record(id, ok, t = Date.now()) {
+  const r = S.res[id] || (S.res[id] = { ac: 0, wa: 0 });
+  ok ? r.ac++ : r.wa++;
+  r.last = ok ? "AC" : "WA"; r.t = t;
+  const k = dateKey(t); S.days[k] = (S.days[k] || 0) + 1;
+}
+const statusOf = id => (S.res[id] && S.res[id].last) || null;
+function passageStatus(p) {
+  const st = p.qs.map(q => statusOf(q.id));
+  if (st.every(x => x === "AC")) return "AC";
+  return st.some(Boolean) ? "WA" : null;
+}
+const unitStatus = (dom, id) => (dom === "reading" ? passageStatus(PASS_BY.get(id)) : statusOf(id));
+const isLearned = w => !!(S.srs[w.id] && S.srs[w.id].box >= 2);
+
+/* 単語の部品 [表記, "r"|"a", 元の形?] */
+const partKey = p => p[2] || p[0];
+const partDef = p => (p[1] === "r" ? ROOT : AFFIX)[partKey(p)];
+const rootOf = w => partKey(w.p.find(p => p[1] === "r"));
+function partHTML(p) {
+  const alias = p[2] ? `<span class="en">${p[2]}</span> の変化形,` : "";
+  return `<b class="en">${p[0]}</b>(${alias}${partDef(p)})`;
+}
+
+/* ---------------- レート ---------------- */
+function history(key) {
+  const perfs = [], out = [];
+  for (const c of S.contests) {
+    const p = c.perf[key];
+    if (p == null) continue;
+    perfs.push(p);
+    out.push({ t: c.t, perf: p, rating: Rating.rating(perfs), prev: out.length ? out[out.length - 1].rating : null });
+  }
+  return out;
+}
+const ratingOf = key => { const h = history(key); return h.length ? h[h.length - 1].rating : null; };
+const maxRating = key => Math.max(0, ...history(key).map(x => x.rating));
+// 本番の出題に使う推定値(補正なしの平均).表示レートは参加回数が少ないうちは低く出るため,こちらで難易度を合わせる
+function estimate(key) {
+  const ps = S.contests.map(c => c.perf[key]).filter(x => x != null);
+  return ps.length ? Rating.aperf(ps) : 600;
+}
+
+/* ---------------- 学習日数 ---------------- */
+function streaks() {
+  const days = new Set(Object.keys(S.days));
+  let cur = 0, d = new Date(); d.setHours(12, 0, 0, 0);
+  if (!days.has(dateKey(d))) d = new Date(d.getTime() - DAY); // 今日まだなら昨日から数える
+  while (days.has(dateKey(d))) { cur++; d = new Date(d.getTime() - DAY); }
+  let max = 0, run = 0, prev = null;
+  for (const k of [...days].sort()) {
+    const t = new Date(k + "T12:00:00").getTime();
+    run = prev != null && Math.round((t - prev) / DAY) === 1 ? run + 1 : 1;
+    prev = t; max = Math.max(max, run);
+  }
+  return { cur, max, total: days.size, today: S.days[dateKey(Date.now())] || 0 };
+}
+
+/* ---------------- 実績 ---------------- */
+function badgeCtx() {
+  const rq = READING.flatMap(p => p.qs);
+  const roots = Object.keys(ROOT).map(r => WORDS.filter(w => rootOf(w) === r));
+  return {
+    contests: S.contests.length,
+    perfect: S.contests.some(c => c.items.every(x => x.ok)),
+    maxPerf: Math.max(0, ...S.contests.map(c => c.perf.all || 0)),
+    maxAll: maxRating("all"),
+    streak: streaks().max,
+    learned: WORDS.filter(isLearned).length,
+    acTotal: [...WORDS, ...GRAM, ...rq].filter(q => statusOf(q.id) === "AC").length,
+    gramAll: GRAM.every(q => statusOf(q.id) === "AC"),
+    readAll: rq.every(q => statusOf(q.id) === "AC"),
+    rootDone: roots.filter(ws => ws.length && ws.every(isLearned)).length
+  };
+}
+const BADGES = [
+  { id: "c1", name: "初参加", desc: "本番を1回解く", ok: c => c.contests >= 1 },
+  { id: "c10", name: "常連", desc: "本番を10回解く", ok: c => c.contests >= 10 },
+  { id: "c30", name: "皆勤", desc: "本番を30回解く", ok: c => c.contests >= 30 },
+  { id: "perfect", name: "全完", desc: "本番で全問正解する", ok: c => c.perfect },
+  { id: "perf1000", name: "好パフォーマンス", desc: "パフォーマンス1000以上を出す", ok: c => c.maxPerf >= 1000 },
+  { id: "brown", name: "茶色", desc: "総合レート400に到達する", ok: c => c.maxAll >= 400 },
+  { id: "green", name: "緑色", desc: "総合レート800に到達する(TOEIC 550点の目安)", ok: c => c.maxAll >= 800 },
+  { id: "cyan", name: "水色", desc: "総合レート1200に到達する", ok: c => c.maxAll >= 1200 },
+  { id: "s3", name: "三日坊主卒業", desc: "3日続けて学習する", ok: c => c.streak >= 3 },
+  { id: "s7", name: "1週間", desc: "7日続けて学習する", ok: c => c.streak >= 7 },
+  { id: "s30", name: "習慣化", desc: "30日続けて学習する", ok: c => c.streak >= 30 },
+  { id: "ac50", name: "AC 50", desc: "50問を AC の状態にする", ok: c => c.acTotal >= 50 },
+  { id: "ac200", name: "AC 200", desc: "200問を AC の状態にする", ok: c => c.acTotal >= 200 },
+  { id: "root1", name: "語根制覇", desc: "1つの語根の単語をすべて習得する", ok: c => c.rootDone >= 1 },
+  { id: "w100", name: "100語", desc: "単語を100語習得する", ok: c => c.learned >= 100 },
+  { id: "gall", name: "文法全 AC", desc: "文法の全問題を AC の状態にする", ok: c => c.gramAll },
+  { id: "rall", name: "長文全 AC", desc: "長文の全設問を AC の状態にする", ok: c => c.readAll }
+];
+function checkBadges() {
+  const c = badgeCtx(), fresh = BADGES.filter(b => !S.badges[b.id] && b.ok(c));
+  if (!fresh.length) return;
+  fresh.forEach(b => { S.badges[b.id] = Date.now(); toast(`<b>実績解除</b> ${esc(b.name)}<br><span class="small">${esc(b.desc)}</span>`); });
+  save();
+}
+function toast(html) {
+  const el = document.createElement("div");
+  el.className = "toast"; el.innerHTML = html;
+  $("#toasts").append(el);
+  setTimeout(() => el.classList.add("out"), 3800);
+  setTimeout(() => el.remove(), 4300);
+}
+
+/* ---------------- 出題 ---------------- */
+const INTERVAL = [0, 1, 2, 4, 8, 16, 32]; // 間隔反復の日数
+function updateSrs(id, ok) {
+  const s = S.srs[id] || { box: 0, due: 0 };
+  if (ok) { s.box = Math.min(s.box + 1, INTERVAL.length - 1); s.due = Date.now() + INTERVAL[s.box] * DAY; }
+  else { s.box = 0; s.due = Date.now() + 10 * 60000; }
+  S.srs[id] = s;
+}
+const dueWords = () => WORDS.filter(w => S.srs[w.id] && S.srs[w.id].due <= Date.now());
+function pickNear(pool, T, k, penalty) {
+  return pool.map(q => ({ q, s: Math.abs(q.d - T) + Math.random() * 200 + (penalty ? penalty(q) : 0) }))
+    .sort((a, b) => a.s - b.s).slice(0, k).map(x => x.q);
+}
+// おまかせ(練習)
+function autoPick(dom, avoid) {
+  if (dom === "word") {
+    const due = dueWords().sort((a, b) => S.srs[a.id].due - S.srs[b.id].due);
+    if (due.length) return due[0].id;
+    const unseen = WORDS.filter(w => !S.srs[w.id]);
+    if (unseen.length) return pickNear(unseen, estimate("word"), 1)[0].id;
+    return shuffle(WORDS.filter(w => w.id !== avoid))[0].id;
+  }
+  if (dom === "grammar") {
+    const notAC = GRAM.filter(q => statusOf(q.id) !== "AC" && q.id !== avoid);
+    return pickNear(notAC.length ? notAC : GRAM.filter(q => q.id !== avoid), estimate("grammar"), 1)[0].id;
+  }
+  const notAC = READING.filter(p => passageStatus(p) !== "AC" && p.id !== avoid);
+  const pool = (notAC.length ? notAC : READING.filter(p => p.id !== avoid)).map(p => ({ id: p.id, d: passageD(p) }));
+  return pickNear(pool.length ? pool : READING.map(p => ({ id: p.id, d: passageD(p) })), estimate("reading"), 1)[0].id;
+}
+
+/* 1問を表す共通の形: {dom, q, p?}  p は長文のときの本文 */
+// 意味に同じ漢字を含む語は紛らわしい(含む/含める,延期する/先送りする)ので選択肢に並べない
+const KANJI = /[一-鿿]/g;
+function overlaps(a, b) { const s = new Set(a.match(KANJI) || []); return (b.match(KANJI) || []).some(c => s.has(c)); }
+function wordChoices(q) {
+  const picked = [];
+  const ok = w => w.id !== q.id && !picked.includes(w) && [q, ...picked].every(x => !overlaps(x.m, w.m));
+  // 同じ語根の単語を優先する(接辞の意味で見分ける練習になる)
+  const root = rootOf(q);
+  for (const w of shuffle(WORDS.filter(w => rootOf(w) === root))) if (picked.length < 2 && ok(w)) picked.push(w);
+  for (const w of shuffle(WORDS)) if (picked.length < 3 && ok(w)) picked.push(w);
+  return shuffle([q.m, ...picked.map(w => w.m)]);
+}
+function newSt(item) { return { sel: null, choices: item.dom === "word" ? wordChoices(item.q) : null }; }
+function isCorrect(item, st) {
+  if (st.sel == null) return false;
+  if (item.dom === "word") return st.choices[st.sel] === item.q.m;
+  return st.sel === item.q.a;
+}
+
+/* ---------------- 画面の切り替え ---------------- */
+let view = "home", pState = null, cState = null, timerId = null, pendingNav = null;
+const LIST = Object.assign({ dom: "word", filter: "all" }, S.prefs.list || {});
+function contestRunning() { return cState && !cState.done; }
+
+$("#nav").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const to = b.dataset.v;
+  if (contestRunning() && to !== "contest") { pendingNav = to; view = "contest"; render(); return; }
+  if (to === "list" && view === "list" && pState) { stopTimer(); pState = null; } // 一覧タブをもう一度押すと一覧に戻る
+  go(to);
+});
+function renderHeader() {
+  const r = ratingOf("all");
+  $("#hdr-rate").innerHTML = r == null ? "" : `<span class="pill" style="${rc(r)}">総合 ${r}</span>`;
+}
+function go(to) { view = to; pendingNav = null; render(); window.scrollTo(0, 0); }
+function render() {
+  $$("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === view ? "page" : "false"));
+  renderHeader();
+  if (view === "home") $("#main").innerHTML = homeHTML();
+  else if (view === "list") renderList();
+  else if (view === "contest") renderContest();
+  else if (view === "record") renderRecord();
+  else $("#main").innerHTML = defsHTML();
+  $$("[data-go]").forEach(b => b.onclick = () => {
+    if (b.dataset.go === "auto") { startSolve(b.dataset.dom || LIST.dom, null, null); return; }
+    go(b.dataset.go);
+  });
+}
+
+/* ---------------- ホーム ---------------- */
+function ratingCells() {
+  return Object.keys(DOMAINS).map(k => {
+    const r = ratingOf(k);
+    return `<div class="rt" style="${rc(r || 0)}"><div class="lab">${DOMAINS[k]}</div><div class="val">${r == null ? "-" : r}</div>
+      <div class="sub">${r == null ? "本番未参加" : `${tierOf(r).name}色 · ${tierOf(r).title}`}</div></div>`;
+  }).join("");
+}
+function heroHTML() {
+  const r = ratingOf("all");
+  if (r == null) return `<div class="hero"><div class="lab">総合レート</div><div class="big muted">-</div><p class="small muted" style="margin:4px 0 0">本番を1回解くと,レートがつきます.</p></div>`;
+  const t = tierOf(r), next = TIERS.find(x => x.min > r);
+  const pct = next ? Math.round(100 * (r - t.min) / (next.min - t.min)) : 100;
+  return `<div class="hero" style="${rc(r)}">
+    <div class="lab">総合レート · <b style="color:var(--rc)">${t.name}色 ${t.title}</b></div>
+    <div class="big">${r}</div>
+    ${next ? `<div class="nextbar"><span style="width:${pct}%"></span></div><div class="small muted">${next.name}色まであと ${next.min - r}</div>` : ""}
+  </div>`;
+}
+function homeHTML() {
+  const due = dueWords().length, sk = streaks();
+  return `
+  ${heroHTML()}
+  <div class="ratings">${ratingCells()}</div>
+  <div class="streak"><div><b>${sk.cur}</b><span>日連続</span></div><div><b>${sk.today}</b><span>今日解いた問題</span></div><div><b>${sk.total}</b><span>学習日数</span></div></div>
+  <div class="row">
+    <button class="btn" data-go="contest">本番に挑戦する</button>
+    <button class="btn ghost" data-go="auto" data-dom="word">${due ? `単語を復習(${due}語)` : "おまかせで練習"}</button>
+  </div>
+  <p class="small muted">練習ではレートは動きません.本番(11問・12分)を解くとレートが変動します.</p>
+  <h2>進捗(今 AC の問題)</h2>
+  ${progressHTML()}`;
+}
+function progressHTML() {
+  const rq = READING.flatMap(p => p.qs);
+  const rows = [
+    ["単語", WORDS.filter(q => statusOf(q.id) === "AC").length, WORDS.length, `習得 ${WORDS.filter(isLearned).length}語`],
+    ["文法", GRAM.filter(q => statusOf(q.id) === "AC").length, GRAM.length, ""],
+    ["長文", rq.filter(q => statusOf(q.id) === "AC").length, rq.length, "設問"]
+  ];
+  return `<div class="prog">${rows.map(([lab, n, all, note]) => `
+    <div class="prow"><span>${lab}</span><span class="pbar"><span style="width:${all ? (100 * n / all).toFixed(1) : 0}%"></span></span><span class="small muted">${n}/${all}${note ? ` · ${note}` : ""}</span></div>`).join("")}</div>`;
+}
+
+/* ---------------- 問題一覧 ---------------- */
+function units(dom) {
+  if (dom === "word") return WORDS.map(q => ({ id: q.id, d: q.d, label: `<span class="en">${q.w}</span>` }));
+  if (dom === "grammar") return GRAM.map(q => ({ id: q.id, d: q.d, label: `<span class="pid">G${q.id.slice(1)}</span>${esc(THM[q.t].name)}` }));
+  return READING.map(p => ({ id: p.id, d: passageD(p), label: `<span class="pid">R${p.id.slice(1)}</span>${esc(p.kind)}` }));
+}
+function filteredUnits() {
+  const f = LIST.filter;
+  return units(LIST.dom).filter(u => {
+    const s = unitStatus(LIST.dom, u.id);
+    return f === "all" || (f === "notac" && s !== "AC") || (f === "wa" && s === "WA");
+  }).sort((a, b) => a.d - b.d || a.id.localeCompare(b.id, "en", { numeric: true }));
+}
+function renderList() {
+  if (pState) { renderSolve(); return; }
+  const m = $("#main"), all = units(LIST.dom);
+  const cnt = s => all.filter(u => unitStatus(LIST.dom, u.id) === s).length;
+  const shown = filteredUnits();
+  const bands = TIERS.map((t, i) => {
+    const hi = TIERS[i + 1] ? TIERS[i + 1].min : Infinity;
+    const inBand = all.filter(u => u.d >= t.min && u.d < hi);
+    const us = shown.filter(u => u.d >= t.min && u.d < hi);
+    if (!inBand.length) return "";
+    const ac = inBand.filter(u => unitStatus(LIST.dom, u.id) === "AC").length;
+    return `<section class="band">
+      <h3><span class="dot" style="--rc:var(${t.color})"></span>${t.name} <span class="muted small">${t.min}〜${hi === Infinity ? "" : hi - 1}</span><span class="small muted" style="margin-left:auto">AC ${ac}/${inBand.length}</span></h3>
+      ${us.length ? `<div class="chips">${us.map(u => {
+        const s = unitStatus(LIST.dom, u.id);
+        return `<button class="chip${s ? " st-" + s.toLowerCase() : ""}" data-pid="${u.id}"><span class="dot" style="${rc(u.d)}"></span><span class="cl">${u.label}</span><span class="cd">${u.d}</span></button>`;
+      }).join("")}</div>` : `<p class="small muted">該当なし</p>`}
+    </section>`;
+  }).join("");
+  m.innerHTML = `
+    <div class="seg" role="group" aria-label="分野">${Object.keys(DOMAINS).map(k => `<button data-dom="${k}" aria-pressed="${LIST.dom === k}">${DOMAINS[k]}</button>`).join("")}</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:6px">
+      <div class="seg sm" role="group" aria-label="絞り込み">${[["all", "すべて"], ["notac", "未 AC"], ["wa", "WA"]].map(([k, v]) => `<button data-f="${k}" aria-pressed="${LIST.filter === k}">${v}</button>`).join("")}</div>
+      <button class="btn" data-go="auto">おまかせ</button>
+    </div>
+    <p class="mode-note">AC ${cnt("AC")} · WA ${cnt("WA")} · 未挑戦 ${all.length - cnt("AC") - cnt("WA")}(全 ${all.length}${LIST.dom === "reading" ? "題" : "問"}).最後に解いた結果を表示します.問題を押すと練習モードで解けます.</p>
+    ${bands}`;
+  const savePref = () => { S.prefs.list = { dom: LIST.dom, filter: LIST.filter }; save(); };
+  m.querySelectorAll("[data-dom]").forEach(b => b.onclick = () => { LIST.dom = b.dataset.dom; savePref(); renderList(); });
+  m.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { LIST.filter = b.dataset.f; savePref(); renderList(); });
+  m.querySelectorAll("[data-pid]").forEach(b => b.onclick = () => startSolve(LIST.dom, b.dataset.pid, filteredUnits().map(u => u.id)));
+  $$("[data-go]").forEach(b => b.onclick = () => (b.dataset.go === "auto" ? startSolve(LIST.dom, null, null) : go(b.dataset.go)));
+}
+
+/* ---------------- 練習モード(1問を解く) ---------------- */
+// ids があれば一覧の並びで次へ進む.なければおまかせで次を選ぶ
+function startSolve(dom, id, ids) {
+  stopTimer();
+  pState = { dom, ids, id: id || autoPick(dom) };
+  setupItem();
+  view = "list"; pendingNav = null; render(); window.scrollTo(0, 0);
+}
+function setupItem() {
+  const { dom, id } = pState;
+  pState.prev = unitStatus(dom, id); // 開いた時点の結果(解いた後も「前回」として表示する)
+  if (dom === "reading") {
+    const p = PASS_BY.get(id);
+    Object.assign(pState, { passage: p, sts: p.qs.map(() => ({ sel: null })), start: Date.now(), done: false, item: { dom, p } });
+  } else {
+    const q = dom === "word" ? WORD_BY.get(id) : GRAM_BY.get(id);
+    pState.item = { dom, q }; pState.st = newSt(pState.item);
+  }
+}
+function nextSolve() {
+  stopTimer();
+  const { dom, ids, id } = pState;
+  if (ids) {
+    const i = ids.indexOf(id);
+    if (i < 0 || i + 1 >= ids.length) { pState = null; toast("一覧の最後まで解きました."); render(); window.scrollTo(0, 0); return; }
+    pState.id = ids[i + 1];
+  } else pState.id = autoPick(dom, id);
+  setupItem(); render(); window.scrollTo(0, 0);
+}
+function backToList() { stopTimer(); pState = null; render(); window.scrollTo(0, 0); }
+function solveTop() {
+  const { dom, ids, id } = pState;
+  const pos = ids ? `${ids.indexOf(id) + 1} / ${ids.length}` : "おまかせ";
+  const s = pState.prev;
+  return `<div class="row" style="justify-content:space-between;margin-bottom:12px">
+    <button class="btn ghost sm" id="back-btn">← 一覧</button>
+    <span class="small muted">${DOMAINS[dom]} · ${pos}${s ? ` · 前回 <span class="verdict ${s.toLowerCase()} xs">${s}</span>` : ""}</span>
+  </div>`;
+}
+function renderSolve() {
+  const m = $("#main");
+  m.innerHTML = solveTop() + `<p class="mode-note">練習モード:${pState.dom === "reading" ? "全問に答えて提出すると判定します" : "1問ごとにすぐ判定します.キーボードの 1〜4 でも選べます"}.レートは動きません.</p><div class="card" id="qcard"></div>`;
+  $("#back-btn").onclick = backToList;
+  if (pState.dom === "reading") renderSolveReading(); else renderSolveSingle();
+}
+function renderSolveSingle() {
+  const item = pState.item, st = pState.st, card = $("#qcard");
+  card.innerHTML = itemHTML(item, st) + `<div id="result"></div><div class="row" style="margin-top:16px" id="actions"></div>`;
+  const show = () => {
+    const ok = isCorrect(item, st);
+    $("#result").innerHTML = `<p style="margin-top:16px"><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span></p>` + editorialHTML(item);
+    markChoices(card, item, st);
+    $("#actions").innerHTML = `<button class="btn" id="next-btn">次の問題</button><button class="btn ghost" id="list-btn">一覧へ</button>`;
+    $("#next-btn").onclick = nextSolve;
+    $("#list-btn").onclick = backToList;
+    $("#next-btn").focus({ preventScroll: true });
+  };
+  if (st.done) { show(); return; }
+  bindChoices(card, st, () => {
+    st.done = true;
+    const ok = isCorrect(item, st);
+    record(item.q.id, ok);
+    if (item.dom === "word") updateSrs(item.q.id, ok);
+    save(); show(); checkBadges();
+  });
+}
+function renderSolveReading() {
+  const p = pState.passage, sts = pState.sts, card = $("#qcard");
+  const done = pState.done;
+  const evs = done ? p.qs.flatMap(q => q.ev) : [];
+  card.innerHTML = `
+    <div class="timebar"><span class="muted">${esc(p.kind)} · 目標 ${fmtSec(p.target)}</span><span class="timer" id="ptimer"></span></div>
+    ${passageHTML(p, evs)}
+    ${p.qs.map((q, k) => `<div class="rq" data-k="${k}">${metaHTML("reading", q.d)}<p class="qtext en">${k + 1}. ${esc(q.q)}</p>${choicesHTML(q.c, sts[k], true)}<div class="rres"></div></div>`).join("")}
+    <div id="rsum"></div>
+    <div class="row" style="margin-top:18px" id="actions"></div>`;
+  const blocks = card.querySelectorAll(".rq");
+  if (done) {
+    const sec = pState.elapsed;
+    $("#ptimer").textContent = fmtSec(sec);
+    let score = 0;
+    blocks.forEach((el, k) => {
+      const item = { dom: "reading", p, q: p.qs[k] }, ok = isCorrect(item, sts[k]);
+      if (ok) score++;
+      markChoices(el, item, sts[k]);
+      el.querySelector(".rres").innerHTML = `<p style="margin-top:12px"><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span></p>` + editorialHTML(item);
+    });
+    const diff = sec - p.target;
+    $("#rsum").innerHTML = `<div class="editorial"><h3>結果</h3><p>${score} / ${p.qs.length} 問正解 · 所要時間 ${fmtSec(sec)}(目標より ${diff <= 0 ? `<span class="up">${fmtSec(-diff)} 速い</span>` : `<span class="down">${fmtSec(diff)} 遅い</span>`})</p>
+      <h3>本文の訳</h3><p>${p.ja}</p></div>`;
+    $("#actions").innerHTML = `<button class="btn" id="next-btn">次の長文</button><button class="btn ghost" id="list-btn">一覧へ</button>`;
+    $("#next-btn").onclick = nextSolve;
+    $("#list-btn").onclick = backToList;
+    return;
+  }
+  blocks.forEach((el, k) => bindChoices(el, sts[k], refresh));
+  $("#actions").innerHTML = `<button class="btn" id="submit-btn">提出する</button><span class="small muted" id="left"></span>`;
+  function refresh() {
+    const left = sts.filter(s => s.sel == null).length;
+    $("#submit-btn").disabled = left > 0;
+    $("#left").textContent = left ? `あと ${left} 問` : "";
+  }
+  refresh();
+  $("#submit-btn").onclick = () => {
+    stopTimer();
+    pState.elapsed = (Date.now() - pState.start) / 1000;
+    pState.done = true;
+    p.qs.forEach((q, k) => record(q.id, isCorrect({ dom: "reading", q }, sts[k])));
+    (S.readTimes[p.id] = S.readTimes[p.id] || []).push(Math.round(pState.elapsed));
+    save(); renderSolveReading(); checkBadges();
+  };
+  const tick = () => { const el = $("#ptimer"); if (el) el.textContent = fmtSec((Date.now() - pState.start) / 1000); };
+  tick(); stopTimer(); timerId = setInterval(tick, 1000);
+}
+function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+
+/* ---------------- 問題と解説の描画 ---------------- */
+function metaHTML(dom, d) {
+  return `<div class="qmeta"><span>${DOMAINS[dom]}</span><span><span class="dot" style="${rc(d)}"></span>難易度 ${d}</span></div>`;
+}
+function choicesHTML(list, st, en) {
+  return `<div class="choices">${list.map((c, i) => `<button class="choice${en ? " en" : ""}" data-i="${i}" aria-pressed="${st.sel === i}"><span class="key">${"ABCD"[i]}</span>${esc(c)}</button>`).join("")}</div>`;
+}
+function passageHTML(p, evs) {
+  const ev = new Set(evs || []);
+  return `<div class="passage en"><div class="ptitle">${esc(p.kind)}:${esc(p.title)}</div>${p.s.map((t, i) => `<p${ev.has(i) ? ' class="ev"' : ""}>${esc(t)}</p>`).join("")}</div>`;
+}
+function itemHTML(item, st) {
+  const q = item.q;
+  if (item.dom === "word") {
+    const ex = esc(q.ex).replace(new RegExp("\\b(" + q.w.slice(0, -1) + "\\w*)", "i"), "<b>$1</b>");
+    return metaHTML("word", q.d) + `<p class="word en">${q.w}</p><p class="sentence en">${ex}</p><p class="small muted">この単語の意味は?</p>` + choicesHTML(st.choices, st, false);
+  }
+  if (item.dom === "grammar") {
+    return metaHTML("grammar", q.d) + `<p class="sentence en">${esc(q.q).replace("____", '<span class="blank">&nbsp;</span>')}</p>` + choicesHTML(q.c, st, true);
+  }
+  return metaHTML("reading", q.d) + passageHTML(item.p) + `<p class="qtext en"><b>${esc(q.q)}</b></p>` + choicesHTML(q.c, st, true);
+}
+function editorialHTML(item) {
+  const q = item.q;
+  if (item.dom === "word") {
+    const chain = q.p.map(partHTML).join(" + ");
+    const root = rootOf(q);
+    const sib = WORDS.filter(w => w.id !== q.id && rootOf(w) === root).map(w => `${w.w}(${w.m})`).join(", ");
+    return `<div class="editorial"><h3>導出</h3><p class="derive">${chain} → <b>${q.m}</b></p><p>${q.n}</p>
+      <h3>例文の訳</h3><p>${q.ja}</p>${sib ? `<h3>同じ語根から導ける単語</h3><p class="en">${esc(sib)}</p>` : ""}</div>`;
+  }
+  if (item.dom === "grammar") {
+    const t = THM[q.t];
+    return `<div class="editorial"><h3>使う定理:${t.name}</h3><div class="thm">${t.s}</div>
+      <p class="small muted">前提の定義:${t.def}</p><h3>この問題では</h3><p>${q.why}</p><h3>訳</h3><p>${q.ja}</p></div>`;
+  }
+  const evText = q.ev.map(i => `<p class="en"><span class="ev" style="background:var(--hl)">${esc(item.p.s[i])}</span></p>`).join("");
+  return `<div class="editorial"><h3>根拠の文</h3>${evText}<h3>解き方</h3><p>${q.why}</p></div>`;
+}
+function markChoices(root, item, st) {
+  root.querySelectorAll(".choice").forEach((b, i) => {
+    b.disabled = true;
+    const right = item.dom === "word" ? st.choices[i] === item.q.m : i === item.q.a;
+    if (right) b.classList.add("right"); else if (i === st.sel) b.classList.add("wrong");
+  });
+}
+function bindChoices(root, st, onPick) {
+  root.querySelectorAll(".choice").forEach(b => b.onclick = () => {
+    st.sel = +b.dataset.i;
+    root.querySelectorAll(".choice").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    if (onPick) onPick();
+  });
+}
+
+/* ---------------- 本番モード ---------------- */
+function startContest() {
+  // 最近3回の本番に出た問題と,今 AC の問題を避ける
+  const recent = new Set(S.contests.slice(-3).flatMap(c => c.items.map(x => x.id)));
+  const pen = id => (recent.has(id) ? 400 : 0) + (statusOf(id) === "AC" ? 150 : 0);
+  const passages = READING.map(p => ({ id: p.id, d: passageD(p) }));
+  const pp = pickNear(passages, estimate("reading"), 1, u => (p => (p.qs.some(q => recent.has(q.id)) ? 400 : 0) + (passageStatus(p) === "AC" ? 150 : 0))(PASS_BY.get(u.id)))[0];
+  const p = PASS_BY.get(pp.id);
+  const items = [
+    ...pickNear(WORDS, estimate("word"), CONTEST.word, q => pen(q.id)).map(q => ({ dom: "word", q })),
+    ...pickNear(GRAM, estimate("grammar"), CONTEST.grammar, q => pen(q.id)).map(q => ({ dom: "grammar", q })),
+    ...p.qs.map(q => ({ dom: "reading", q, p }))
+  ];
+  cState = { items, sts: items.map(newSt), i: 0, end: Date.now() + CONTEST.sec * 1000, done: false, confirming: false };
+  stopTimer(); timerId = setInterval(contestTick, 1000);
+  persistContest();
+  renderContest();
+}
+function persistContest() {
+  S.live = contestRunning() ? {
+    items: cState.items.map(it => ({ dom: it.dom, id: it.q.id })),
+    sts: cState.sts.map(s => ({ sel: s.sel, choices: s.choices })),
+    i: cState.i, end: cState.end
+  } : null;
+  save();
+}
+// 起動時:途中の本番があれば再開する.時間切れなら採点する
+const Q_PASSAGE = new Map(READING.flatMap(p => p.qs.map(q => [q.id, p])));
+function restoreContest() {
+  const L = S.live;
+  if (!L) return;
+  try {
+    const items = L.items.map(({ dom, id }) => {
+      if (dom === "word") return { dom, q: WORD_BY.get(id) };
+      if (dom === "grammar") return { dom, q: GRAM_BY.get(id) };
+      const p = Q_PASSAGE.get(id);
+      return { dom, q: p.qs.find(q => q.id === id), p };
+    });
+    if (items.some(it => !it.q)) throw new Error("missing");
+    cState = { items, sts: L.sts.map(s => ({ sel: s.sel, choices: s.choices })), i: L.i || 0, end: L.end, done: false, confirming: false };
+    view = "contest";
+    if (Date.now() >= L.end) { finishContest(); setTimeout(() => toast("前回の本番は時間切れだったので採点しました."), 300); }
+    else timerId = setInterval(contestTick, 1000);
+  } catch (e) { cState = null; S.live = null; save(); }
+}
+function contestTick() {
+  if (!contestRunning()) { stopTimer(); return; }
+  const left = (cState.end - Date.now()) / 1000;
+  const el = $("#timer");
+  if (el) { el.textContent = `残り ${fmtSec(left)}`; el.classList.toggle("low", left <= 60); }
+  if (left <= 0) { finishContest(); if (view === "contest") renderContest(); }
+}
+function finishContest() {
+  if (!contestRunning()) return;
+  stopTimer();
+  cState.done = true;
+  const t = Date.now();
+  const items = cState.items.map((it, i) => ({ id: it.q.id, dom: it.dom, d: it.q.d, ok: isCorrect(it, cState.sts[i]) ? 1 : 0 }));
+  const before = {};
+  Object.keys(SERIES).forEach(k => before[k] = ratingOf(k));
+  const perf = { all: Rating.performance(items) };
+  Object.keys(DOMAINS).forEach(k => perf[k] = Rating.performance(items.filter(x => x.dom === k)));
+  items.forEach(x => { record(x.id, !!x.ok, t); if (x.dom === "word") updateSrs(x.id, !!x.ok); });
+  S.contests.push({ t, items, perf });
+  const after = {};
+  Object.keys(SERIES).forEach(k => after[k] = ratingOf(k));
+  cState.res = items.map(x => !!x.ok);
+  cState.sum = { before, after, perf };
+  S.live = null;
+  save();
+  renderHeader();
+  checkBadges();
+}
+const unanswered = () => cState.sts.filter(s => s.sel == null).length;
+
+function renderContest() {
+  const m = $("#main");
+  if (!cState) {
+    m.innerHTML = `
+      <div class="card">
+        <p style="margin-top:0"><b>本番モード</b>:11問・制限時間12分.単語4問,文法4問,長文1題(3問)を,今の実力に近い難易度から出題します.</p>
+        <p class="small muted">解答中は正誤を表示しません.終了後にまとめて判定し,パフォーマンス(今回の出来)を計算してレートを更新します.時間切れになるとその時点で採点します.</p>
+        <button class="btn" id="start-btn">開始する</button>
+      </div>`;
+    $("#start-btn").onclick = startContest;
+    return;
+  }
+  if (cState.done) {
+    m.innerHTML = contestResultHTML();
+    $("#again-btn").onclick = () => { cState = null; renderContest(); };
+    $$("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+    return;
+  }
+  const i = cState.i, item = cState.items[i], st = cState.sts[i], n = cState.items.length;
+  const left = unanswered();
+  let banner = "";
+  if (pendingNav) {
+    banner = `<div class="banner"><p style="margin:0 0 10px">本番の途中です.ここで終了すると,未解答の問題は WA として採点されます.</p>
+      <div class="row"><button class="btn warn" id="leave-yes">終了して採点する</button><button class="btn ghost" id="leave-no">本番を続ける</button></div></div>`;
+  } else if (cState.confirming) {
+    banner = `<div class="banner"><p style="margin:0 0 10px">未解答が ${left} 問あります.このまま提出すると,未解答の問題は WA になります.</p>
+      <div class="row"><button class="btn warn" id="conf-yes">提出して採点する</button><button class="btn ghost" id="conf-no">解答に戻る</button></div></div>`;
+  }
+  m.innerHTML = `${banner}
+    <div class="ctop">
+      <span>${i + 1} / ${n}問目 <span class="small muted" id="left-count">(未解答 ${left})</span></span>
+      <span class="timer" id="timer"></span>
+    </div>
+    <div class="dots">${cState.items.map((_, k) => `<button class="qdot${k === i ? " cur" : ""}${cState.sts[k].sel != null ? " done" : ""}" data-j="${k}" aria-label="${k + 1}問目">${k + 1}</button>`).join("")}</div>
+    <div class="card" id="qcard">${itemHTML(item, st)}
+      <div class="row" style="margin-top:18px">
+        <button class="btn ghost" id="prev-btn" ${i === 0 ? "disabled" : ""}>前へ</button>
+        ${i < n - 1 ? `<button class="btn" id="next-btn">次へ</button>` : ""}
+        <button class="btn${i < n - 1 ? " ghost" : ""}" id="submit-btn" style="margin-left:auto">提出</button>
+      </div>
+    </div>`;
+  contestTick();
+  const moveTo = j => { cState.i = j; cState.confirming = false; persistContest(); renderContest(); };
+  bindChoices($("#qcard"), st, () => {
+    persistContest();
+    $("#left-count").textContent = `(未解答 ${unanswered()})`;
+    m.querySelector(`.qdot[data-j="${i}"]`).classList.add("done");
+  });
+  m.querySelectorAll(".qdot").forEach(b => b.onclick = () => moveTo(+b.dataset.j));
+  $("#prev-btn").onclick = () => moveTo(i - 1);
+  if (i < n - 1) $("#next-btn").onclick = () => moveTo(i + 1);
+  $("#submit-btn").onclick = () => {
+    if (unanswered() && !cState.confirming) { cState.confirming = true; renderContest(); window.scrollTo(0, 0); return; }
+    finishContest(); renderContest(); window.scrollTo(0, 0);
+  };
+  if (pendingNav) {
+    $("#leave-yes").onclick = () => { const to = pendingNav; finishContest(); go(to); };
+    $("#leave-no").onclick = () => { pendingNav = null; render(); };
+  }
+  if (cState.confirming && !pendingNav) {
+    $("#conf-yes").onclick = () => { finishContest(); renderContest(); window.scrollTo(0, 0); };
+    $("#conf-no").onclick = () => { cState.confirming = false; renderContest(); };
+  }
+}
+function contestResultHTML() {
+  const c = cState, score = c.res.filter(Boolean).length, { before, after, perf } = c.sum;
+  const promos = Object.keys(SERIES).filter(k => after[k] != null && tierOf(after[k]).min > tierOf(before[k] || 0).min);
+  const promoHTML = promos.map(k => { const t = tierOf(after[k]); return `<div class="promo" style="${rc(after[k])}"><b>昇格!</b> ${SERIES[k]}が<b>${t.name}色(${t.title})</b>になりました</div>`; }).join("");
+  const rows = Object.keys(SERIES).map(k => {
+    const b = before[k], a = after[k];
+    return `<tr${k === "all" ? ' class="strong"' : ""}><td>${SERIES[k]}</td><td>${rateSpan(perf[k])}</td><td>${b == null ? `<span class="muted small">初参加</span>` : rateSpan(b)} → ${rateSpan(a)}</td><td>${b == null ? "" : signed(a - b)}</td></tr>`;
+  }).join("");
+  const shown = new Set();
+  const det = c.items.map((item, i) => {
+    const st = c.sts[i], ok = c.res[i], q = item.q;
+    let title, yours, ans, extra = "";
+    if (item.dom === "word") {
+      title = `<span class="en">${q.w}</span>`;
+      yours = st.sel == null ? "未解答" : esc(st.choices[st.sel]);
+      ans = esc(q.m);
+    } else {
+      title = `<span class="en">${esc(q.q)}</span>`;
+      yours = st.sel == null ? "未解答" : `<span class="en">${esc(q.c[st.sel])}</span>`;
+      ans = `<span class="en">${esc(q.c[q.a])}</span>`;
+      if (item.dom === "reading" && !shown.has(item.p.id)) {
+        shown.add(item.p.id);
+        extra = passageHTML(item.p, item.p.qs.flatMap(x => x.ev)) + `<p class="small muted">本文の訳:${item.p.ja}</p>`;
+      }
+    }
+    return `<details><summary><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span> ${i + 1}. ${DOMAINS[item.dom]}:${title}</summary>
+      ${extra}<p class="small">あなたの解答:${yours}<br>正解:${ans}</p>${editorialHTML(item)}</details>`;
+  }).join("");
+  return `${promoHTML}
+    <p style="margin-top:0"><b>結果:${score} / ${c.items.length} 問正解</b></p>
+    <div style="overflow-x:auto"><table class="rtable"><thead><tr><th></th><th>パフォーマンス</th><th>レート</th><th>変動</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="small muted">パフォーマンスは「今回の出来をレートに換算した値」です.レートはパフォーマンスの平均に近づいていきます(参加回数が少ないうちは低めに出ます).</p>
+    <h2>各問題の解説</h2>${det}
+    <div class="row" style="margin-top:20px"><button class="btn" id="again-btn">もう一度挑戦する</button><button class="btn ghost" data-go="record">記録を見る</button></div>`;
+}
+
+/* ---------------- 記録 ---------------- */
+let chartKey = "all";
+function renderRecord() {
+  const m = $("#main"), sk = streaks();
+  const h = history("all");
+  const rows = S.contests.map((c, i) => ({ c, i })).reverse().slice(0, 30).map(({ c }) => {
+    const e = h.find(x => x.t === c.t);
+    return `<tr><td>${new Date(c.t).toLocaleDateString("ja-JP")}</td><td>${c.items.filter(x => x.ok).length}/${c.items.length}</td><td>${rateSpan(c.perf.all)}</td><td>${e ? rateSpan(e.rating) : ""}</td><td>${e && e.prev != null ? signed(e.rating - e.prev) : ""}</td></tr>`;
+  }).join("");
+  const c = badgeCtx();
+  const badges = BADGES.map(b => {
+    const got = !!S.badges[b.id] || b.ok(c);
+    return `<div class="badge${got ? " got" : ""}"><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`;
+  }).join("");
+  m.innerHTML = `
+    ${heroHTML()}
+    <div class="ratings">${ratingCells()}</div>
+    <div class="streak"><div><b>${sk.cur}</b><span>日連続</span></div><div><b>${sk.max}</b><span>最長連続</span></div><div><b>${sk.total}</b><span>学習日数</span></div></div>
+    <h2>レートの推移</h2>
+    <div class="seg sm" role="group" aria-label="系列">${Object.keys(SERIES).map(k => `<button data-k="${k}" aria-pressed="${chartKey === k}">${SERIES[k]}</button>`).join("")}</div>
+    <div class="chart" id="chart"></div>
+    <h2>本番の履歴</h2>
+    ${rows ? `<div style="overflow-x:auto"><table><thead><tr><th>日付</th><th>正解</th><th>パフォーマンス</th><th>総合レート</th><th>変動</th></tr></thead><tbody>${rows}</tbody></table></div>`
+           : `<p class="muted small">まだありません.まずは1回本番に挑戦して,今の位置を測りましょう.</p>`}
+    <h2>実績 <span class="small muted">${BADGES.filter(b => S.badges[b.id] || b.ok(c)).length}/${BADGES.length}</span></h2>
+    <div class="badges">${badges}</div>
+    ${S.legacy ? `<p class="small muted" style="margin-top:16px">旧方式(Elo)の本番 ${S.legacy.history.length} 回分の記録は,レート計算方式の変更により新しいレートには含めていません.</p>` : ""}
+    <h2>データの引き継ぎ</h2>
+    <p class="small muted">進捗はこの端末のブラウザに保存されます.別の端末に移すときは,書き出したファイルを移した先で読み込んでください.</p>
+    <div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>`;
+  m.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { chartKey = b.dataset.k; renderRecord(); });
+  $("#exp-btn").onclick = exportData;
+  $("#imp-file").onchange = e => { const f = e.target.files[0]; if (f) importData(f); };
+  const box = $("#chart");
+  box.dataset.w = box.clientWidth;
+  drawChart(box, chartKey);
+  if (chartRO) chartRO.observe(box);
+}
+function exportData() {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" }));
+  a.download = `eigo-judge-${dateKey(Date.now())}.json`;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function importData(file) {
+  file.text().then(txt => {
+    const o = JSON.parse(txt);
+    if (!o || typeof o !== "object" || !(o.res || o.stats)) throw new Error("bad");
+    if (!confirm("今の進捗を,読み込んだデータで置き換えます.よろしいですか?")) return;
+    stopTimer(); cState = null; pState = null;
+    S = migrate(o); S.live = null; save(); render(); toast("読み込みました.");
+  }).catch(() => toast("このファイルは読み込めませんでした."));
+}
+
+/* レートの推移グラフ(1系列.背景は色の帯,点はその時点の色) */
+function drawChart(box, key) {
+  const h = history(key);
+  box.innerHTML = "";
+  if (!h.length) { box.innerHTML = `<p class="muted small">本番を1回解くと,ここに日付ごとのレートが表示されます.</p>`; return; }
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, at, parent) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (parent) parent.append(e); return e; };
+  const W = Math.max(280, box.clientWidth), H = 240, M = { l: 40, r: 14, t: 10, b: 26 };
+  const top = Math.max(800, Math.ceil((Math.max(...h.map(x => x.rating)) + 100) / 400) * 400);
+  let t0 = h[0].t, t1 = h[h.length - 1].t;
+  if (t1 - t0 < DAY) { t0 -= DAY / 2; t1 += DAY / 2; }
+  const x = t => M.l + (t - t0) / (t1 - t0) * (W - M.l - M.r);
+  const y = r => M.t + (1 - r / top) * (H - M.t - M.b);
+  const svg = el("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: "0",
+    "aria-label": `${SERIES[key]}レートの推移.最新 ${h[h.length - 1].rating}.表は本番の履歴を参照` }, box);
+  TIERS.forEach((t, i) => {
+    const hi = Math.min(TIERS[i + 1] ? TIERS[i + 1].min : top, top);
+    if (t.min >= top) return;
+    el("rect", { x: M.l, y: y(hi), width: W - M.l - M.r, height: y(t.min) - y(hi), fill: `var(${t.color})`, "fill-opacity": 0.12 }, svg);
+  });
+  for (let r = 0; r <= top; r += 400) {
+    el("line", { x1: M.l, x2: W - M.r, y1: y(r), y2: y(r), stroke: "var(--line)", "stroke-width": 1 }, svg);
+    el("text", { x: M.l - 6, y: y(r) + 4, "text-anchor": "end", class: "ax" }, svg).textContent = r;
+  }
+  const nt = Math.min(4, h.length);
+  for (let i = 0; i < nt; i++) {
+    const t = nt === 1 ? h[0].t : t0 + (t1 - t0) * i / (nt - 1);
+    el("text", { x: x(t), y: H - 6, "text-anchor": i === 0 && nt > 1 ? "start" : i === nt - 1 && nt > 1 ? "end" : "middle", class: "ax" }, svg).textContent = fmtDate(t);
+  }
+  el("path", { d: h.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(1)},${y(p.rating).toFixed(1)}`).join(""), fill: "none", stroke: "var(--ink)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-opacity": 0.75 }, svg);
+  const cross = el("line", { y1: M.t, y2: H - M.b, stroke: "var(--muted)", "stroke-width": 1, visibility: "hidden" }, svg);
+  const dots = h.map(p => el("circle", { cx: x(p.t), cy: y(p.rating), r: 4.5, fill: `var(${tierOf(p.rating).color})`, stroke: "var(--surface)", "stroke-width": 2 }, svg));
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; box.append(tip);
+  let cur = -1;
+  const show = i => {
+    cur = i; const p = h[i], px = x(p.t);
+    cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
+    dots.forEach((d, j) => d.setAttribute("r", j === i ? 6 : 4.5));
+    tip.replaceChildren();
+    const v = document.createElement("div"); v.className = "tv"; v.textContent = p.rating;
+    const s1 = document.createElement("div"); s1.className = "small muted"; s1.textContent = `${new Date(p.t).toLocaleDateString("ja-JP")} · ${SERIES[key]}`;
+    const s2 = document.createElement("div"); s2.className = "small"; s2.textContent = `パフォーマンス ${p.perf}` + (p.prev != null ? ` · ${p.rating - p.prev >= 0 ? "+" : ""}${p.rating - p.prev}` : "");
+    tip.append(v, s1, s2); tip.hidden = false;
+    const tw = tip.offsetWidth;
+    tip.style.left = Math.min(Math.max(px - tw / 2, 0), W - tw) + "px";
+    tip.style.top = Math.max(0, y(p.rating) - tip.offsetHeight - 12) + "px";
+  };
+  const hide = () => { cur = -1; cross.setAttribute("visibility", "hidden"); dots.forEach(d => d.setAttribute("r", 4.5)); tip.hidden = true; };
+  const nearest = ev => {
+    const r = svg.getBoundingClientRect(), mx = ev.clientX - r.left;
+    let best = 0; h.forEach((p, i) => { if (Math.abs(x(p.t) - mx) < Math.abs(x(h[best].t) - mx)) best = i; });
+    return best;
+  };
+  svg.addEventListener("pointermove", ev => show(nearest(ev)));
+  svg.addEventListener("pointerdown", ev => show(nearest(ev)));
+  svg.addEventListener("pointerleave", hide);
+  svg.addEventListener("focus", () => show(h.length - 1));
+  svg.addEventListener("blur", hide);
+  svg.addEventListener("keydown", ev => {
+    if (ev.key === "ArrowLeft" && cur > 0) { show(cur - 1); ev.preventDefault(); }
+    if (ev.key === "ArrowRight" && cur < h.length - 1) { show(cur + 1); ev.preventDefault(); }
+  });
+}
+// 幅が変わったら描き直す(端末の回転など)
+const chartRO = typeof ResizeObserver === "function" ? new ResizeObserver(entries => {
+  for (const e of entries) {
+    const w = Math.round(e.contentRect.width);
+    if (e.target.isConnected && w && w !== +e.target.dataset.w) { e.target.dataset.w = w; drawChart(e.target, chartKey); }
+  }
+}) : null;
+
+/* ---------------- 定義集 ---------------- */
+function defsHTML() {
+  // 変化形: 元の形 → 単語中の表記の一覧
+  const variants = {};
+  WORDS.forEach(w => w.p.forEach(p => { if (p[2]) (variants[p[1] + p[2]] = variants[p[1] + p[2]] || new Set()).add(p[0]); }));
+  const nameCell = (t, k) => `<td class="en"><b>${k}</b>${variants[t + k] ? `<br><span class="small muted">${[...variants[t + k]].join(", ")}</span>` : ""}</td>`;
+  const roots = Object.keys(ROOT).map(r => {
+    const ws = WORDS.filter(w => w.p.some(p => p[1] === "r" && partKey(p) === r));
+    const learned = ws.filter(isLearned).length;
+    return `<tr>${nameCell("r", r)}<td>${ROOT[r]}</td><td class="en">${ws.map(w => w.w).join(", ")}</td><td>${learned}/${ws.length}</td></tr>`;
+  }).join("");
+  const affix = Object.keys(AFFIX).map(a => `<tr>${nameCell("a", a)}<td>${AFFIX[a]}</td></tr>`).join("");
+  const thm = Object.keys(THM).map(k => `<details><summary><b>${THM[k].name}</b></summary><div class="thm">${THM[k].s}</div><div class="small muted">前提の定義:${THM[k].def}</div></details>`).join("");
+  return `
+  <h2 style="margin-top:0">語根(単語を導く定義)</h2>
+  <p class="mode-note">習得は,2回以上続けて正解した単語の数です.小さい字は単語の中での変化形です.</p>
+  <div style="overflow-x:auto"><table><thead><tr><th>語根</th><th>意味</th><th>導出される単語</th><th>習得</th></tr></thead><tbody>${roots}</tbody></table></div>
+  <h2>接頭辞・接尾辞</h2>
+  <table><tbody>${affix}</tbody></table>
+  <h2>文法の定理</h2>
+  ${thm}`;
+}
+
+/* ---------------- キーボード操作 ---------------- */
+// 1〜4(または A〜D): 選択肢を選ぶ.本番では ← → で前後の問題へ移る.
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+  if (e.target.closest && e.target.closest("svg")) return;
+  const card = $("#qcard"); if (!card) return;
+  const single = (view === "list" && pState && pState.dom !== "reading") || (view === "contest" && contestRunning() && !pendingNav && !cState.confirming);
+  if (!single) return;
+  const k = e.key.toLowerCase(), idx = "1234".indexOf(k) >= 0 ? "1234".indexOf(k) : "abcd".indexOf(k);
+  if (idx >= 0) {
+    const b = card.querySelectorAll(".choice")[idx];
+    if (b && !b.disabled) { e.preventDefault(); b.click(); }
+  } else if (view === "contest" && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+    const b = $(e.key === "ArrowRight" ? "#next-btn" : "#prev-btn");
+    if (b && !b.disabled) { e.preventDefault(); b.click(); }
+  }
+});
+
+// ブラウザに保存データを消されにくくする(対応している環境のみ)
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* noop */ }
+restoreContest();
+render();
