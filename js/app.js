@@ -56,6 +56,7 @@ const rateSpan = r => (r == null ? `<span class="muted">-</span>` : `<b class="r
 const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
 
 const WORD_BY = new Map(WORDS.map(w => [w.id, w]));
+const WORD_BY_M = new Map(WORDS.map(w => [w.m, w])); // 意味 → 単語(意味は全単語で重ならない)
 const GRAM_BY = new Map(GRAM.map(g => [g.id, g]));
 const PASS_BY = new Map(READING.map(p => [p.id, p]));
 const passageD = p => Math.round(avg(p.qs.map(q => q.d)));
@@ -642,7 +643,7 @@ function metaHTML(dom, d) {
 }
 function choicesHTML(list, st, en) {
   // 最後の「わからない」は,当てずっぽうで AC にしないための選択肢(WA になる)
-  return `<div class="choices">${list.map((c, i) => `<button class="choice${en ? " en" : ""}" data-i="${i}" aria-pressed="${st.sel === i}"><span class="key">${"ABCD"[i]}</span>${esc(c)}</button>`).join("")}
+  return `<div class="choices">${list.map((c, i) => `<button class="choice${en ? " en" : ""}" data-i="${i}" aria-pressed="${st.sel === i}"><span class="key">${"ABCD"[i]}</span><span class="ct">${esc(c)}</span></button>`).join("")}
     <button class="choice idk" data-i="${IDK}" aria-pressed="${st.sel === IDK}"><span class="key">?</span>わからない</button></div>`;
 }
 function passageHTML(p, evs) {
@@ -695,7 +696,22 @@ function markChoices(root, item, st) {
     b.disabled = true;
     const right = i >= 0 && (item.dom === "word" ? st.choices[i] === item.q.m : i === item.q.a);
     if (right) b.classList.add("right"); else if (i === st.sel) b.classList.add("wrong");
+    // 単語:判定後,各選択肢がどの単語の意味かを示す(誤答の選択肢もついでに覚えられる)
+    const w = item.dom === "word" && i >= 0 && WORD_BY_M.get(st.choices[i]);
+    if (w && !b.querySelector(".cw")) b.insertAdjacentHTML("beforeend", choiceWordHTML(w, w.id !== item.q.id));
   });
+}
+// badge: その単語の今の状態(AC / WA)を付けるか.今解いた単語には付けない
+function choiceWordHTML(w, badge) {
+  const s = badge && statusOf(w.id);
+  return `<span class="cw"><b class="en">${esc(w.w)}</b>${s ? ` <span class="verdict ${s.toLowerCase()} xs">${s}</span>` : ""}</span>`;
+}
+// 本番の結果など,選択肢を表示しない画面で使う一覧
+function choiceWordsHTML(item, st) {
+  return `<div class="cwlist">${st.choices.map((m, i) => {
+    const w = WORD_BY_M.get(m), cls = m === item.q.m ? " right" : i === st.sel ? " wrong" : "";
+    return `<div class="cwrow${cls}"><b class="en">${esc(w ? w.w : "")}</b><span>${esc(m)}</span></div>`;
+  }).join("")}</div>`;
 }
 function bindChoices(root, st, onPick) {
   root.querySelectorAll(".choice").forEach(b => b.onclick = () => {
@@ -860,6 +876,7 @@ function contestResultHTML() {
       title = `<span class="en">${q.w}</span>`;
       yours = st.sel == null ? "未解答" : st.sel < 0 ? "わからない" : esc(st.choices[st.sel]);
       ans = esc(q.m);
+      extra = `<p class="small muted" style="margin:8px 0 0">選択肢の単語</p>` + choiceWordsHTML(item, st);
     } else {
       title = `<span class="en">${esc(q.q)}</span>`;
       yours = st.sel == null ? "未解答" : st.sel < 0 ? "わからない" : `<span class="en">${esc(q.c[st.sel])}</span>`;
