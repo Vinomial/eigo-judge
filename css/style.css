@@ -270,3 +270,29 @@ summary { cursor: pointer; }
 .del { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 .del > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .btn.danger { color: var(--wa); border-color: var(--wa); flex: none; }
+
+/* 本番の種類 */
+.kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.kind { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 12px; min-height: 84px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; }
+.kind b { font-size: 1.05rem; }
+.kind span { font-size: .8rem; color: var(--muted); line-height: 1.4; }
+.kind.main { grid-column: 1 / -1; border-color: var(--accent); }
+@media (hover: hover) { .kind:hover { border-color: var(--accent); } }
+
+/* 意味 → 英単語 */
+.word.jm { font-size: 1.5rem; font-weight: 700; }
+.cw .jm { font-size: .88rem; }
+
+/* Part 6 の空所 */
+.p6b { display: inline-block; min-width: 3.2em; padding: 0 6px; margin: 0 2px; border-bottom: 2px solid var(--ink); text-align: center; font-family: "Zen Kaku Gothic New", sans-serif; font-size: .9em; color: var(--muted); }
+.p6b.cur { background: var(--hl); color: var(--ink); font-weight: 700; }
+.p6b.done { border-bottom-color: var(--ac); background: var(--ac-bg); color: var(--ink); font-family: inherit; font-size: inherit; }
+
+/* ほかの選択肢の説明 */
+.xlist { display: grid; gap: 6px; }
+.xrow { display: grid; grid-template-columns: minmax(5em, auto) 1fr; gap: 10px; padding: 6px 8px; border-radius: 6px; background: var(--bg); font-size: .92rem; }
+.xrow b { font-weight: 600; }
+@media (max-width: 480px) { .xrow { grid-template-columns: 1fr; gap: 0; } }
+
+/* 実際の点数の入力 */
+.sform .search { flex: 1 1 8em; width: auto; margin: 0; }

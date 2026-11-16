@@ -27,6 +27,12 @@ const choices4 = (id, c, a) => {
   else if (new Set(c).size !== 4) err(id, "選択肢が重複");
   if (!(Number.isInteger(a) && a >= 0 && a < (c || []).length)) err(id, `正解の添字 a が範囲外 (${a})`);
 };
+// 誤答の選択肢ごとの説明 x(省略可).選択肢と同じ並びで4つ.正解の位置は空にする
+const checkX = (id, q) => {
+  if (q.x == null) return;
+  if (!Array.isArray(q.x) || q.x.length !== 4) return err(id, "x は選択肢と同じ4つにする");
+  q.x.forEach((t, i) => { if (i !== q.a && !t) err(id, `x[${i}] (誤答の説明) がない`); });
+};
 const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // 単語(words.js: 語根から導く単語 w1…,vocab.js: 語根のない単語 v_…)
@@ -71,6 +77,7 @@ for (const g of GRAM) {
   if (!THM[g.t]) err(g.id, `定理 ${g.t} が THM にない`);
   choices4(g.id, g.c, g.a);
   if (!g.why || !g.ja) err(g.id, "why / ja がない");
+  checkX(g.id, g);
   if (stems.has(g.q)) err(g.id, `問題文が ${stems.get(g.q)} と同じ`);
   stems.set(g.q, g.id);
 }
@@ -92,7 +99,11 @@ for (const r of READING) {
       if (!b.title) err(r.id, `s[${i}] 文書の見出しに title がない`);
     } else err(r.id, `s[${i}] ブロックの種類 ${b.t} が不正`);
   });
-  if (r.qs.length !== 3) err(r.id, "設問は3問にする(本番は長文1題3問)");
+  if (r.part6) {
+    const blanks = r.s.filter(b => typeof b === "string").join(" ").match(/\[\d\]/g) || [];
+    if (r.qs.length !== 4) err(r.id, "Part 6 の設問は4問にする");
+    if (blanks.join("") !== r.qs.map((_, k) => `[${k + 1}]`).join("")) err(r.id, `Part 6 の空所 [1]〜[${r.qs.length}] が本文に順に1つずつない (${blanks.join("")})`);
+  } else if (r.qs.length !== 3) err(r.id, "設問は3問にする");
   r.qs.forEach((q, k) => {
     uniqueId(q.id, new RegExp(`^${r.id}q${k + 1}$`));
     dRange(q.id, q.d);
@@ -105,6 +116,7 @@ for (const r of READING) {
       else if (row != null && (typeof b === "string" || !(b.rows || b.items) || !(b.rows || b.items)[row])) err(q.id, `根拠 ev の行が不正 (${JSON.stringify(e)})`);
     });
     if (!q.why) err(q.id, "why がない");
+    checkX(q.id, q);
   });
 }
 
@@ -158,6 +170,7 @@ const plainN = WORDS.filter(w => !w.p.length).length;
 console.log(`単語 ${WORDS.length} 語(語根から導く ${WORDS.length - plainN},語根なし ${plainN}.語根 ${Object.keys(ROOT).length},接辞 ${Object.keys(AFFIX).length}) / 文法 ${GRAM.length} 問(定理 ${Object.keys(THM).length}) / 長文 ${READING.length} 題 ${READING.reduce((a, r) => a + r.qs.length, 0)} 問(図表つき ${READING.filter(r => r.s.some(b => typeof b !== "string" && b.t !== "doc")).length} 題)`);
 console.log(`難易度の分布(灰 / 茶 / 緑 / 水 / 青): 単語 ${bands(WORDS.map(w => w.d))} ・ 文法 ${bands(GRAM.map(g => g.d))} ・ 長文の設問 ${bands(READING.flatMap(r => r.qs.map(q => q.d)))}`);
 console.log(`定理ごとの問題数: 最少 ${Math.min(...perThm)} / 最多 ${Math.max(...perThm)}`);
+console.log(`誤答の説明つき: 文法 ${GRAM.filter(g => g.x).length} 問 / 長文 ${READING.flatMap(r => r.qs).filter(q => q.x).length} 問 / Part 6 ${READING.filter(r => r.part6).length} 題`);
 console.log(`文法・長文の正解位置: A ${pos[0]} / B ${pos[1]} / C ${pos[2]} / D ${pos[3]}`);
 console.log(`長文に出てくるが単語データにない語: ${missing.size} 語${missing.size && !process.argv.includes("--vocab") ? "(--vocab で一覧)" : ""}`);
 if (process.argv.includes("--vocab")) console.log([...missing].sort().map(([w, s]) => `${w}(${[...s].join(",")})`).join(" "));

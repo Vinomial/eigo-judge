@@ -1140,5 +1140,316 @@ window.READING = [
       { id: "r50q2", q: "Why are some Harborview residents worried?", c: ["They expect more trucks near their homes.", "They will lose their jobs.", "Their homes will be torn down.", "Ship traffic will block their views."], a: 0, ev: [4], d: 1000, why: "increased truck traffic will worsen congestion and air quality in their neighborhood.近所でトラックが増えることを心配している." },
       { id: "r50q3", q: "What problem do critics point out?", c: ["The electric equipment is too expensive.", "The port expansion will take longer than four years.", "The new road may not be ready when it is needed.", "The road will pass through residential streets."], a: 2, ev: [5, 7], d: 1600, why: "専用道路はまだ予算がなく,港の拡張部分の開業から2年後まで完成しないかもしれない.トラックが増える時点で道路が間に合わない,ということ.「住宅街を通る」は逆で,道路は住宅街を避けるためのもの." }
     ]
+  },
+
+  // ---- Part 6(長文の穴埋め).本文の [1]〜[4] が空所.part6: true ----
+  {
+    id: "r51", part6: true,
+    kind: "Part 6 メール",
+    title: "To: All employees / Subject: New parking system",
+    target: 150,
+    s: [
+      "Starting on March 1, employees will need a new electronic pass to enter the company parking lot.",
+      "Passes will be [1] at the security office on the first floor from February 20 to 28.",
+      "To receive your pass, please bring your employee ID card.",
+      "[2]",
+      "Employees who do not have a pass by March 1 will [3] to park on the street until they receive one.",
+      "[4], visitors will continue to use the guest parking area near the main entrance.",
+      "Thank you for your cooperation."
+    ],
+    ja: "3月1日から,社員は会社の駐車場に入るために新しい電子パスが必要になる.パスは2月20日から28日まで,1階の警備室で配布される.受け取るには社員証を持ってくること.[パスは1人1枚で,ほかの人に貸してはならない.] 3月1日までにパスを持っていない社員は,受け取るまで路上に駐車しなければならない.なお,来客は引き続き正面玄関近くの来客用駐車場を使う.ご協力に感謝する.",
+    qs: [
+      { id: "r51q1", q: "(1)", c: ["distribute", "distributing", "distributed", "distribution"], a: 2, ev: [1], d: 600, why: "Passes will be ___ で,パスは「配られる」側なので受動態.will be + 過去分詞 distributed.", x: ["原形は be の後ろに置けない(受動態にならない).", "will be distributing は「配っている最中だ」で,主語 Passes(物)が配る側になってしまう.", "", "名詞.Passes will be distribution(パスは配布である)では意味が通らない."] },
+      { id: "r51q2", q: "(2)", c: ["Each pass may be used by one person only.", "The parking lot was built last year.", "Please return your ID card after the meeting.", "Visitors must also apply for a pass."], a: 0, ev: [2, 3, 4], d: 1000, why: "前の文はパスの受け取り方,後ろの文はパスがない場合の話.その間に入るのは,パスの使い方についての補足.文を入れる問題は,前後の話題をつなぐ文を選ぶ.", x: ["", "駐車場がいつできたかは,パスの話の流れと関係がない.", "社員証は受け取るときに見せるもので,返す話は出てこない.", "後ろの文で「来客は引き続き来客用駐車場を使う」とあり,来客もパスが必要という内容と矛盾する."] },
+      { id: "r51q3", q: "(3)", c: ["require", "be required", "requiring", "have required"], a: 1, ev: [4], d: 800, why: "社員は「求められる」側.be required to do で「〜しなければならない」.will の後ろなので be required.", x: ["will require to park では「社員が(何かを)要求する」になり,目的語もない.", "", "will の後ろに -ing は置けない(will be requiring なら可だが意味が合わない).", "will have required は未来完了で「求めてしまっているだろう」.主語が求める側になり意味が合わない."] },
+      { id: "r51q4", q: "(4)", c: ["Therefore", "In addition", "For example", "However"], a: 1, ev: [5], d: 900, why: "社員の駐車の話に,来客の駐車についての情報を付け加えている.情報の追加は In addition(さらに).", x: ["Therefore(したがって)は前の文が原因で後ろが結果のとき.社員が路上に止めることは,来客が来客用駐車場を使う理由にならない.", "", "For example(例えば)は前の文の具体例を挙げるとき.来客の話は社員の話の例ではない.", "However(しかし)は逆の内容が続くとき.来客の駐車は前の文と対立していない."] }
+    ]
+  },
+  {
+    id: "r52", part6: true,
+    kind: "Part 6 お知らせ",
+    title: "Westfield Community Pool — Summer Hours",
+    target: 140,
+    s: [
+      "The Westfield Community Pool will open for the summer season on June 1.",
+      "This year, the pool will stay open until 9:00 P.M. on weekdays, two hours [1] than last year.",
+      "The change was made in response to requests from residents who work during the day.",
+      "[2]",
+      "Swimming lessons for children will be offered every Saturday morning, and [3] is now open on our Web site.",
+      "Because space is limited, we recommend signing up [4]."
+    ],
+    ja: "ウェストフィールド市民プールは6月1日に夏の営業を始める.今年は平日の午後9時まで開いており,昨年より2時間遅くまで営業する.この変更は,日中に働く住民の要望に応えたものだ.[週末の営業時間は昨年と同じ.] 子ども向けの水泳教室は毎週土曜の午前に開かれ,Web サイトで申し込みの受付が始まっている.定員があるので,早めの申し込みを勧める.",
+    qs: [
+      { id: "r52q1", q: "(1)", c: ["late", "later", "latest", "lately"], a: 1, ev: [1], d: 600, why: "than があるので比較級 later.「昨年より2時間遅く」.", x: ["原級は than と組めない.", "", "最上級は than と組めない(the latest のように the と使う).", "lately は「最近」という別の意味の副詞."] },
+      { id: "r52q2", q: "(2)", c: ["The pool was closed for repairs last month.", "Weekend hours will remain the same as last year.", "Many residents work at night.", "The lessons are free for adults."], a: 1, ev: [1, 3], d: 1100, why: "前の文までは平日の営業時間が変わる話.それに続けて「週末は変わらない」と営業時間の話を補うのが自然.", x: ["修理の話は前後の営業時間の話とつながらない.", "", "前の文で「日中に働く住民」とあり,夜に働く人の話は出てこない.", "後ろの文は子ども向けの教室の話で,大人の料金は出てこない.話題が飛ぶ."] },
+      { id: "r52q3", q: "(3)", c: ["register", "registered", "registration", "registers"], a: 2, ev: [4], d: 700, why: "and の後ろで,is now open の主語になる位置なので名詞 registration(申し込みの受付).", x: ["動詞の原形は主語になれない.", "過去分詞は主語になれない.", "", "3人称単数の動詞で,主語になれない."] },
+      { id: "r52q4", q: "(4)", c: ["early", "lately", "rarely", "nearly"], a: 0, ev: [5], d: 800, why: "定員があるので「早めに」申し込むことを勧める.early.", x: ["", "lately(最近)は現在完了と使う語で,勧める内容に合わない.", "rarely(めったに〜ない)では「めったに申し込まないことを勧める」になり意味が逆.", "nearly(ほとんど)は数量や程度を修飾する語で,signing up を修飾しない."] }
+    ]
+  },
+  {
+    id: "r53", part6: true,
+    kind: "Part 6 手紙",
+    title: "Letter — Halden Insurance",
+    target: 150,
+    s: [
+      "Dear Mr. Ortega,",
+      "Thank you for being a Halden Insurance customer for the past five years.",
+      "We are writing to let you know that your car insurance policy [1] on April 30.",
+      "To continue your coverage without interruption, please renew it before that date.",
+      "[2], you can renew online in just a few minutes.",
+      "As a loyal customer, you are [3] for a 10 percent discount on your next policy.",
+      "[4]",
+      "Sincerely, Halden Insurance Customer Service"
+    ],
+    ja: "オルテガ様.5年間ハルデン保険をご利用いただきありがとうございます.お客様の自動車保険の契約は4月30日で切れることをお知らせします.補償を途切れさせずに続けるには,その日までに更新してください.便利なことに,オンラインなら数分で更新できます.長年のお客様として,次の契約は10%引きの対象になります.[ご質問は,平日の午前9時から午後6時まで 555-0190 にお電話ください.]",
+    qs: [
+      { id: "r53q1", q: "(1)", c: ["expired", "has expired", "will expire", "expiring"], a: 2, ev: [2, 3], d: 700, why: "次の文で「その日までに更新して」とあるので,4月30日はこれからの日付.未来の will expire.", x: ["過去形だと,もう切れたことになり,次の文の「その日までに更新して」と合わない.", "現在完了も「すでに切れた」ことになり,これからの更新の話と合わない.", "", "that 節の中に動詞が必要.-ing だけでは文にならない."] },
+      { id: "r53q2", q: "(2)", c: ["Otherwise", "Conveniently", "Instead", "Previously"], a: 1, ev: [4], d: 1000, why: "数分でオンライン更新できるという「便利な」情報を前置きする副詞 Conveniently.", x: ["Otherwise(さもなければ)は「更新しないと」の意味になり,後ろの便利な情報とつながらない.", "", "Instead(代わりに)は,前の内容を否定して別の方法を言うとき.前の文の「更新して」を否定していない.", "Previously(以前は)だと,昔はオンラインで更新できた(今はできない)という意味になってしまう."] },
+      { id: "r53q3", q: "(3)", c: ["eligible", "available", "responsible", "capable"], a: 0, ev: [5], d: 900, why: "be eligible for 〜 で「〜の対象になる・資格がある」.割引を受ける資格がある.", x: ["", "be available for は「〜に応じられる・都合がつく」.人が割引の対象であることは表せない.", "be responsible for は「〜に責任がある」.割引に責任があることになる.", "capable は capable of 〜 の形で使い,for とは組まない."] },
+      { id: "r53q4", q: "(4)", c: ["Your policy was canceled last year.", "If you have any questions, please call us at 555-0190.", "We have opened a new office in Madrid.", "Please pay the late fee immediately."], a: 1, ev: [6, 7], d: 900, why: "手紙の結び(Sincerely)の直前なので,問い合わせ先を案内する文が自然.", x: ["5年間の顧客で,これから更新する話なので,昨年取り消されたという内容と矛盾する.", "", "新しい事務所の話は,更新の案内と関係がない.", "まだ期限前なので,延滞料の話は合わない."] }
+    ]
+  },
+  {
+    id: "r54", part6: true,
+    kind: "Part 6 記事",
+    title: "Lakeview Herald — Local Bakery Wins National Award",
+    target: 150,
+    s: [
+      "Sunrise Bakery, a small family business on Elm Street, has won first prize in the National Bread Competition.",
+      "The bakery's whole-wheat loaf was [1] from more than 400 entries.",
+      "Owner Lisa Park, [2] opened the bakery in 2015, said she was surprised by the news.",
+      "\"We simply bake the way my grandmother taught me,\" she said.",
+      "[3]",
+      "Since the announcement, the bakery has been so busy [4] it now opens an hour earlier to meet demand."
+    ],
+    ja: "エルム通りの小さな家族経営の店サンライズ・ベーカリーが,全国パンコンテストで1位を獲得した.同店の全粒粉パンが,400を超える応募作の中から選ばれた.2015年に店を開いた店主のパークさんは,知らせに驚いたと話した.「祖母に教わったとおりに焼いているだけです」.[パンは今も毎朝,手でこねて作られている.] 発表以来,店はとても忙しくなり,需要に応えるため1時間早く開店している.",
+    qs: [
+      { id: "r54q1", q: "(1)", c: ["chose", "chosen", "choosing", "choice"], a: 1, ev: [1], d: 600, why: "パンは「選ばれる」側.was + 過去分詞 で受動態 chosen.", x: ["過去形 chose は be 動詞の後ろに置けない.", "", "was choosing だと,パンが(何かを)選んでいたことになる.", "名詞 choice では「パンは選択だった」になり,from 以下とつながらない."] },
+      { id: "r54q2", q: "(2)", c: ["which", "who", "whose", "what"], a: 1, ev: [2], d: 700, why: "先行詞は人(Owner Lisa Park)で,opened の主語が欠けているので who.カンマの後なので that は使えない.", x: ["which は先行詞が物のとき.", "", "whose の後ろには名詞が必要(whose bakery opened ...).", "what は先行詞がないときに使う."] },
+      { id: "r54q3", q: "(3)", c: ["Her grandmother still works at a bank.", "Every loaf is still made by hand each morning.", "The competition will be held again next year in Paris.", "The bakery plans to close next month."], a: 1, ev: [3, 4], d: 1000, why: "前の文は「祖母に教わったとおりに焼く」.それに続けて作り方を説明する文が自然.", x: ["祖母が今どこで働いているかは,パン作りの話とつながらない.", "", "次のコンテストの開催地は,この店の話の流れから外れる.", "後ろの文で「忙しくて早く開店している」とあり,閉店の予定と矛盾する."] },
+      { id: "r54q4", q: "(4)", c: ["that", "which", "what", "so"], a: 0, ev: [5], d: 900, why: "so busy that ... で「とても忙しいので…」.so + 形容詞 + that の that.", x: ["", "which は関係代名詞で,so ... that の形をつくれない.", "what は先行詞のない関係代名詞で,この位置には入らない.", "so はすでに busy の前にあり,もう1つ入れると文にならない."] }
+    ]
+  },
+  {
+    id: "r55", part6: true,
+    kind: "Part 6 社内メモ",
+    title: "MEMO — Re: Annual performance reviews",
+    target: 150,
+    s: [
+      "Annual performance reviews will take place during the first two weeks of December.",
+      "Each employee will meet with his or her supervisor for about 30 minutes.",
+      "Before the meeting, please complete the self-evaluation form [1] to you by e-mail last week.",
+      "Forms should be returned to Human Resources no later than November 25.",
+      "[2]",
+      "During the review, you and your supervisor will discuss your goals for next year.",
+      "This is also a good opportunity to talk about any training you would like to [3].",
+      "We hope these meetings will be [4] for everyone."
+    ],
+    ja: "年1回の人事評価は12月の最初の2週間に行う.各社員は上司と30分ほど面談する.面談の前に,先週メールで送った自己評価の用紙に記入すること.用紙は11月25日までに人事部へ返すこと.[期限を過ぎて届いた用紙は受け付けられない場合がある.] 面談では,上司と来年の目標について話し合う.受けたい研修について話すのにも良い機会だ.面談が全員にとって有益なものになることを願う.",
+    qs: [
+      { id: "r55q1", q: "(1)", c: ["send", "sent", "sending", "to send"], a: 1, ev: [2], d: 800, why: "文の動詞は complete.空所は form を後ろから修飾する.用紙は「送られた」側で,last week(過去)もあるので過去分詞 sent.", x: ["原形は名詞を後ろから修飾できない.", "", "sending だと用紙が(何かを)送ることになる.", "to send だと「これから送る用紙」になり,last week(先週)と合わない."] },
+      { id: "r55q2", q: "(2)", c: ["Forms received after this date may not be accepted.", "Human Resources is located on the fifth floor.", "Reviews were canceled last year.", "Supervisors will receive a bonus."], a: 0, ev: [3, 4], d: 1000, why: "前の文は用紙の提出期限.期限を過ぎた場合どうなるかを続けるのが自然.", x: ["", "人事部の場所は,期限の話の続きとしては唐突.", "昨年の評価が中止された話は,今年の評価の案内の流れに合わない.", "上司の賞与は,社員向けの評価の案内と関係がない."] },
+      { id: "r55q3", q: "(3)", c: ["receive", "be received", "receiving", "received"], a: 0, ev: [6], d: 700, why: "would like to + 動詞の原形.社員が研修を「受ける」側なので能動の receive.", x: ["", "be received だと,社員が「受け取られる」ことになる.", "would like to の後ろは原形で,-ing は置けない.", "would like to の後ろに過去分詞は置けない."] },
+      { id: "r55q4", q: "(4)", c: ["benefit", "beneficial", "beneficially", "benefits"], a: 1, ev: [7], d: 800, why: "will be の後ろ(補語の位置)なので形容詞 beneficial(有益な).", x: ["名詞 benefit だと「面談が利益である」になり,for everyone とのつながりも不自然.", "", "副詞は補語になれない.", "複数名詞 benefits も「面談が利益たちである」になり,不自然."] }
+    ]
+  },
+  {
+    id: "r56", part6: true,
+    kind: "Part 6 広告",
+    title: "Greenleaf Garden Center — Spring Sale",
+    target: 140,
+    s: [
+      "Get your garden ready for spring at Greenleaf Garden Center!",
+      "From April 5 to April 12, all flowering plants will be 20 percent off.",
+      "In addition, customers who spend more than $100 will receive a free bag of soil, [1] $15.",
+      "Our [2] staff will be happy to help you choose the right plants for your garden.",
+      "[3]",
+      "We are open daily from 8:00 A.M. to 7:00 P.M., [4] Easter Sunday."
+    ],
+    ja: "グリーンリーフ園芸センターで春の庭の準備を! 4月5日から12日まで,花の咲く植物はすべて20%引き.さらに,100ドルを超えて買い物をした客には,15ドル相当の土を1袋無料で差し上げる.知識豊富なスタッフが,庭に合う植物選びを喜んで手伝う.[無料の園芸講座も毎週土曜の午前10時に開いている.] 営業は毎日午前8時から午後7時まで.ただし復活祭の日曜日は休み.",
+    qs: [
+      { id: "r56q1", q: "(1)", c: ["value", "valued at", "valuing", "values"], a: 1, ev: [2], d: 1100, why: "a free bag of soil を後ろから説明する分詞.土は「評価される」側なので過去分詞 valued at $15(15ドル相当の).", x: ["名詞 value を直接置くと,a bag of soil, value $15 で文法的につながらない.", "", "valuing だと,土が(何かを)評価することになる.", "values は動詞なので,カンマの後ろで名詞を説明できない(主語もない)."] },
+      { id: "r56q2", q: "(2)", c: ["knowledge", "knowledgeable", "knowingly", "know"], a: 1, ev: [3], d: 900, why: "所有格 Our と名詞 staff の間なので形容詞 knowledgeable(知識豊富な).", x: ["名詞 knowledge を置くと knowledge staff となり,意味の通らない名詞の並びになる.", "", "副詞は名詞を修飾できない.", "動詞の原形は名詞の前に置けない."] },
+      { id: "r56q3", q: "(3)", c: ["Free gardening workshops are also held every Saturday at 10:00 A.M.", "The sale ended last week.", "Our staff will be on vacation in April.", "Soil is not sold at our store."], a: 0, ev: [3, 4, 5], d: 1000, why: "前の文はスタッフが手伝ってくれるという客向けのサービス.さらにサービスを紹介する文が自然.", x: ["", "セールは4月5日から12日なので,先週終わったという内容と矛盾する.", "前の文でスタッフが手伝うと言っているので,休暇中という内容と矛盾する.", "前の文で土を無料で渡すとあり,土を売っていないのは不自然."] },
+      { id: "r56q4", q: "(4)", c: ["except", "without", "unless", "besides"], a: 0, ev: [5], d: 900, why: "「毎日営業.ただし復活祭の日曜日を除く」.後ろが名詞なので前置詞 except.", x: ["", "without(〜なしで)では「復活祭の日曜日なしで営業」になり,意味が通らない.", "unless は接続詞なので,後ろに節(主語 + 動詞)が必要.", "besides(〜に加えて)だと,復活祭の日曜日にも営業することになり,意味が逆."] }
+    ]
+  },
+  {
+    id: "r57", part6: true,
+    kind: "Part 6 メール",
+    title: "From: Ken Watanabe / To: Sarah Cole / Subject: Delivery date",
+    target: 150,
+    s: [
+      "Dear Ms. Cole,",
+      "Thank you for your order of 200 printed T-shirts for your company's charity run.",
+      "Unfortunately, our printing machine broke down yesterday, and the repair will take several days.",
+      "[1], we will not be able to deliver the shirts by May 10 as promised.",
+      "We now expect to ship them on May 14, [2] means they should reach you by May 16.",
+      "We understand that your event is on May 18. [3]",
+      "As an apology, we will [4] the shipping charge for this order.",
+      "Sincerely, Ken Watanabe"
+    ],
+    ja: "コール様.御社のチャリティー・ランのための印刷 T シャツ200枚のご注文ありがとうございます.残念ながら,昨日印刷機が故障し,修理に数日かかります.そのため,お約束の5月10日までにシャツをお届けできません.5月14日に発送する見込みで,16日までにお手元に届くはずです.催しは5月18日と承知しています.[催しには間に合いますが,ご心配をおかけし申し訳ありません.] おわびとして,このご注文の送料はいただきません.",
+    qs: [
+      { id: "r57q1", q: "(1)", c: ["However", "As a result", "Instead", "Meanwhile"], a: 1, ev: [2, 3], d: 800, why: "印刷機の故障(原因)→ 期限に間に合わない(結果).As a result(その結果).", x: ["However(しかし)は逆の内容が続くとき.故障したので遅れるのは,予想どおりの流れ.", "", "Instead(代わりに)は前の内容の代わりを言うとき.代わりのものは出てこない.", "Meanwhile(その間に)は同時に起きている別のことを言うとき.原因と結果の関係を表せない."] },
+      { id: "r57q2", q: "(2)", c: ["that", "what", "which", "it"], a: 2, ev: [4], d: 1100, why: "カンマの後で,前の内容全体(5月14日に発送すること)を受けて説明する非制限用法の which.", x: ["that はカンマの後(非制限用法)では使えない.", "what は先行詞がないときに使い,前の文を受けられない.", "", "it は代名詞で,節と節をつなげない(カンマだけで2つの文をつなぐことになる)."] },
+      { id: "r57q3", q: "(3)", c: ["The shirts will arrive in time, but we apologize for the worry.", "Please cancel the event.", "The charity run was very successful.", "We have not received your payment."], a: 0, ev: [4, 5], d: 1200, why: "16日までに届き,催しは18日なので間に合う.そのうえで謝る文が自然.日付を比べて判断する.", x: ["", "シャツは間に合うので,催しの中止を頼む理由がない.", "催しはまだ先(5月18日)なので,成功したという過去の内容は合わない.", "支払いの話は,遅れのおわびの流れに合わない."] },
+      { id: "r57q4", q: "(4)", c: ["waive", "wave", "waiver", "waiving"], a: 0, ev: [6], d: 1300, why: "will の後ろなので動詞の原形.waive(料金を免除する).", x: ["", "wave(手を振る)はつづりが似ているが意味が違う.", "waiver は名詞(権利放棄の書類).will の後ろに名詞は置けない.", "will の後ろに -ing は置けない."] }
+    ]
+  },
+  {
+    id: "r58", part6: true,
+    kind: "Part 6 Web ページ",
+    title: "Brightline Electronics — Product Registration",
+    target: 140,
+    s: [
+      "Thank you for purchasing a Brightline product.",
+      "By registering your product, you can receive important updates and faster customer support.",
+      "Registration takes only a few minutes and can be completed [1] on our Web site.",
+      "You will need the serial number, which is printed on a label on the back of the device.",
+      "[2]",
+      "Once your product is registered, your warranty will be [3] extended by six months at no cost.",
+      "Please note that products purchased from unauthorized sellers are not [4] for this offer."
+    ],
+    ja: "ブライトラインの製品をお買い上げいただきありがとうございます.製品を登録すると,重要な更新情報やより早いサポートを受けられる.登録は数分で済み,Web サイトですべて完了できる.機器の裏のラベルに印刷されている製造番号が必要.[購入日を確かめるため,領収書もお手元にご用意ください.] 製品を登録すると,保証は無料で自動的に6か月延長される.なお,正規でない販売店で買った製品は,この特典の対象外.",
+    qs: [
+      { id: "r58q1", q: "(1)", c: ["entire", "entirely", "entirety", "entireness"], a: 1, ev: [2], d: 800, why: "can be completed を修飾するので副詞 entirely(すべて).", x: ["形容詞 entire は名詞の前に置く語で,動詞を修飾できない.", "", "名詞 entirety は in its entirety の形で使い,単独では動詞を修飾できない.", "entireness はふつう使わない名詞で,動詞を修飾できない."] },
+      { id: "r58q2", q: "(2)", c: ["You should also have your receipt ready to confirm the purchase date.", "The device is not waterproof.", "Our store is closed on Sundays.", "The serial number has been removed."], a: 0, ev: [3, 4], d: 1100, why: "前の文は登録に必要なもの(製造番号).さらに必要なもの(領収書)を加える文が自然.also がつながりの手がかり.", x: ["", "防水かどうかは,登録の手順の話とつながらない.", "店の休みは Web での登録の話と関係がない.", "前の文で製造番号はラベルに印刷されているとあり,取り除かれたという内容と矛盾する."] },
+      { id: "r58q3", q: "(3)", c: ["automatic", "automatically", "automation", "automate"], a: 1, ev: [5], d: 700, why: "be と過去分詞 extended の間なので副詞 automatically.", x: ["形容詞は be と過去分詞の間に置けない.", "", "名詞は be と過去分詞の間に置けない.", "動詞の原形は be の後ろに置けない."] },
+      { id: "r58q4", q: "(4)", c: ["eligible", "possible", "able", "valuable"], a: 0, ev: [6], d: 1000, why: "be eligible for 〜 で「〜の対象となる」.正規でない店で買った製品は特典の対象外.", x: ["", "possible は人や物を主語にして「〜の対象だ」とは言えない.", "able は be able to do の形で使い,for とは組まない.", "valuable(価値がある)だと「特典にとって価値がない」になり,意味が通らない."] }
+    ]
+  },
+
+  // ---- 長文の追加(r59〜).x は誤答の選択肢ごとの説明 ----
+  {
+    id: "r59",
+    kind: "お知らせ",
+    title: "Notice — Riverside Apartments Water Shutoff",
+    target: 100,
+    s: [
+      "To all residents of Riverside Apartments:",
+      "The water supply to Buildings A and B will be shut off on Tuesday, July 8, from 9:00 A.M. to 1:00 P.M.",
+      "During this time, workers will replace old pipes in the basement.",
+      "Residents of Building C will not be affected.",
+      "We recommend storing some water in advance for drinking and cooking.",
+      "We apologize for the inconvenience. — Property Management"
+    ],
+    ja: "リバーサイド・アパートの住民の皆様へ.7月8日(火)午前9時から午後1時まで,A 棟と B 棟の水道を止める.この間,作業員が地下の古い配管を交換する.C 棟の住民には影響はない.飲み水や料理用の水を前もってためておくことを勧める.ご不便をおかけして申し訳ない.管理会社.",
+    qs: [
+      { id: "r59q1", q: "Why will the water be shut off?", c: ["To test the water quality", "To build a new building", "To clean the basement", "To replace pipes"], a: 3, ev: [2], d: 400, why: "workers will replace old pipes in the basement.配管の交換のため.", x: ["水質検査の話は書かれていない.", "新しい建物を建てる話は出てこない.", "地下(basement)は作業の場所で,掃除するとは書かれていない.", ""] },
+      { id: "r59q2", q: "Who will NOT be affected by the shutoff?", c: ["Residents of Building A", "Residents of Building B", "Residents of Building C", "Property managers"], a: 2, ev: [1, 3], d: 400, why: "Residents of Building C will not be affected.水が止まるのは A 棟と B 棟.", x: ["A 棟は水が止まる.", "B 棟も水が止まる.", "", "管理会社が影響を受けるかどうかは書かれていない."] },
+      { id: "r59q3", q: "What are residents advised to do?", c: ["Leave the building by 9:00 A.M.", "Call the management office", "Turn off their heaters", "Save water before the work begins"], a: 3, ev: [4], d: 600, why: "storing some water in advance(前もって水をためておく)= save water before the work begins.", x: ["建物を出るようには言われていない.", "管理会社に電話するようには言われていない.", "暖房の話は出てこない.", ""] }
+    ]
+  },
+  {
+    id: "r60",
+    kind: "チャット",
+    title: "Online chat — Marketing team",
+    target: 120,
+    s: [
+      "Jenna Ross [10:02 A.M.]: Has anyone heard from the printer about the new catalogs?",
+      "Paul Diaz [10:04 A.M.]: Yes, they called this morning. The catalogs will be ready on Thursday instead of Tuesday.",
+      "Jenna Ross [10:05 A.M.]: That's a problem. The trade show starts on Wednesday.",
+      "Mia Chen [10:06 A.M.]: Could we bring printed copies of the online version for the first day?",
+      "Jenna Ross [10:07 A.M.]: Good idea. Paul, can you print 200 copies here at the office?",
+      "Paul Diaz [10:08 A.M.]: Sure. I'll start right after lunch.",
+      "Mia Chen [10:09 A.M.]: And I can pick up the real catalogs on Thursday morning and bring them to the show."
+    ],
+    ja: "ロス [10:02]:新しいカタログについて印刷所から連絡はあった? ディアス [10:04]:今朝電話があった.カタログは火曜日ではなく木曜日にできあがる. ロス [10:05]:それは困る.見本市は水曜日から. チェン [10:06]:初日はオンライン版を印刷したものを持っていけないかな. ロス [10:07]:いい考え.ポール,事務所で200部印刷できる? ディアス [10:08]:もちろん.昼食の後すぐ始めるよ. チェン [10:09]:それから,木曜の朝に本物のカタログを受け取って見本市に持っていくね.",
+    qs: [
+      { id: "r60q1", q: "What problem does Ms. Ross mention?", c: ["The catalogs contain errors.", "The catalogs will not be ready for the start of an event.", "The trade show has been canceled.", "The printer has closed."], a: 1, ev: [1, 2], d: 600, why: "カタログは木曜日にできるが,見本市は水曜日から.初日に間に合わない.", x: ["カタログの誤りの話は出てこない.", "", "見本市が中止になったとは書かれていない.", "印刷所は今朝電話してきており,閉店していない."] },
+      { id: "r60q2", q: "At 10:07 A.M., what does Ms. Ross mean when she writes, \"Good idea\"?", c: ["She agrees to make copies at the office.", "She wants to cancel the order.", "She will call the printer again.", "She prefers to wait until Thursday."], a: 0, ev: [3, 4], d: 900, why: "直前のチェンさんの提案(オンライン版を印刷して持っていく)に賛成し,すぐに事務所で200部印刷するよう頼んでいる.", x: ["", "注文を取り消すとは言っていない(本物のカタログも木曜に受け取る).", "印刷所に再び電話するとは言っていない.", "木曜まで待つのではなく,初日の分を事務所で印刷する."] },
+      { id: "r60q3", q: "What will Ms. Chen most likely do on Thursday?", c: ["Print copies at the office", "Call the printer", "Return to the office", "Bring catalogs to the trade show"], a: 3, ev: [6], d: 700, why: "I can pick up the real catalogs on Thursday morning and bring them to the show.", x: ["事務所で印刷するのはディアスさんで,今日の午後.", "印刷所に電話するとは言っていない.", "事務所に戻るとは書かれていない.", ""] }
+    ]
+  },
+  {
+    id: "r61",
+    kind: "記事",
+    title: "City Business Journal — Office Furniture Maker Goes Green",
+    target: 160,
+    s: [
+      "Norwood Furniture, which has made office desks and chairs in Clayton for more than 60 years, announced on Monday that all of its products will be made from recycled or sustainably harvested materials by 2028.",
+      "The company currently uses recycled steel in about half of its products.",
+      "According to CEO Daniel Price, the change was driven largely by demand from corporate customers, many of whom now require suppliers to meet environmental standards.",
+      "\"Five years ago, our clients asked mainly about price,\" Mr. Price said. \"Today, the first question is often where our materials come from.\"",
+      "The transition will require new equipment at the company's main factory, and production may slow down temporarily while the machines are installed.",
+      "Norwood expects its prices to rise by about 5 percent, though Mr. Price said the company hopes to reduce that figure as it finds more efficient methods."
+    ],
+    ja: "クレイトンで60年以上事務用の机といすを作ってきたノーウッド家具は月曜日,2028年までに全製品を再生素材か持続可能な方法で収穫された素材で作ると発表した.同社は現在,製品の約半分に再生鋼を使っている.プライス CEO によると,この変更の大きな理由は法人客からの需要で,その多くが今では仕入先に環境の基準を満たすよう求めている.「5年前,顧客の質問は主に価格についてだった.今は最初に,素材がどこから来るのかをよく聞かれる」とプライス氏は話した.切り替えには本工場に新しい設備が必要で,機械を設置する間,生産が一時的に遅くなる可能性がある.ノーウッドは価格が約5%上がると見込んでいるが,プライス氏は,より効率的な方法を見つけてこの数字を下げたいとしている.",
+    qs: [
+      { id: "r61q1", q: "What is the article mainly about?", c: ["A company's plan to change its materials", "The opening of a new furniture store", "A decline in demand for office furniture", "The retirement of a company's CEO"], a: 0, ev: [0], d: 800, why: "第1文が主題:2028年までに全製品を再生素材などで作る.素材を変える計画.", x: ["", "新しい店の開店の話は出てこない.", "需要が減っているとは書かれていない(むしろ環境への要望が増えている).", "CEO の引退の話は出てこない."] },
+      { id: "r61q2", q: "According to Mr. Price, what has changed in recent years?", c: ["The cost of steel has fallen.", "Fewer companies buy office desks.", "The company has moved its factory.", "Clients are more interested in where materials come from."], a: 3, ev: [3], d: 1000, why: "5年前は価格の質問が中心だったが,今は素材の出どころをまず聞かれる.", x: ["鋼の価格が下がったとは書かれていない.", "机を買う会社が減ったとは書かれていない.", "工場を移したとは書かれていない(新しい設備を入れる).", ""] },
+      { id: "r61q3", q: "What is indicated about the new equipment?", c: ["It has already been installed.", "It will lower prices immediately.", "Its installation may affect production for a time.", "It will be used only for chairs."], a: 2, ev: [4], d: 1200, why: "production may slow down temporarily while the machines are installed.設置の間,生産が一時的に遅くなるかもしれない.", x: ["これから設置するもので,まだ入っていない.", "価格はむしろ約5%上がる見込み.", "", "いすだけに使うとは書かれていない."] }
+    ]
+  },
+  {
+    id: "r62",
+    kind: "広告とメールと予定表",
+    title: "Summit Language School — Business English Courses",
+    target: 210,
+    s: [
+      "Summit Language School offers business English courses for working professionals.",
+      { t: "table", head: ["Course", "Days", "Time", "Fee"], rows: [
+        ["Presentations", "Mon. & Wed.", "7:00–8:30 P.M.", "$320"],
+        ["E-mail Writing", "Tue. & Thu.", "7:00–8:30 P.M.", "$280"],
+        ["Negotiation", "Saturday", "10:00 A.M.–1:00 P.M.", "$350"]
+      ] },
+      "All courses last eight weeks. Students who sign up for two courses receive 15 percent off the total fee.",
+      { t: "doc", title: "E-mail — From: Kenji Abe / To: Summit Language School / Date: August 20" },
+      "Hello,",
+      "I work in sales and often have to write to overseas clients and give presentations in English.",
+      "I would like to take courses that will help with both.",
+      "I travel for work on Wednesdays every other week, so I would like to know whether I could make up any classes I miss.",
+      { t: "doc", title: "E-mail — From: Summit Language School / To: Kenji Abe / Date: August 21" },
+      "Dear Mr. Abe,",
+      "Thank you for your interest. Students may make up a missed class by joining a recorded online session within one week.",
+      "Please note that make-up sessions are limited to three per course."
+    ],
+    ja: "サミット語学学校は社会人向けのビジネス英語の講座を開いている.[表:プレゼンテーション 月・水 午後7時〜8時半 320ドル,メールの書き方 火・木 午後7時〜8時半 280ドル,交渉 土曜 午前10時〜午後1時 350ドル] どの講座も8週間.2つの講座を申し込むと合計が15%引き.[メール1:阿部さんから] 営業の仕事で,海外の顧客にメールを書いたり,英語で発表したりすることが多い.その両方に役立つ講座を受けたい.隔週の水曜日に出張があるので,休んだ授業を補えるか知りたい.[メール2:学校から] 休んだ授業は,1週間以内に録画のオンライン授業に参加すれば補える.補講は1講座につき3回まで.",
+    qs: [
+      { id: "r62q1", q: "Which courses will Mr. Abe most likely take?", c: ["Presentations and Negotiation", "E-mail Writing and Negotiation", "Negotiation only", "Presentations and E-mail Writing"], a: 3, ev: [5, 6, [1, 0], [1, 1]], d: 800, why: "海外の顧客へのメールと英語の発表,両方に役立つ講座 → Presentations と E-mail Writing.", x: ["交渉の講座は,メールと発表の両方という希望に合わない.", "発表の講座が入っていない.", "メールと発表のどちらにも当たらない.", ""] },
+      { id: "r62q2", q: "How much will Mr. Abe pay if he takes those two courses?", c: ["$510", "$600", "$540", "$85"], a: 0, ev: [[1, 0], [1, 1], 2], d: 1300, why: "320 + 280 = 600ドル.2つの講座を申し込むと15%引きなので,600 × 0.85 = 510ドル.", x: ["", "割引前の合計.2講座で15%引きになる条件を見落としている.", "10%引きで計算した数字.割引は15%.", "割引の額(600 × 0.15).支払う額ではない."] },
+      { id: "r62q3", q: "What problem might Mr. Abe have with the Presentations course?", c: ["It is too expensive.", "It meets on a day when he sometimes travels.", "It is only offered online.", "It is held on weekends."], a: 1, ev: [7, [1, 0]], d: 1400, why: "Presentations は月曜と水曜.阿部さんは隔週の水曜日に出張がある.8週間で約4回休むことになり,補講の上限(3回)を超えるおそれもある.3つの文書をつないで答える.", x: ["値段について阿部さんは何も言っていない.", "", "授業は教室で行われ,オンラインは補講だけ.", "Presentations は平日(月・水)の夜."] }
+    ]
+  },
+  {
+    id: "r63",
+    kind: "レビュー",
+    title: "Product Review — TrailPro Hiking Backpack ★★★★★",
+    target: 110,
+    s: [
+      "I bought the TrailPro backpack for a two-week hiking trip and was very impressed.",
+      "Despite its large size, it is surprisingly light, and the padded straps kept my shoulders comfortable even after long days on the trail.",
+      "The side pockets are big enough for water bottles, and the built-in rain cover kept everything dry during two days of heavy rain.",
+      "My only complaint is that the color options are limited; I would have preferred something brighter than dark green.",
+      "At $150, it is not cheap, but I think it is worth the price. — Rachel Kim"
+    ],
+    ja: "2週間の山歩きの旅のためにトレイルプロのリュックを買い,とても感心した.大きいのに驚くほど軽く,クッションの入った肩ひものおかげで,山道を長く歩いた日も肩が楽だった.横のポケットは水筒が入る大きさで,付属の雨よけカバーのおかげで2日間の大雨でも中身がぬれなかった.唯一の不満は色の選択肢が少ないことで,濃い緑より明るい色がよかった.150ドルと安くはないが,値段だけの価値はあると思う.",
+    qs: [
+      { id: "r63q1", q: "What does Ms. Kim say about the backpack's weight?", c: ["It is lighter than she expected.", "It is too heavy for long trips.", "It is heavier than other models.", "It becomes heavy when wet."], a: 0, ev: [1], d: 600, why: "surprisingly light(驚くほど軽い)= 思ったより軽い.", x: ["", "長い旅でも肩が楽だったと書いており,重すぎるとは言っていない.", "ほかの機種との比較はしていない.", "大雨でも中身がぬれなかったとあり,ぬれて重くなる話はない."] },
+      { id: "r63q2", q: "What feature protected her belongings from the weather?", c: ["The padded straps", "The side pockets", "The rain cover", "The dark green color"], a: 2, ev: [2], d: 500, why: "the built-in rain cover kept everything dry.雨よけカバーが中身を守った.", x: ["肩ひもは肩を楽にするためのもの.", "横のポケットは水筒を入れるためのもの.", "", "色は天気から守るものではない."] },
+      { id: "r63q3", q: "What does Ms. Kim dislike about the backpack?", c: ["Its price", "Its size", "The quality of the straps", "The choice of colors"], a: 3, ev: [3], d: 600, why: "My only complaint is that the color options are limited.不満は色の選択肢の少なさだけ.", x: ["安くはないが値段の価値はあると書いており,不満ではない.", "大きさは長所として書いている(大きいのに軽い).", "肩ひもはほめている.", ""] }
+    ]
+  },
+  {
+    id: "r64",
+    kind: "記事",
+    title: "Global Trade Weekly — Shipping Delays Ease",
+    target: 190,
+    s: [
+      "After nearly two years of severe disruption, international shipping times are finally returning to normal, according to a report released Tuesday by the Maritime Logistics Council.",
+      "The average time for a container to travel from Asia to Europe fell to 38 days in the last quarter, compared with a peak of 61 days the previous year.",
+      "The report credits the improvement to the opening of two new terminals in Rotterdam and to fewer labor shortages at major ports.",
+      "However, it cautions that freight rates remain about 30 percent higher than before the disruption, largely because fuel costs have not come down.",
+      "Retailers that stocked up heavily during the delays now face a different problem: excess inventory.",
+      "Several large chains have announced discounts of up to 40 percent to clear warehouse space before the holiday season.",
+      "Analysts warn that such discounts could squeeze profit margins, even as transport becomes more reliable."
+    ],
+    ja: "海事物流協議会が火曜日に発表した報告書によると,2年近く続いた深刻な混乱の後,国際輸送の日数はようやく通常に戻りつつある.コンテナがアジアからヨーロッパへ運ばれる平均日数は,前年の最長61日に対し,直近の四半期は38日に下がった.報告書は,改善の理由をロッテルダムの2つの新しいターミナルの開業と,主要な港での人手不足の緩和に求めている.ただし,燃料費が下がっていないため,運賃は混乱前より約30%高いままだと注意を促している.遅れの間に大量に在庫を抱えた小売業者は,今は別の問題,つまり在庫の過剰に直面している.いくつかの大手チェーンは,休暇の時期の前に倉庫を空けるため,最大40%の値引きを発表した.専門家は,輸送の信頼性が高まる一方で,こうした値引きが利幅を圧迫しかねないと警告している.",
+    qs: [
+      { id: "r64q1", q: "According to the report, what helped reduce shipping times?", c: ["Lower fuel costs", "New port facilities", "Higher freight rates", "Fewer containers"], a: 1, ev: [2], d: 1000, why: "the opening of two new terminals in Rotterdam(新しいターミナル)= new port facilities.人手不足の緩和も理由だが,選択肢にあるのは新しい施設.", x: ["燃料費は下がっていない(運賃が高い理由).", "", "運賃が高いことは,日数が短くなった理由ではない.", "コンテナの数が減ったとは書かれていない."] },
+      { id: "r64q2", q: "Why are freight rates still high?", c: ["Ports are still too crowded.", "Retailers are ordering more goods.", "There are too few ships.", "Fuel remains expensive."], a: 3, ev: [3], d: 1100, why: "largely because fuel costs have not come down.燃料費が下がっていないのが主な理由.", x: ["港の混雑はむしろ解消に向かっている.", "小売業者はむしろ在庫が余っている.", "船の数の話は出てこない.", ""] },
+      { id: "r64q3", q: "What is suggested about some retailers?", c: ["They may earn less profit on each sale.", "They are building new warehouses.", "They are waiting for shipping to improve.", "They have stopped importing from Asia."], a: 0, ev: [5, 6], d: 1500, why: "在庫を減らすための大幅な値引き → could squeeze profit margins(利幅を圧迫する)= 1つ売るごとの利益が減るかもしれない.squeeze は「締めつける」.", x: ["", "倉庫を建てるのではなく,値引きで倉庫を空けようとしている.", "輸送はすでに改善しつつあり,待っているわけではない.", "アジアからの輸入をやめたとは書かれていない."] }
+    ]
   }
 ];
