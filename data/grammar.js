@@ -31,7 +31,17 @@ window.THM = {
   T27: { name: "決まった前置詞", s: "組み合わせで覚える.be responsible for, be eligible for, comply with, be aware of, in charge of, depend on, be committed to(-ing), be subject to, specialize in, refrain from, be equipped with.", def: "前置詞:名詞の前に置いて関係を示す語." },
   T28: { name: "未来完了と過去完了", s: "「by + 未来の時点」までに完了することは未来完了(will have + 過去分詞).過去のある時点より前に済んだことは過去完了(had + 過去分詞).", def: "完了形:ある時点までに完了・継続していることを表す形." },
   T29: { name: "使役動詞", s: "have / make / let + 人 + 動詞の原形.have + 物 + 過去分詞 は「(物を)〜してもらう」.get + 人 + to do(to が必要),help + 人 + (to) 原形.", def: "使役動詞:人や物に何かをさせることを表す動詞." },
-  T30: { name: "関係副詞 where と which", s: "空所の後ろが完全な文(主語も目的語もそろっている)なら関係副詞 where(先行詞が時なら when).主語や目的語が欠けていれば関係代名詞 which.前置詞 + which = where(in which).", def: "関係副詞:先行詞(場所・時など)を説明し,節の中で副詞の働きをする語." }
+  T30: { name: "関係副詞 where と which", s: "空所の後ろが完全な文(主語も目的語もそろっている)なら関係副詞 where(先行詞が時なら when).主語や目的語が欠けていれば関係代名詞 which.前置詞 + which = where(in which).", def: "関係副詞:先行詞(場所・時など)を説明し,節の中で副詞の働きをする語." },
+  T31: { name: "目的を表す形", s: "「〜するために」は to do / in order to do / so that + 主語 + can(will)+ 原形.後ろが動詞の原形なら in order to,節(主語 + 動詞)なら so that.for は後ろに名詞(for the meeting)か -ing の用途(for cutting).", def: "目的:動作をする理由・ねらい." },
+  T32: { name: "時を表す前置詞", s: "時刻・時点は at(at 3:00),曜日・日付は on(on Monday, on May 5),月・年・季節・長い期間は in(in June, in 2025).within は「〜以内に」,throughout は「〜の間ずっと」,in + 期間 は「〜後に」.", def: "前置詞:名詞の前に置いて,時・場所・関係を表す語." },
+  T33: { name: "自動詞と他動詞", s: "他動詞は前置詞なしで目的語をとる(discuss the plan, attend the meeting, reach the station, contact us, enter the room).自動詞は前置詞が必要(respond to, arrive at, reply to, apologize for).rise / raise,lie / lay は自動詞と他動詞の組.", def: "自動詞:目的語をとらない動詞.他動詞:目的語(〜を)をとる動詞." },
+  T34: { name: "時制の目印", s: "ago, yesterday, last 〜, in + 過去の年 → 過去形.tomorrow, next 〜, soon → 未来(will).currently, now, at the moment → 進行形.usually, every 〜, always → 現在形.", def: "時制:動詞の形で,いつのことかを表す仕組み." },
+  T35: { name: "名詞節をつくる語", s: "「〜かどうか」は whether(if).「〜ということ」は that.疑問詞(how, when, where, why, what)が名詞節をつくるときは,後ろが「主語 + 動詞」の順(間接疑問).whether の後ろには or not を置ける,前置詞の後ろは whether(if は不可).", def: "名詞節:文の中で主語や目的語になる節." },
+  T36: { name: "other と another", s: "another + 単数名詞(もう1つの),other + 複数名詞(ほかの),the other(2つのうちの残りの1つ・残り全部),others(ほかの人・物.単独で使う),each other(お互い).", def: "限定:the が付くと「残りの全部」に決まる." },
+  T37: { name: "対比・譲歩の接続詞", s: "whereas / while(一方で〜)は2つを対比する.even though(〜だけれども)は事実,even if(たとえ〜でも)は仮定.whereas, although は接続詞で,後ろに節が来る.", def: "譲歩:相手の言い分を認めつつ,反対のことを言うこと." },
+  T38: { name: "決まった前置詞のまとまり", s: "according to(〜によると),in addition to(〜に加えて),instead of(〜の代わりに),on behalf of(〜を代表して),regardless of(〜に関係なく),in spite of(〜にもかかわらず),as of(〜時点で・〜から),because of(〜のため).後ろは名詞か -ing.", def: "群前置詞:2語以上で1つの前置詞の働きをするまとまり." },
+  T39: { name: "人を目的語にとる動詞の形", s: "inform / notify / remind / assure + 人 + of 〜 / that 節.explain / suggest / mention + (to 人) + 内容(explain 人 〜 は不可).tell + 人 + 内容,say + 内容(say 人 は不可).", def: "目的語:動詞の動作を受ける語." },
+  T40: { name: "to do を続ける形容詞と名詞", s: "be able / likely / willing / eager / reluctant / pleased + to do.ability / plan / effort / decision / opportunity + to do.be worth -ing,be busy -ing は -ing.", def: "不定詞の形容詞用法:to do が前の名詞を説明する使い方." }
 };
 
 window.GRAM = [
@@ -429,5 +439,126 @@ window.GRAM = [
   { id: "g297", q: "We toured the factory in ____ the engines are assembled.", c: ["where", "that", "which", "what"], a: 2, t: "T30", d: 1300, why: "前置詞 in の直後に置けるのは which だけ.in which = where.where には前置詞の意味が含まれているので,in where とは言わない.", ja: "私たちは,エンジンが組み立てられている工場を見学した." },
   { id: "g298", q: "The day ____ we signed the contract was a Friday.", c: ["which", "where", "what", "when"], a: 3, t: "T30", d: 1000, why: "空所の後ろ we signed the contract は完全な文.先行詞が時(the day)なので関係副詞 when.場所なら where,時なら when.", ja: "契約に署名した日は金曜日だった." },
   { id: "g299", q: "The office ____ Mr. Kim works in is on the third floor.", c: ["where", "which", "when", "what"], a: 1, t: "T30", d: 1400, why: "後ろの文は works in で終わり,前置詞 in の目的語が欠けている.欠けた名詞を補うのは関係代名詞 which.where を入れると in が余る.", ja: "キムさんが働いている事務所は3階にある." },
-  { id: "g300", q: "There are several situations ____ this rule does not apply.", c: ["which", "what", "where", "who"], a: 2, t: "T30", d: 1400, why: "空所の後ろ this rule does not apply は完全な文.situation, case, point など,実際の場所でない「場面・状況」にも where を使う.", ja: "この規則が当てはまらない状況がいくつかある." }
+  { id: "g300", q: "There are several situations ____ this rule does not apply.", c: ["which", "what", "where", "who"], a: 2, t: "T30", d: 1400, why: "空所の後ろ this rule does not apply は完全な文.situation, case, point など,実際の場所でない「場面・状況」にも where を使う.", ja: "この規則が当てはまらない状況がいくつかある." },
+
+  // ---- 新しい定理 T31〜T40(g301〜) ----
+  // T31
+  { id: "g301", q: "Ms. Hill arrived early ____ prepare the meeting room.", c: ["to", "for", "so that", "because"], a: 0, t: "T31", d: 600, why: "後ろが動詞の原形 prepare なので,目的を表す to.so that の後ろは節(主語 + 動詞),for の後ろは名詞.", ja: "ヒルさんは会議室の準備をするために早く着いた." },
+  { id: "g302", q: "Please speak clearly so that everyone ____ hear you.", c: ["in order", "to", "for", "can"], a: 3, t: "T31", d: 700, why: "so that + 主語 + can + 原形 で「〜できるように」.", ja: "全員に聞こえるように,はっきり話してください." },
+  { id: "g303", q: "The store extended its hours ____ attract more customers.", c: ["so that", "in order to", "for", "because of"], a: 1, t: "T31", d: 800, why: "後ろが動詞の原形 attract なので in order to.so that の後ろには主語が必要.", ja: "その店はより多くの客を呼ぶために営業時間を延ばした." },
+  { id: "g304", q: "We use this knife ____ cutting bread.", c: ["to", "in order to", "for", "so that"], a: 2, t: "T31", d: 900, why: "後ろが -ing(cutting)で,物の用途を表すので for.to / in order to の後ろは原形.", ja: "このナイフはパンを切るのに使う." },
+  { id: "g305", q: "The manager sent a reminder ____ no one would forget the deadline.", c: ["so that", "to", "in order to", "for"], a: 0, t: "T31", d: 1000, why: "後ろが節(no one would forget)なので so that.過去の文では so that + 主語 + would / could.", ja: "部長は,だれも締め切りを忘れないよう催促を送った." },
+  { id: "g306", q: "Mr. Kim went to the bank ____ open an account.", c: ["with", "for", "by", "to"], a: 3, t: "T31", d: 500, why: "「口座を開くために」.後ろが原形 open なので目的の to.", ja: "キムさんは口座を開くために銀行へ行った." },
+  { id: "g307", q: "____ to reduce costs, the company moved to a smaller office.", c: ["So that", "In order", "For", "Because"], a: 1, t: "T31", d: 1100, why: "文頭の In order to do で「〜するために」.to の前に置けるのは in order.", ja: "費用を減らすため,その会社はより狭い事務所に移った." },
+  { id: "g308", q: "Please arrive ten minutes early so as ____ the start of the tour.", c: ["not miss", "to not missing", "not to miss", "not missing"], a: 2, t: "T31", d: 1200, why: "so as to do も「〜するために」.否定は so as not to do(not の位置は to の前).in order not to も同じ.", ja: "ツアーの開始に遅れないよう,10分前に来てください." },
+  { id: "g309", q: "The city built a new road ____ traffic would move more smoothly.", c: ["so that", "in order to", "for", "to"], a: 0, t: "T31", d: 900, why: "後ろが節(traffic would move)なので so that.", ja: "交通がもっと円滑に流れるよう,市は新しい道路を造った." },
+  { id: "g310", q: "She saved money ____ a new car.", c: ["to", "so that", "in order to", "for"], a: 3, t: "T31", d: 700, why: "後ろが名詞 a new car なので for(〜のために).to buy a new car なら to を使う.", ja: "彼女は新しい車のためにお金をためた." },
+
+  // T32
+  { id: "g311", q: "The meeting will start ____ 3:00 P.M.", c: ["in", "at", "on", "by"], a: 1, t: "T32", d: 300, why: "時刻には at.", ja: "会議は午後3時に始まる." },
+  { id: "g312", q: "The store is closed ____ Sundays.", c: ["in", "at", "on", "for"], a: 2, t: "T32", d: 400, why: "曜日には on.", ja: "その店は日曜日は休みだ." },
+  { id: "g313", q: "Our company was founded ____ 1998.", c: ["in", "on", "at", "for"], a: 0, t: "T32", d: 400, why: "年には in.", ja: "当社は1998年に創業した." },
+  { id: "g314", q: "The new product will be released ____ May 10.", c: ["in", "at", "for", "on"], a: 3, t: "T32", d: 600, why: "日付には on(月だけなら in May,日付まであれば on).", ja: "新製品は5月10日に発売される." },
+  { id: "g315", q: "Please return the form ____ seven days of receiving it.", c: ["during", "within", "since", "until"], a: 1, t: "T32", d: 700, why: "「受け取ってから7日以内に」なので within.", ja: "受け取ってから7日以内に用紙を返送してください." },
+  { id: "g316", q: "The museum is open to visitors ____ the year.", c: ["within", "since", "throughout", "by"], a: 2, t: "T32", d: 800, why: "「1年を通してずっと」なので throughout.", ja: "その博物館は1年中来館者を受け入れている." },
+  { id: "g317", q: "The repair technician will arrive ____ an hour.", c: ["in", "on", "at", "since"], a: 0, t: "T32", d: 900, why: "in + 期間 で「(今から)〜後に」.「1時間以内に」なら within.", ja: "修理の技術者は1時間後に到着する." },
+  { id: "g318", q: "The sale ends ____ midnight on Friday.", c: ["in", "on", "during", "at"], a: 3, t: "T32", d: 1000, why: "midnight, noon, night などの時点には at.", ja: "セールは金曜日の夜12時に終わる." },
+  { id: "g319", q: "Sales usually increase ____ the holiday season.", c: ["at", "during", "while", "since"], a: 1, t: "T32", d: 1100, why: "後ろが名詞 the holiday season で,「その期間中に」なので during.while は接続詞なので後ろに節が必要.", ja: "売上はふつう休暇の時期に増える." },
+  { id: "g320", q: "The workshop will be held ____ the morning of June 5.", c: ["in", "at", "on", "by"], a: 2, t: "T32", d: 1200, why: "in the morning は「午前中に」だが,特定の日の午前(the morning of June 5)には on を使う.", ja: "講習会は6月5日の午前に開かれる." },
+
+  // T33
+  { id: "g321", q: "We need to discuss ____ before Friday.", c: ["the budget", "about the budget", "on the budget", "for the budget"], a: 0, t: "T33", d: 600, why: "discuss は他動詞なので,前置詞なしで目的語をとる.discuss about とは言わない.", ja: "金曜日までに予算について話し合う必要がある." },
+  { id: "g322", q: "Please reply ____ this e-mail by tomorrow.", c: ["for", "at", "on", "to"], a: 3, t: "T33", d: 500, why: "reply は自動詞.「〜に返信する」は reply to.", ja: "明日までにこのメールに返信してください." },
+  { id: "g323", q: "All employees are required to attend ____ the safety meeting.", c: ["to", "(何も入らない)", "in", "at"], a: 1, t: "T33", d: 700, why: "attend(出席する)は他動詞なので,前置詞を置かずに attend the meeting.", ja: "全従業員は安全会議に出席しなければならない." },
+  { id: "g324", q: "The company will ____ its prices next month.", c: ["rise", "arise", "raise", "rising"], a: 2, t: "T33", d: 800, why: "its prices(目的語)があるので他動詞 raise(〜を上げる).rise は自動詞(上がる).", ja: "その会社は来月値上げをする." },
+  { id: "g325", q: "The number of visitors has ____ steadily.", c: ["risen", "raised", "raising", "raise"], a: 0, t: "T33", d: 800, why: "後ろに目的語がないので自動詞 rise(上がる)の過去分詞 risen.", ja: "来場者の数は着実に増えている." },
+  { id: "g326", q: "Our train will arrive ____ the station at noon.", c: ["to", "(何も入らない)", "on", "at"], a: 3, t: "T33", d: 600, why: "arrive は自動詞.地点には arrive at,都市・国には arrive in.", ja: "電車は正午に駅に着く." },
+  { id: "g327", q: "You can contact ____ by phone or e-mail.", c: ["to us", "us", "with us", "for us"], a: 1, t: "T33", d: 900, why: "contact(連絡する)は他動詞なので contact us.", ja: "電話かメールで私たちに連絡できる." },
+  { id: "g328", q: "The shipment is expected to reach ____ on Monday.", c: ["to Tokyo", "at Tokyo", "Tokyo", "in Tokyo"], a: 2, t: "T33", d: 1000, why: "reach(到着する)は他動詞なので前置詞なし.arrive in Tokyo と同じ意味.", ja: "荷物は月曜日に東京に着く予定だ." },
+  { id: "g329", q: "Please ____ the documents on my desk when you are finished.", c: ["lay", "lie", "lying", "lain"], a: 0, t: "T33", d: 1300, why: "the documents(目的語)があるので他動詞 lay(〜を置く).lie は自動詞(横たわる・ある)で,過去形は lay なので紛らわしい.", ja: "終わったら書類を私の机に置いてください." },
+  { id: "g330", q: "Please enter ____ the building through the side door.", c: ["into", "to", "in", "(何も入らない)"], a: 3, t: "T33", d: 1200, why: "enter(入る)は他動詞なので,前置詞を置かずに enter the building.enter into は「(契約などを)結ぶ」という別の意味.", ja: "建物には横の扉から入ってください." },
+
+  // T34
+  { id: "g331", q: "Mr. Ito ____ the company three years ago.", c: ["joins", "joined", "has joined", "will join"], a: 1, t: "T34", d: 400, why: "ago は過去の時点を表すので過去形 joined.現在完了は ago と使えない.", ja: "伊藤さんは3年前に入社した." },
+  { id: "g332", q: "The new store ____ next month.", c: ["opened", "opens", "will open", "has opened"], a: 2, t: "T34", d: 500, why: "next month は未来なので will open.", ja: "新しい店は来月開店する." },
+  { id: "g333", q: "Ms. Lee is ____ working on a new project.", c: ["currently", "current", "currency", "currents"], a: 0, t: "T34", d: 500, why: "be と -ing の間なので副詞 currently(現在).進行形と組む語.", ja: "リーさんは今,新しい事業に取り組んでいる." },
+  { id: "g334", q: "The bus usually ____ at 8:15.", c: ["leave", "leaving", "is left", "leaves"], a: 3, t: "T34", d: 600, why: "usually(ふつうは)は習慣を表すので現在形.主語が単数なので leaves.", ja: "バスはふつう8時15分に出る." },
+  { id: "g335", q: "We ____ the contract yesterday.", c: ["sign", "signed", "have signed", "will sign"], a: 1, t: "T34", d: 700, why: "yesterday は過去なので過去形 signed.", ja: "私たちは昨日,契約に署名した." },
+  { id: "g336", q: "At the moment, the manager ____ with a client.", c: ["meets", "met", "is meeting", "has met"], a: 2, t: "T34", d: 800, why: "at the moment(今ちょうど)は進行形の目印.", ja: "部長は今,顧客と会っている." },
+  { id: "g337", q: "The results of the survey ____ announced soon.", c: ["will be", "have been", "were", "are being"], a: 0, t: "T34", d: 900, why: "soon(まもなく)は未来なので will be announced.", ja: "調査結果はまもなく発表される." },
+  { id: "g338", q: "In 2020, the firm ____ its first overseas office.", c: ["opens", "had been opening", "has opened", "opened"], a: 3, t: "T34", d: 1000, why: "In 2020 は過去の年なので過去形 opened.", ja: "2020年,その会社は初の海外事務所を開いた." },
+  { id: "g339", q: "Every Friday, the team ____ a short meeting to review the week.", c: ["held", "holds", "is holding", "will have held"], a: 1, t: "T34", d: 1100, why: "Every Friday(毎週金曜日)は習慣なので現在形 holds.", ja: "毎週金曜日,チームは1週間を振り返る短い会議を開く." },
+  { id: "g340", q: "The CEO ____ to Paris tomorrow morning for the trade show.", c: ["flew", "has flown", "is flying", "had been flying"], a: 2, t: "T34", d: 1300, why: "tomorrow があり,すでに決まっている予定は現在進行形でも表せる(is flying).過去形・完了形は tomorrow と合わない.", ja: "CEO は明朝,見本市のためにパリへ飛ぶ." },
+
+  // T35
+  { id: "g341", q: "Please let me know ____ you can attend the meeting.", c: ["whether", "what", "that", "which"], a: 0, t: "T35", d: 600, why: "「出席できるかどうか」なので whether.", ja: "会議に出席できるかどうか知らせてください." },
+  { id: "g342", q: "I am not sure ____ the train leaves.", c: ["time what", "what time does", "what does time", "what time"], a: 3, t: "T35", d: 700, why: "間接疑問では,疑問詞の後ろは「主語 + 動詞」の順.what time the train leaves(does は使わない).", ja: "電車が何時に出るのか分からない." },
+  { id: "g343", q: "The manager explained ____ the system works.", c: ["what", "how", "that", "whether"], a: 1, t: "T35", d: 800, why: "後ろの the system works は完全な文.「どのように動くか」なので how.what は後ろに欠けた要素が必要.", ja: "部長はそのシステムがどう動くかを説明した." },
+  { id: "g344", q: "We were told ____ the office would be closed on Monday.", c: ["what", "whether", "that", "which"], a: 2, t: "T35", d: 800, why: "後ろが完全な文で,「〜ということ」を伝えているので that.", ja: "月曜日は事務所が休みだと言われた." },
+  { id: "g345", q: "Do you know where ____?", c: ["the station is", "is the station", "does the station", "the station"], a: 0, t: "T35", d: 900, why: "間接疑問(Do you know の目的語)では,疑問詞の後ろは「主語 + 動詞」の順.where the station is.", ja: "駅がどこにあるか知っていますか." },
+  { id: "g346", q: "____ the event will be held outdoors depends on the weather.", c: ["If", "That", "What", "Whether"], a: 3, t: "T35", d: 1000, why: "文頭で主語になる「〜かどうか」は whether.if は主語の位置では使えない.", ja: "催しを屋外で行うかどうかは天気次第だ." },
+  { id: "g347", q: "The decision depends on ____ the client approves the budget.", c: ["if", "whether", "that", "what"], a: 1, t: "T35", d: 1100, why: "前置詞 on の後ろなので whether(if は前置詞の後ろに置けない).", ja: "決定は顧客が予算を承認するかどうかにかかっている." },
+  { id: "g348", q: "Please tell us ____ or not you will need a hotel room.", c: ["if", "that", "whether", "what"], a: 2, t: "T35", d: 1100, why: "直後に or not を置けるのは whether.", ja: "ホテルの部屋が必要かどうか教えてください." },
+  { id: "g349", q: "No one knows ____ caused the system failure.", c: ["what", "that", "whether", "how"], a: 0, t: "T35", d: 1200, why: "caused の主語が欠けているので what(何が〜したか).how / whether / that の後ろは完全な文.", ja: "何がシステムの障害を引き起こしたのか,だれも分からない." },
+  { id: "g350", q: "The fact ____ sales have declined is worrying.", c: ["which", "what", "whether", "that"], a: 3, t: "T35", d: 1400, why: "the fact that + 完全な文 で「〜という事実」(同格の that).後ろは完全な文なので,関係代名詞の which / what は入らない.", ja: "売上が減っているという事実は心配だ." },
+
+  // T36
+  { id: "g351", q: "Would you like ____ cup of coffee?", c: ["other", "another", "others", "the others"], a: 1, t: "T36", d: 500, why: "後ろが単数名詞 cup で「もう1杯」なので another.", ja: "コーヒーをもう1杯いかがですか." },
+  { id: "g352", q: "Some employees walk to work, while ____ take the bus.", c: ["another", "the other", "others", "other"], a: 2, t: "T36", d: 600, why: "後ろに名詞がなく「ほかの人たち」なので others.other は後ろに名詞が必要.", ja: "歩いて通勤する社員もいれば,バスに乗る社員もいる." },
+  { id: "g353", q: "We have two offices; one is in Osaka, and ____ is in Tokyo.", c: ["the other", "other", "others", "another"], a: 0, t: "T36", d: 700, why: "2つのうちの残りの1つは the other.", ja: "事務所は2つあり,1つは大阪,もう1つは東京にある." },
+  { id: "g354", q: "Please contact us if you have any ____ questions.", c: ["another", "the other", "others", "other"], a: 3, t: "T36", d: 700, why: "後ろが複数名詞 questions なので other.another は単数名詞と使う.", ja: "ほかにご質問があればご連絡ください." },
+  { id: "g355", q: "The team members help each ____ when they are busy.", c: ["another", "other", "others", "one"], a: 1, t: "T36", d: 800, why: "each other で「お互い」.", ja: "チームの仲間は忙しいときにお互いに助け合う." },
+  { id: "g356", q: "Only three people came; ____ were on vacation.", c: ["another", "others", "the others", "other"], a: 2, t: "T36", d: 900, why: "決まった人数の中の「残りの全員」なので the others.", ja: "3人しか来なかった.残りは全員休暇中だった." },
+  { id: "g357", q: "The flight was canceled, so we had to book ____ one.", c: ["another", "others", "other", "the others"], a: 0, t: "T36", d: 1000, why: "one(= flight)は単数.「別の1便」なので another.", ja: "便が欠航したので,別の便を予約しなければならなかった." },
+  { id: "g358", q: "Mr. Sato visits the factory every ____ week.", c: ["another", "the other", "others", "other"], a: 3, t: "T36", d: 1000, why: "every other + 単数名詞 で「1つおきに」.every other week は「隔週で」.", ja: "佐藤さんは隔週で工場を訪れる." },
+  { id: "g359", q: "One of the printers works, but ____ two are broken.", c: ["another", "the other", "others", "other"], a: 1, t: "T36", d: 1100, why: "3台のうち1台を除いた残りの2台なので the other two.the があるので残りが決まる.", ja: "プリンターの1台は動くが,残りの2台は壊れている." },
+  { id: "g360", q: "In ____ words, the project will be delayed by a month.", c: ["the other", "another", "other", "others"], a: 2, t: "T36", d: 1300, why: "in other words で「言い換えれば」.決まった言い方.", ja: "言い換えれば,事業は1か月遅れるということだ." },
+
+  // T37
+  { id: "g361", q: "Sales rose in Asia, ____ they fell in Europe.", c: ["whereas", "despite", "because", "so"], a: 0, t: "T37", d: 700, why: "アジアでは増え,ヨーロッパでは減ったという対比なので whereas(一方で).", ja: "アジアでは売上が伸びたが,一方でヨーロッパでは減った." },
+  { id: "g362", q: "____ the restaurant is small, it is very popular.", c: ["Even if", "Despite", "However", "Even though"], a: 3, t: "T37", d: 800, why: "「小さい」は事実なので even though(〜だけれども).even if は「たとえ〜でも」という仮定.", ja: "そのレストランは小さいが,とても人気がある." },
+  { id: "g363", q: "The event will take place ____ it rains.", c: ["even though", "even if", "whereas", "despite"], a: 1, t: "T37", d: 800, why: "雨が降るかどうかは分からないので,仮定の even if(たとえ〜でも).", ja: "たとえ雨が降っても,催しは行われる." },
+  { id: "g364", q: "Some staff prefer working at home, ____ others prefer the office.", c: ["despite", "during", "while", "so"], a: 2, t: "T37", d: 900, why: "2つのグループの対比なので while(一方で).during は前置詞なので後ろに節は置けない.", ja: "在宅勤務を好むスタッフもいれば,一方で事務所を好むスタッフもいる." },
+  { id: "g365", q: "____ you are late, please call the office.", c: ["In case", "Even though", "Whereas", "Despite"], a: 0, t: "T37", d: 1000, why: "「遅れる場合には」なので in case.対比や譲歩の意味ではない.", ja: "遅れる場合は事務所に電話してください." },
+  { id: "g366", q: "The first model is cheap, ____ the second one is more reliable.", c: ["despite", "although of", "in spite", "whereas"], a: 3, t: "T37", d: 1000, why: "2つの機種の対比なので whereas.in spite と despite は前置詞で,後ろに節を置けない.", ja: "1つ目の機種は安く,一方で2つ目の機種はより信頼性が高い." },
+  { id: "g367", q: "____ he had little experience, Mr. Ono was hired.", c: ["Despite", "Even though", "Even", "Nevertheless"], a: 1, t: "T37", d: 1100, why: "後ろが節(he had little experience)で,事実を認めているので even though.despite は前置詞,nevertheless は副詞.", ja: "経験が少なかったにもかかわらず,小野さんは採用された." },
+  { id: "g368", q: "____ the price increases, we will continue to buy from this supplier.", c: ["Even though", "Whereas", "Even if", "Despite"], a: 2, t: "T37", d: 1200, why: "値上がりするかどうかはまだ分からないので,仮定の even if.", ja: "たとえ値上がりしても,この仕入先から買い続ける." },
+  { id: "g369", q: "____ the first half of the year was difficult, the second half was very successful.", c: ["Whereas", "Because", "Despite", "Unless"], a: 0, t: "T37", d: 1300, why: "前半と後半の対比なので whereas.despite は前置詞で,後ろに節は置けない.", ja: "上半期は苦しかったが,一方で下半期はとても好調だった." },
+  { id: "g370", q: "The proposal was rejected, ____ it had strong support from the staff.", c: ["even if", "whereas", "so that", "even though"], a: 3, t: "T37", d: 1400, why: "スタッフの強い支持は「あった」事実なので even though(〜だったのに).even if は仮定.", ja: "スタッフから強い支持があったのに,その提案は却下された." },
+
+  // T38
+  { id: "g371", q: "____ the weather report, it will rain tomorrow.", c: ["Instead of", "According to", "Because", "In addition"], a: 1, t: "T38", d: 600, why: "「天気予報によると」なので according to.", ja: "天気予報によると,明日は雨が降る." },
+  { id: "g372", q: "____ the usual menu, the café offers seasonal dishes.", c: ["Instead", "According", "In addition to", "Because"], a: 2, t: "T38", d: 700, why: "「通常のメニューに加えて」なので in addition to.後ろは名詞.", ja: "通常のメニューに加えて,そのカフェは季節の料理を出している." },
+  { id: "g373", q: "Ms. Ito took the train ____ driving.", c: ["instead of", "in spite", "according to", "on behalf"], a: 0, t: "T38", d: 700, why: "「車で行く代わりに」なので instead of.後ろは -ing.", ja: "伊藤さんは車ではなく電車で行った." },
+  { id: "g374", q: "Mr. Park accepted the award ____ the entire team.", c: ["instead", "because", "in addition", "on behalf of"], a: 3, t: "T38", d: 900, why: "「チーム全体を代表して」なので on behalf of.", ja: "パークさんはチーム全体を代表して賞を受け取った." },
+  { id: "g375", q: "All employees must attend the training, ____ their position.", c: ["according to", "regardless of", "instead of", "because"], a: 1, t: "T38", d: 1000, why: "「役職に関係なく」なので regardless of.", ja: "全従業員は,役職に関係なく研修に出席しなければならない." },
+  { id: "g376", q: "____ April 1, the new prices will apply.", c: ["Because of", "Instead of", "As of", "Regardless of"], a: 2, t: "T38", d: 1100, why: "as of + 日付 で「〜から・〜時点で」.", ja: "4月1日から,新しい価格が適用される." },
+  { id: "g377", q: "The game was canceled ____ the heavy snow.", c: ["because of", "because", "according", "instead"], a: 0, t: "T38", d: 1000, why: "後ろが名詞 the heavy snow なので because of.because は接続詞で後ろに節が必要.", ja: "大雪のため試合は中止された." },
+  { id: "g378", q: "The team finished on time ____ the shortage of staff.", c: ["instead", "because", "even though", "in spite of"], a: 3, t: "T38", d: 1200, why: "「人手不足にもかかわらず」.後ろが名詞なので in spite of(= despite).even though は接続詞.", ja: "人手不足にもかかわらず,チームは期限どおりに終えた." },
+  { id: "g379", q: "The report was rewritten ____ the client's feedback.", c: ["in terms", "in response to", "responding", "respond to"], a: 1, t: "T38", d: 1300, why: "in response to 〜 で「〜に応えて」.後ろは名詞.", ja: "報告書は顧客の意見に応えて書き直された." },
+  { id: "g380", q: "____ cost, the second option is better than the first.", c: ["On behalf of", "Instead of", "In terms of", "As of"], a: 2, t: "T38", d: 1400, why: "in terms of 〜 で「〜の点では」.", ja: "費用の点では,2つ目の案の方が1つ目より良い." },
+
+  // T39
+  { id: "g381", q: "Please inform ____ of any changes to the schedule.", c: ["us", "to us", "for us", "with us"], a: 0, t: "T39", d: 800, why: "inform + 人 + of 〜 で「人に〜を知らせる」.人の前に前置詞は付けない.", ja: "予定の変更があればお知らせください." },
+  { id: "g382", q: "The manager explained ____ the new rules.", c: ["us", "us to", "for us", "to us"], a: 3, t: "T39", d: 900, why: "explain は「explain + 内容 + to 人」か「explain to 人 + 内容」.explain us とは言わない.", ja: "部長は私たちに新しい規則を説明した." },
+  { id: "g383", q: "This e-mail is to remind you ____ tomorrow's meeting.", c: ["to", "about", "for", "with"], a: 1, t: "T39", d: 900, why: "remind + 人 + of / about 〜 で「人に〜を思い出させる」.", ja: "このメールは明日の会議をお知らせするためのものです." },
+  { id: "g384", q: "Mr. Kim ____ that the delivery would arrive on time.", c: ["told", "said us", "assured us", "explained us"], a: 2, t: "T39", d: 1000, why: "assure + 人 + that 節 で「人に〜と保証する」.say us,explain us とは言わない.told なら told us that が必要.", ja: "キムさんは,配達は時間どおりに届くと私たちに請け合った." },
+  { id: "g385", q: "Ms. Hara ____ me that the meeting had been canceled.", c: ["told", "said", "explained", "mentioned"], a: 0, t: "T39", d: 1000, why: "tell + 人 + that 節.say / explain / mention は人を直接目的語にとらない(say to me that).", ja: "原さんは会議が中止になったと私に言った." },
+  { id: "g386", q: "Please notify the front desk ____ you plan to check out late.", c: ["to", "for", "of", "if"], a: 3, t: "T39", d: 1100, why: "notify + 人 + of 名詞 / that 節.ここでは「遅いチェックアウトの予定なら知らせて」という条件なので if.", ja: "遅くチェックアウトする予定なら,フロントに知らせてください." },
+  { id: "g387", q: "The guide reminded the tourists ____ their bags on the bus.", c: ["not leaving", "not to leave", "to not leaving", "not leave"], a: 1, t: "T39", d: 1200, why: "remind + 人 + to do で「人に〜するよう念を押す」.否定は not to do.", ja: "ガイドは観光客に,バスにかばんを置き忘れないよう念を押した." },
+  { id: "g388", q: "Mr. Lee suggested ____ that we postpone the launch.", c: ["us", "for us", "to us", "with us"], a: 2, t: "T39", d: 1200, why: "suggest は人を直接目的語にとらない.「人に提案する」は suggest to 人 that ….", ja: "リーさんは私たちに発売の延期を提案した." },
+  { id: "g389", q: "The bank notified customers ____ the new fees would take effect in May.", c: ["that", "about", "of", "to"], a: 0, t: "T39", d: 1300, why: "後ろが節(the new fees would take effect)なので that.of / about の後ろは名詞.", ja: "銀行は顧客に,新しい手数料が5月から適用されると通知した." },
+  { id: "g390", q: "Could you explain ____ how to use the copier?", c: ["me", "me to", "for me", "to me"], a: 3, t: "T39", d: 1400, why: "explain は人を直接目的語にとらない.explain to me how to … の形にする.", ja: "コピー機の使い方を私に説明していただけますか." },
+
+  // T40
+  { id: "g391", q: "We are pleased ____ you to our new store.", c: ["welcoming", "to welcome", "welcome", "welcomed"], a: 1, t: "T40", d: 500, why: "be pleased to do で「喜んで〜する」.", ja: "新しい店にお迎えできることをうれしく思います." },
+  { id: "g392", q: "Mr. Ono is not able ____ the meeting today.", c: ["attend", "attending", "to attend", "attended"], a: 2, t: "T40", d: 600, why: "be able to do で「〜できる」.", ja: "小野さんは今日の会議に出席できない." },
+  { id: "g393", q: "The museum is worth ____.", c: ["visiting", "to visit", "visit", "visited"], a: 0, t: "T40", d: 700, why: "be worth -ing で「〜する価値がある」.", ja: "その博物館は訪れる価値がある." },
+  { id: "g394", q: "Sales are likely ____ next year.", c: ["increase", "increased", "increasing", "to increase"], a: 3, t: "T40", d: 700, why: "be likely to do で「〜しそうだ」.", ja: "来年は売上が伸びそうだ." },
+  { id: "g395", q: "Thank you for the opportunity ____ with your team.", c: ["work", "to work", "working", "worked"], a: 1, t: "T40", d: 800, why: "opportunity to do で「〜する機会」.名詞の後ろの to do が名詞を説明する.", ja: "御社のチームと働く機会をいただき,ありがとうございます." },
+  { id: "g396", q: "The staff were busy ____ for the event.", c: ["prepare", "to prepare", "preparing", "prepared"], a: 2, t: "T40", d: 900, why: "be busy -ing で「〜するのに忙しい」.", ja: "スタッフは催しの準備で忙しかった." },
+  { id: "g397", q: "Many customers are reluctant ____ personal information online.", c: ["to share", "sharing", "share", "shared"], a: 0, t: "T40", d: 1000, why: "be reluctant to do で「〜したがらない」.", ja: "多くの客はネットで個人情報を出したがらない." },
+  { id: "g398", q: "The company made an effort ____ its waste.", c: ["reducing", "reduce", "reduced", "to reduce"], a: 3, t: "T40", d: 1100, why: "effort to do で「〜しようとする努力」.", ja: "その会社はごみを減らす努力をした." },
+  { id: "g399", q: "Employees are eligible ____ for the bonus after one year.", c: ["applying", "to apply", "apply", "applied"], a: 1, t: "T40", d: 1200, why: "be eligible to do で「〜する資格がある」.be eligible for + 名詞 とも言う.", ja: "従業員は1年たつと賞与を申請する資格がある." },
+  { id: "g400", q: "The board is eager ____ the project as soon as possible.", c: ["begin", "beginning", "to begin", "for beginning"], a: 2, t: "T40", d: 1300, why: "be eager to do で「しきりに〜したがっている」.", ja: "取締役会はできるだけ早く事業を始めたがっている." }
 ];

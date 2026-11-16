@@ -23,6 +23,8 @@ north south east west near nearby online home homes inside outside together alon
 # 追加の基本語
 another basic example forward hello myself yourself himself herself itself ourselves themselves note past print save space step though travel usually go do be service score college seat freeze tear hide helpful sentence single dining sale worker user driver speaker visitor meeting reopen unchanged unused cleanliness
 memo ink unit gift solar
+app arms bicycle beach booth care careful chef dessert elevator fish festival health group wine nothing rest possible necessary probably safety stairs level smartphone startup router setup premium lite gbps mbps kilogram catalog magazine digital truck view sister lock unlock sharp tester text usual dressmaker activity
+coremark ergomax farmlink greenport harper mei ryan
 
 # カタカナ語としてそのまま通じる語・単位
 internet intranet web website site email mail video camera radio television taxi bus hotel restaurant café caf menu coffee tea juice pizza cake soap shampoo towel curtain lamp tent jacket shirt helmet

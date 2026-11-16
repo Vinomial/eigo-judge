@@ -783,5 +783,362 @@ window.READING = [
       { id: "r34q2", q: "What is suggested about the Elm Street garage?", c: ["It will be torn down in June.", "It is owned by restaurant owners.", "It charges high fees.", "It usually has many empty spaces."], a: 3, ev: [3], d: 1300, why: "which is rarely more than half full(半分以上埋まることはめったにない)= たいてい空きが多い.rarely(めったに〜ない)という否定の語に注意して読み替える." },
       { id: "r34q3", q: "What is true about the start of construction?", c: ["It depends on funding from the state.", "It has been postponed until next year.", "It was opposed by all council members.", "It will cost the state $2.4 million."], a: 0, ev: [5, 6], d: 1500, why: "provided that the state approves a grant(州が補助金を承認するという条件で).provided that 〜 = 〜という条件で,なので工事の開始は州の資金次第.240万ドルは費用の全体で,州が出すのはその3分の1." }
     ]
+  },
+
+  // ---- 長文の追加(r35〜) ----
+  {
+    id: "r35",
+    kind: "チャット",
+    title: "Text message chain — Ryan Ford and Mei Tanaka",
+    target: 90,
+    s: [
+      "Ryan Ford [9:12 A.M.]: Mei, are you already at the convention center?",
+      "Mei Tanaka [9:14 A.M.]: Yes, I'm setting up our booth now. Where are you?",
+      "Ryan Ford [9:15 A.M.]: My train is stopped because of a signal problem. I'll probably be about 40 minutes late.",
+      "Mei Tanaka [9:16 A.M.]: No problem. The doors don't open to visitors until ten.",
+      "Ryan Ford [9:17 A.M.]: Great. Did the brochures arrive?",
+      "Mei Tanaka [9:18 A.M.]: They did, but we only got half of the boxes. I'll call the printer.",
+      "Ryan Ford [9:19 A.M.]: Thanks. I can pick up the rest on my way if they're ready."
+    ],
+    ja: "フォード [9:12]:メイ,もう会議場にいる? 田中 [9:14]:ええ,今ブースを準備中.どこにいるの? フォード [9:15]:信号の故障で電車が止まっている.たぶん40分ほど遅れる. 田中 [9:16]:大丈夫.来場者の入場は10時から. フォード [9:17]:よかった.パンフレットは届いた? 田中 [9:18]:届いたけど,箱が半分しか来ていない.印刷所に電話する. フォード [9:19]:ありがとう.できていれば,途中で残りを受け取れるよ.",
+    qs: [
+      { id: "r35q1", q: "Why will Mr. Ford be late?", c: ["He missed his train.", "His train has been delayed.", "He went to the wrong place.", "He is picking up boxes."], a: 1, ev: [2], d: 300, why: "My train is stopped because of a signal problem.電車が止まっている = 遅れている.乗り遅れた(missed)わけではない." },
+      { id: "r35q2", q: "At 9:16 A.M., what does Ms. Tanaka mean when she writes, \"No problem\"?", c: ["She can set up the booth by herself.", "She has already called the printer.", "The event has been postponed.", "Mr. Ford will arrive before visitors come in."], a: 3, ev: [2, 3], d: 700, why: "フォードさんは約40分遅れ(9:55ごろ着).来場者が入るのは10時からなので,それより前に着く.だから「問題ない」.発言の意図は,前後の発言とつないで考える." },
+      { id: "r35q3", q: "What problem does Ms. Tanaka mention?", c: ["Some materials have not been delivered.", "The booth is too small.", "The brochures contain errors.", "The doors opened late."], a: 0, ev: [5], d: 500, why: "we only got half of the boxes.パンフレットの箱が半分しか届いていない = 一部の資料が届いていない." }
+    ]
+  },
+  {
+    id: "r36",
+    kind: "お知らせ",
+    title: "Notice — Elevator Maintenance at Crestview Tower",
+    target: 100,
+    s: [
+      "To all tenants of Crestview Tower:",
+      "Elevators A and B will be out of service on Saturday, October 4, from 8:00 A.M. to 5:00 P.M. for annual safety inspections.",
+      "Elevator C, located near the loading dock, will remain in operation during this time.",
+      "Tenants expecting deliveries that day are advised to inform their suppliers in advance.",
+      "We also ask that you avoid moving large furniture in the building on that date.",
+      "We appreciate your understanding. — Building Management Office"
+    ],
+    ja: "クレストビュー・タワーの入居者の皆様へ.エレベーター A と B は,年1回の安全点検のため,10月4日(土)午前8時から午後5時まで運転を停止する.荷物の搬入口の近くにあるエレベーター C は,この間も運転する.その日に配達がある入居者は,前もって仕入先に知らせておくこと.その日は,建物内で大きな家具を運ぶのも避けてほしい.ご理解に感謝する.ビル管理事務所.",
+    qs: [
+      { id: "r36q1", q: "What is the purpose of the notice?", c: ["To announce a new elevator", "To inform tenants of a temporary service interruption", "To ask tenants to move out", "To introduce a new delivery company"], a: 1, ev: [1], d: 500, why: "エレベーターが点検のため一時的に止まることを知らせている.out of service(運転停止)= service interruption." },
+      { id: "r36q2", q: "What is indicated about Elevator C?", c: ["It will be inspected first.", "It is used only by managers.", "It is out of order.", "It can be used on October 4."], a: 3, ev: [2], d: 400, why: "will remain in operation during this time.点検の日も動いているので使える." },
+      { id: "r36q3", q: "What are tenants asked to do?", c: ["Let suppliers know about the situation", "Use the stairs only", "Leave the building by 5:00 P.M.", "Report any problems with the elevators"], a: 0, ev: [3], d: 700, why: "are advised to inform their suppliers in advance.inform = let 〜 know.be advised to do は「〜するよう勧められる」= 依頼の言い方." }
+    ]
+  },
+  {
+    id: "r37",
+    kind: "広告",
+    title: "Swift Wash — Professional Laundry for Busy People",
+    target: 110,
+    s: [
+      "Too busy to do your laundry? Let Swift Wash take care of it.",
+      "Simply leave your clothes in one of our bags at your front door by 9:00 A.M.",
+      "We will pick them up, wash and fold them, and return them the next day.",
+      "Our standard rate is $2 per kilogram, with a minimum charge of $10.",
+      "Dry cleaning for suits and dresses is also available for an additional fee.",
+      "First-time customers receive their first bag free when they sign up through our mobile app.",
+      "Service is currently available only in the Eastside and Riverbank areas."
+    ],
+    ja: "忙しくて洗濯ができない? スウィフトウォッシュにお任せを.午前9時までに,当社の袋に衣類を入れて玄関前に置くだけ.回収し,洗ってたたみ,翌日お返しする.通常料金は1キロ2ドル,最低料金は10ドル.スーツやドレスのドライクリーニングも追加料金で受け付ける.初めての客は,スマホのアプリから申し込むと最初の1袋が無料.サービスは今のところイーストサイドとリバーバンク地区だけ.",
+    qs: [
+      { id: "r37q1", q: "What kind of business is Swift Wash?", c: ["A clothing store", "A laundry service", "A delivery company", "A dressmaker"], a: 1, ev: [0, 2], d: 300, why: "laundry(洗濯物)を回収して洗う.洗濯のサービス." },
+      { id: "r37q2", q: "How much would a customer pay for 3 kilograms of clothes?", c: ["$2", "$10", "$6", "$13"], a: 1, ev: [3], d: 900, why: "3キロ × 2ドル = 6ドルだが,最低料金(minimum charge)が10ドルなので10ドル.計算した後に条件を確かめる." },
+      { id: "r37q3", q: "How can new customers get a free service?", c: ["By registering with an app", "By living in the Eastside area", "By ordering dry cleaning", "By leaving a bag before 9:00 A.M."], a: 0, ev: [5], d: 600, why: "when they sign up through our mobile app.sign up = register.アプリで申し込むと最初の1袋が無料." }
+    ]
+  },
+  {
+    id: "r38",
+    kind: "メール",
+    title: "From: Olivia Grant / To: Sales Team / Subject: Quarterly targets",
+    target: 140,
+    s: [
+      "Hi team,",
+      "I'm pleased to report that we exceeded our sales target for the second quarter by 8 percent.",
+      "This success was largely due to the new corporate accounts that Tom and Aisha brought in.",
+      "For the third quarter, management has raised our target by 15 percent.",
+      "To help us reach it, the company has approved two additional positions for our team, and interviews will begin next week.",
+      "I would also like each of you to send me a list of three potential clients by Friday.",
+      "We will discuss these lists at our meeting on Monday morning.",
+      "Thank you all for your hard work.",
+      "Olivia"
+    ],
+    ja: "チームの皆さん.第2四半期の売上目標を8%上回ったことを報告でき,うれしく思います.この成功は,主にトムとアイシャが獲得した新しい法人の取引先によるものです.第3四半期について,経営陣は目標を15%引き上げました.達成を助けるため,会社はチームの人員を2人増やすことを承認し,来週から面接が始まります.また,金曜日までに,見込みのある顧客を3社ずつリストにして送ってください.月曜の朝の会議でそのリストについて話し合います.皆さんの努力に感謝します.",
+    qs: [
+      { id: "r38q1", q: "What is the main purpose of the e-mail?", c: ["To announce a new manager", "To report results and explain the next goal", "To introduce new clients to the team", "To cancel a meeting"], a: 1, ev: [1, 3], d: 600, why: "前半で第2四半期の結果(目標を上回った),後半で第3四半期の目標と対策を伝えている." },
+      { id: "r38q2", q: "According to the e-mail, why did the team do well?", c: ["Prices were lowered.", "The team grew larger.", "The market for the product expanded.", "Two members gained new business clients."], a: 3, ev: [2], d: 800, why: "due to the new corporate accounts that Tom and Aisha brought in.corporate account(法人の取引先)= business client.人員増はこれからのことで,原因ではない." },
+      { id: "r38q3", q: "What are team members asked to do by Friday?", c: ["Interview job candidates", "Prepare for a client visit", "Report their sales figures", "Submit names of possible customers"], a: 3, ev: [5], d: 700, why: "send me a list of three potential clients by Friday.potential client(見込み客)= possible customer.面接は会社が来週始めるもの." }
+    ]
+  },
+  {
+    id: "r39",
+    kind: "記事",
+    title: "Greenport Times — New Bike-Sharing Program Launches",
+    target: 150,
+    s: [
+      "Greenport residents now have a new way to get around the city.",
+      "Last Monday, the city launched a bike-sharing program with 300 bicycles at 25 stations downtown.",
+      "Users can unlock a bike with a smartphone app and return it to any station.",
+      "The first 30 minutes of each ride are free, after which a fee of $1 is charged for every additional 15 minutes.",
+      "City officials hope the program will reduce traffic and encourage healthier habits.",
+      "According to Deputy Mayor Clara Ruiz, more than 2,000 people registered during the first week, far more than the city had anticipated.",
+      "Because of this strong demand, the city plans to add 15 stations in residential neighborhoods by next summer."
+    ],
+    ja: "グリーンポートの住民に,市内を移動する新しい手段ができた.先週の月曜日,市は中心街の25か所の駐輪場に300台の自転車を置く自転車シェアの仕組みを始めた.利用者はスマホのアプリで自転車のかぎを開け,どの駐輪場に返してもよい.1回の利用の最初の30分は無料で,その後は15分ごとに1ドルかかる.市の職員は,この仕組みが渋滞を減らし,健康的な習慣を促すことを期待している.ルイス副市長によると,最初の1週間で2000人を超える人が登録し,市の予想をはるかに上回った.この強い需要を受け,市は来年の夏までに住宅地に15か所の駐輪場を加える計画だ.",
+    qs: [
+      { id: "r39q1", q: "How much would a 60-minute ride cost?", c: ["Nothing", "$2", "$1", "$4"], a: 1, ev: [3], d: 1000, why: "最初の30分は無料.残り30分は15分ごとに1ドルなので2ドル.60分すべてに料金がかかるわけではない." },
+      { id: "r39q2", q: "What is suggested about the number of registrations?", c: ["It was lower than expected.", "It was higher than the city predicted.", "It included only downtown workers.", "It will be limited to 2,000."], a: 1, ev: [5], d: 900, why: "far more than the city had anticipated(市の予想をはるかに上回った).anticipate = predict." },
+      { id: "r39q3", q: "What will the city most likely do next?", c: ["Raise the fees", "Remove some bicycles", "Close downtown stations", "Expand the program to more areas"], a: 3, ev: [6], d: 700, why: "plans to add 15 stations in residential neighborhoods.住宅地に駐輪場を加える = 対象地域を広げる." }
+    ]
+  },
+  {
+    id: "r40",
+    kind: "求人広告",
+    title: "Harper & Lane Publishing — Part-Time Editorial Assistant",
+    target: 120,
+    s: [
+      "Harper & Lane Publishing is looking for a part-time editorial assistant to join our children's books department.",
+      "Duties include checking manuscripts for errors, communicating with authors, and updating our online catalog.",
+      "The position requires 20 hours per week, and hours are flexible.",
+      "Candidates should have excellent writing skills and strong attention to detail.",
+      "Previous experience in publishing is helpful but not essential.",
+      "This position may lead to a full-time role after six months.",
+      "Please submit a cover letter and a short writing sample through our Web site by May 30."
+    ],
+    ja: "ハーパー&レーン出版は,児童書部門で働くパートタイムの編集助手を募集している.仕事は原稿の誤りの確認,著者との連絡,オンラインの目録の更新など.週20時間で,勤務時間は融通がきく.応募者には,優れた文章力と細部への注意力が求められる.出版の経験はあれば役立つが,必須ではない.6か月後に正社員になれる可能性がある.5月30日までに,Web サイトから送り状と短い文章の見本を提出すること.",
+    qs: [
+      { id: "r40q1", q: "What is one responsibility of the position?", c: ["Writing children's books", "Designing book covers", "Selling books to stores", "Reviewing texts for mistakes"], a: 3, ev: [1], d: 600, why: "checking manuscripts for errors.manuscript(原稿)= text,error = mistake." },
+      { id: "r40q2", q: "What is NOT a requirement for the job?", c: ["Writing ability", "Experience in publishing", "Careful attention to detail", "Availability for 20 hours a week"], a: 1, ev: [3, 4, 2], d: 800, why: "Previous experience in publishing is helpful but not essential.経験は必須ではない.文章力・細部への注意・週20時間は求められている." },
+      { id: "r40q3", q: "What is mentioned about the position?", c: ["It could become a full-time job.", "It is located overseas.", "It starts on May 30.", "It requires working on weekends."], a: 0, ev: [5], d: 700, why: "may lead to a full-time role after six months.full-time role = full-time job.5月30日は応募の締め切り." }
+    ]
+  },
+  {
+    id: "r41",
+    kind: "レビュー",
+    title: "Customer Review — Taste of Lima Restaurant ★★★☆☆",
+    target: 120,
+    s: [
+      "I visited Taste of Lima last Friday with three colleagues to celebrate a project's completion.",
+      "The food was outstanding; the grilled fish in particular was the best I have had in years.",
+      "However, the service did not match the quality of the food.",
+      "We had a reservation for 7:00 P.M., but we were not seated until 7:40.",
+      "Our server was friendly but seemed to have too many tables to manage.",
+      "When I mentioned the wait to the manager, she apologized and offered us a free dessert.",
+      "I would return for the food, but I would probably avoid busy weekend evenings.",
+      "— Daniel Wu"
+    ],
+    ja: "先週の金曜日,事業の完了を祝うため,同僚3人とテイスト・オブ・リマを訪れた.料理はすばらしく,特に焼き魚はここ数年で最高だった.しかし,サービスは料理の質に見合っていなかった.午後7時に予約していたのに,席に着けたのは7時40分だった.担当の給仕係は感じが良かったが,受け持つテーブルが多すぎるようだった.支配人に待ち時間のことを伝えると,彼女は謝り,無料のデザートを出してくれた.料理のためにまた行くつもりだが,混む週末の夜はたぶん避けるだろう.",
+    qs: [
+      { id: "r41q1", q: "Why did Mr. Wu go to the restaurant?", c: ["To meet a client", "To celebrate with coworkers", "To write a review for a magazine", "To attend a cooking event"], a: 1, ev: [0], d: 500, why: "with three colleagues to celebrate a project's completion.colleague = coworker." },
+      { id: "r41q2", q: "What did Mr. Wu complain about?", c: ["The price of the food", "The taste of the fish", "The attitude of the manager", "The length of time he waited"], a: 3, ev: [3], d: 500, why: "7時の予約で7時40分まで席に着けなかった = 待ち時間の長さ.給仕係も支配人も対応は良かったと書いている." },
+      { id: "r41q3", q: "What does Mr. Wu suggest about the restaurant?", c: ["It should hire more staff.", "It is too expensive.", "It will close on weekends.", "It has a limited menu."], a: 0, ev: [4, 6], d: 1200, why: "給仕係が「受け持つテーブルが多すぎる」ように見えた → 人手が足りない.はっきり書いていないことを推測させる問題.メニューの種類や値段については書かれていない." }
+    ]
+  },
+  {
+    id: "r42",
+    kind: "料金表",
+    title: "Clearview Internet — Home Plans",
+    target: 120,
+    s: [
+      { t: "table", head: ["Plan", "Speed", "Monthly fee", "Contract"], rows: [
+        ["Lite", "100 Mbps", "$25", "None"],
+        ["Standard", "300 Mbps", "$40", "1 year"],
+        ["Premium", "1 Gbps", "$60", "2 years"]
+      ] },
+      "All plans include unlimited data and free installation.",
+      "Customers who choose a plan with a contract receive a free wireless router.",
+      "Customers on the Lite plan may rent a router for $5 per month.",
+      "If you cancel a contract early, a fee of $100 will be charged."
+    ],
+    ja: "[表:ライト 100Mbps 月25ドル 契約期間なし,スタンダード 300Mbps 月40ドル 1年,プレミアム 1Gbps 月60ドル 2年] すべてのプランはデータ無制限で,設置は無料.契約期間のあるプランを選んだ客には,無線ルーターを無料で渡す.ライトプランの客は,月5ドルでルーターを借りられる.契約を途中で解約すると100ドルの料金がかかる.",
+    qs: [
+      { id: "r42q1", q: "Which plan does not require a contract?", c: ["Lite", "Standard", "Premium", "All of them"], a: 0, ev: [[0, 0]], d: 300, why: "表の Contract の列で None(なし)になっているのは Lite." },
+      { id: "r42q2", q: "How much would a Lite customer pay each month including a router?", c: ["$25", "$30", "$40", "$45"], a: 1, ev: [[0, 0], 3], d: 800, why: "Lite は月25ドル.ルーターは契約のないプランでは無料にならず,月5ドルで借りる.25 + 5 = 30ドル." },
+      { id: "r42q3", q: "What is true about all three plans?", c: ["They come with a free router.", "They have the same speed.", "They can be canceled without a fee.", "They do not charge for setup."], a: 3, ev: [1], d: 700, why: "All plans include ... free installation.installation(設置)= setup.無料ルーターは契約のあるプランだけ." }
+    ]
+  },
+  {
+    id: "r43",
+    kind: "グラフつき記事",
+    title: "Coastal Tourism Report — Visitor Numbers",
+    target: 150,
+    s: [
+      "The Bayfield Tourism Board released its annual report on Thursday.",
+      { t: "bar", cap: "Visitors to Bayfield by season (thousands)", unit: "", items: [["Spring", 45], ["Summer", 120], ["Fall", 60], ["Winter", 15]] },
+      "As in previous years, summer was by far the busiest season, driven by the town's beaches and outdoor festivals.",
+      "Fall numbers rose by 25 percent from last year, which the board attributes to a new food and wine festival held in October.",
+      "Winter, however, continues to attract few visitors, and several hotels close entirely from December to February.",
+      "To change this, the board will promote indoor attractions such as the maritime museum and local hot springs in a winter advertising campaign."
+    ],
+    ja: "ベイフィールド観光局は木曜日に年次報告書を発表した.[グラフ:季節ごとの訪問者数(千人):春45,夏120,秋60,冬15] 例年どおり,浜辺と屋外の祭りによって,夏が飛び抜けて忙しい季節だった.秋の訪問者は前年から25%増え,観光局はこれを10月に開いた新しい食とワインの祭りのおかげだとしている.しかし,冬は相変わらず訪問者が少なく,12月から2月まで完全に休業するホテルもある.これを変えるため,観光局は冬の広告で海洋博物館や地元の温泉など屋内の名所を宣伝する.",
+    qs: [
+      { id: "r43q1", q: "How many people visited Bayfield in the fall?", c: ["15,000", "60,000", "45,000", "120,000"], a: 1, ev: [[1, 2]], d: 400, why: "グラフの Fall は 60.単位は thousands(千人)なので60,000人." },
+      { id: "r43q2", q: "According to the report, what caused the increase in fall visitors?", c: ["Lower hotel prices", "A new event", "Better weather", "A new museum"], a: 1, ev: [3], d: 900, why: "attributes to a new food and wine festival.attribute A to B は「A を B のおかげ・せいだと考える」.festival = event." },
+      { id: "r43q3", q: "What does the tourism board plan to do?", c: ["Hold a festival in winter", "Build new hotels", "Advertise activities that can be enjoyed indoors", "Close the beaches in winter"], a: 2, ev: [5], d: 1000, why: "will promote indoor attractions ... in a winter advertising campaign.冬の祭りを開くとは書いていない(祭りは10月の話)." }
+    ]
+  },
+  {
+    id: "r44",
+    kind: "メール2通",
+    title: "E-mails — Conference speaker",
+    target: 180,
+    s: [
+      "From: Linda Park / To: Dr. Samuel Osei / Date: February 2",
+      "Dear Dr. Osei,",
+      "On behalf of the National Nursing Association, I would like to invite you to give the opening speech at our annual conference in Denver on April 18.",
+      "The theme this year is \"Technology in Patient Care,\" and your recent research on digital health records would be of great interest to our members.",
+      "We will cover your travel and two nights of accommodation, and we can offer a speaker's fee of $1,500.",
+      "Could you let me know by February 15 whether you are available?",
+      { t: "doc", title: "From: Samuel Osei / To: Linda Park / Date: February 9" },
+      "Dear Ms. Park,",
+      "Thank you for your kind invitation.",
+      "Unfortunately, I will be attending a workshop in Toronto on April 18 and will not be able to give the opening speech.",
+      "However, I could speak on the morning of April 19 if that would work for your schedule.",
+      "Alternatively, my colleague Dr. Hannah Lee, who worked with me on the research, would be an excellent speaker on the topic."
+    ],
+    ja: "[1通目:2月2日 パークさんから] 全国看護協会を代表して,4月18日にデンバーで開く年次大会の基調講演をお願いしたい.今年のテーマは「患者の看護における技術」で,あなたの電子カルテについての最近の研究は会員にとって大変興味深いはずだ.交通費と2泊分の宿泊費は協会が負担し,講演料は1500ドルを出せる.2月15日までに都合を知らせてほしい.[2通目:2月9日 オセイ博士から] ご招待に感謝する.残念ながら,4月18日はトロントの講習会に出席するため,基調講演はできない.ただ,そちらの予定に合うなら4月19日の午前に話すことはできる.あるいは,研究を一緒に行った同僚のハンナ・リー博士なら,このテーマのすばらしい講演者になるだろう.",
+    qs: [
+      { id: "r44q1", q: "Why did Ms. Park contact Dr. Osei?", c: ["To ask him to give a talk", "To invite him to join the association", "To request a copy of his research", "To arrange a workshop in Toronto"], a: 0, ev: [2], d: 500, why: "invite you to give the opening speech.give a speech = give a talk." },
+      { id: "r44q2", q: "What is NOT offered to Dr. Osei?", c: ["Payment for speaking", "Hotel accommodation", "Travel expenses", "A conference membership"], a: 3, ev: [4], d: 900, why: "交通費(travel),2泊の宿泊(accommodation),講演料(speaker's fee)は書かれている.会員資格はどこにもない." },
+      { id: "r44q3", q: "What does Dr. Osei suggest?", c: ["Moving the conference to Toronto", "Changing the theme of the conference", "Having another researcher speak", "Reducing the speaker's fee"], a: 2, ev: [11], d: 1100, why: "Alternatively(あるいは),同僚のリー博士を講演者として推している = 別の研究者に話してもらう.もう1つの提案(19日の午前)は選択肢にない." }
+    ]
+  },
+  {
+    id: "r45",
+    kind: "社内メモ",
+    title: "MEMO — To: All staff / From: Facilities / Re: Office recycling program",
+    target: 140,
+    s: [
+      "Starting next Monday, we will introduce a new recycling program on every floor.",
+      "Each kitchen area will have three separate bins: blue for paper, green for bottles and cans, and black for general waste.",
+      "Please rinse bottles and cans before placing them in the green bin.",
+      "Confidential documents should not be placed in the blue bins; instead, put them in the locked shredding boxes next to the printers.",
+      "The bins will be emptied every evening by our cleaning contractor.",
+      "Last year, our office sent nearly eight tons of waste to landfills, and we aim to cut that amount in half.",
+      "If you have suggestions for reducing waste, please send them to facilities@coremark.example."
+    ],
+    ja: "来週の月曜日から,すべての階で新しいリサイクルの仕組みを導入する.各給湯室に3つの分別ごみ箱を置く.青は紙,緑は瓶と缶,黒は一般ごみ.瓶と缶は,ゆすいでから緑の箱に入れること.機密書類は青い箱に入れず,プリンターの横にある鍵付きの裁断用ボックスに入れること.ごみ箱は毎晩,清掃業者が空にする.昨年,当社の事務所はおよそ8トンのごみを埋め立て地に送った.この量を半分にすることを目指す.ごみを減らす提案があれば,施設管理部まで送ってほしい.",
+    qs: [
+      { id: "r45q1", q: "Where should employees put an empty juice bottle?", c: ["In the blue bin", "In the green bin", "In the black bin", "In a shredding box"], a: 1, ev: [1, 2], d: 400, why: "green for bottles and cans.ゆすいでから緑の箱へ." },
+      { id: "r45q2", q: "What should be done with confidential papers?", c: ["They should be recycled in the blue bins.", "They should be returned to their owners.", "They should be placed in secure boxes.", "They should be taken home."], a: 2, ev: [3], d: 800, why: "locked shredding boxes(鍵付きの裁断用ボックス)に入れる.locked = secure.紙でも機密書類は青い箱ではない." },
+      { id: "r45q3", q: "What is the goal of the program?", c: ["To reduce landfill waste by 50 percent", "To save eight tons of paper", "To hire a new cleaning company", "To lower the cost of printing"], a: 0, ev: [5], d: 900, why: "8トンを埋め立て地に送った → cut that amount in half(半分に減らす)= 50% 減らす.8トンを節約するのではない." }
+    ]
+  },
+  {
+    id: "r46",
+    kind: "予定表とメール",
+    title: "Lindon Library — Free Computer Classes (November)",
+    target: 170,
+    s: [
+      { t: "table", head: ["Class", "Day", "Time", "Level"], rows: [
+        ["E-mail basics", "Mon., Nov. 3", "10:00–11:30 A.M.", "Beginner"],
+        ["Making spreadsheets", "Wed., Nov. 5", "6:00–8:00 P.M.", "Intermediate"],
+        ["Online safety", "Sat., Nov. 8", "1:00–2:30 P.M.", "Beginner"],
+        ["Building a Web site", "Wed., Nov. 12", "6:00–8:00 P.M.", "Advanced"]
+      ] },
+      "Classes are free, but registration is required because each class is limited to 12 people.",
+      "Participants may bring their own laptops; otherwise, library computers will be provided.",
+      { t: "doc", title: "E-mail — From: George Adams / To: Lindon Library / Date: October 28" },
+      "Hello,",
+      "I am retired and just bought my first computer, so I would like to learn how to send messages to my family.",
+      "I volunteer at a hospital on weekday mornings, so I am only free in the afternoons, evenings, and on weekends.",
+      "Is there a class that would suit me?"
+    ],
+    ja: "[表:リンドン図書館の無料パソコン教室(11月):メールの基本 11月3日(月)午前10時〜11時半 初級,表計算の作成 5日(水)午後6〜8時 中級,ネットの安全 8日(土)午後1時〜2時半 初級,Web サイトの作成 12日(水)午後6〜8時 上級] 教室は無料だが,各回12人までなので登録が必要.自分のノートパソコンを持ってきてもよい.なければ図書館のパソコンを用意する.[メール:10月28日 アダムズさんから] 退職して初めてパソコンを買ったので,家族にメッセージを送る方法を学びたい.平日の午前は病院でボランティアをしているので,空いているのは午後と夜と週末だけ.自分に合う教室はあるか.",
+    qs: [
+      { id: "r46q1", q: "Why is registration necessary?", c: ["Classes have a fee.", "The number of participants is limited.", "Laptops must be reserved.", "Classes are held online."], a: 1, ev: [1], d: 500, why: "registration is required because each class is limited to 12 people.人数に限りがあるから.無料なので費用のためではない." },
+      { id: "r46q2", q: "Which class matches Mr. Adams's interest?", c: ["E-mail basics", "Making spreadsheets", "Online safety", "Building a Web site"], a: 0, ev: [5, [0, 0]], d: 600, why: "家族にメッセージを送る方法を学びたい → E-mail basics(メールの基本)." },
+      { id: "r46q3", q: "What problem will Mr. Adams most likely have with that class?", c: ["It is too advanced for him.", "It is full.", "He has to bring his own computer.", "It is scheduled when he is busy."], a: 3, ev: [[0, 0], 6], d: 1300, why: "メールの基本は月曜の午前10時.アダムズさんは平日の午前はボランティアで空いていない.表とメールの都合を合わせると,時間が合わないと分かる." }
+    ]
+  },
+  {
+    id: "r47",
+    kind: "記事",
+    title: "Tech Business Review — Startup Secures Funding",
+    target: 170,
+    s: [
+      "Farmlink, a startup that connects small farms directly with restaurants, has raised $12 million from a group of investors led by Northstar Capital.",
+      "Founded three years ago by former chef Marta Silva, the company operates an online marketplace where restaurants can order produce that is harvested the same morning.",
+      "Ms. Silva said she started the company after struggling to find fresh, reasonably priced vegetables for her own restaurant.",
+      "Farmlink currently works with about 400 farms and 1,500 restaurants in three states.",
+      "The new funds will be used primarily to build refrigerated warehouses, which will allow the company to serve customers farther from the farms.",
+      "Some analysts, however, question whether the company can remain profitable while expanding so quickly, noting that delivery costs have risen sharply this year.",
+      "Ms. Silva responded that the warehouses would actually lower costs by reducing the number of trips its trucks need to make."
+    ],
+    ja: "小規模農家とレストランを直接結ぶ新興企業ファームリンクは,ノーススター・キャピタルが率いる投資家グループから1200万ドルを調達した.元料理人のシルバ氏が3年前に創業した同社は,その日の朝に収穫された農産物をレストランが注文できるネット上の市場を運営している.シルバ氏は,自分の店のために新鮮で手ごろな野菜を探すのに苦労したことから会社を始めたという.ファームリンクは現在,3つの州で約400の農家と1500のレストランと取引している.新しい資金は主に冷蔵倉庫の建設に使われ,これによって農場から遠い客にもサービスを届けられるようになる.しかし一部の専門家は,今年は配送費が急上昇していることを挙げ,これほど急に拡大しながら利益を出し続けられるのか疑問視している.シルバ氏は,倉庫によってトラックの運行回数が減り,むしろ費用は下がると答えた.",
+    qs: [
+      { id: "r47q1", q: "What does Farmlink do?", c: ["It runs several restaurants.", "It operates farms in three states.", "It helps restaurants buy produce from farms.", "It trains chefs to cook vegetables."], a: 2, ev: [0, 1], d: 700, why: "connects small farms directly with restaurants / an online marketplace where restaurants can order produce.農家とレストランを結ぶ仲介.自分で農場やレストランを運営しているのではない." },
+      { id: "r47q2", q: "Why did Ms. Silva start the company?", c: ["She wanted to leave the restaurant business.", "She had difficulty getting good ingredients.", "She was asked by investors.", "She owned a large farm."], a: 1, ev: [2], d: 900, why: "struggling to find fresh, reasonably priced vegetables(新鮮で手ごろな野菜を探すのに苦労した)= 良い材料を手に入れるのが難しかった." },
+      { id: "r47q3", q: "What concern do some analysts have?", c: ["That the company is growing too slowly", "That restaurants will stop using the service", "That rising expenses may affect profits", "That the warehouses will be too small"], a: 2, ev: [5], d: 1300, why: "question whether the company can remain profitable ... noting that delivery costs have risen sharply.費用の上昇が利益に響くかもしれない,という懸念.growing too slowly は逆(expanding so quickly)." }
+    ]
+  },
+  {
+    id: "r48",
+    kind: "メール",
+    title: "From: Brightwater Hotel / To: Ms. Chloe Martin / Subject: Your upcoming stay",
+    target: 150,
+    s: [
+      "Dear Ms. Martin,",
+      "Thank you for choosing the Brightwater Hotel for your stay from June 3 to June 6.",
+      "We regret to inform you that our swimming pool will be closed for repairs during your visit.",
+      "As a gesture of apology, we have upgraded your reservation from a standard room to a suite with an ocean view at no additional charge.",
+      "In addition, guests may use the pool at our sister property, the Brightwater Resort, which is a ten-minute drive away.",
+      "A complimentary shuttle leaves from our main entrance every hour between 9:00 A.M. and 6:00 P.M.",
+      "If you would prefer to change your reservation dates, please reply to this e-mail, and we will waive the usual change fee.",
+      "We look forward to welcoming you."
+    ],
+    ja: "マーティン様.6月3日から6日までのご宿泊にブライトウォーター・ホテルをお選びいただきありがとうございます.残念ながら,ご滞在中はプールが修理のため閉鎖されます.おわびの気持ちとして,追加料金なしで,ご予約を通常の部屋から海の見えるスイートに格上げいたしました.また,車で10分の系列施設ブライトウォーター・リゾートのプールをお使いいただけます.午前9時から午後6時まで,1時間ごとに正面玄関から無料のシャトルが出ます.ご予約の日程を変更されたい場合はこのメールにご返信ください.通常の変更手数料はいただきません.お待ちしております.",
+    qs: [
+      { id: "r48q1", q: "Why did the hotel write to Ms. Martin?", c: ["To confirm a payment", "To inform her about a facility closure", "To offer her a job", "To ask her to write a review"], a: 1, ev: [2], d: 500, why: "our swimming pool will be closed for repairs.施設(プール)の閉鎖を知らせるメール." },
+      { id: "r48q2", q: "What has the hotel done for Ms. Martin?", c: ["Given her a better room", "Refunded her deposit", "Changed her dates", "Reserved a table at a restaurant"], a: 0, ev: [3], d: 600, why: "upgraded your reservation ... to a suite with an ocean view.より良い部屋に替えた.日程の変更は「希望すれば」の話." },
+      { id: "r48q3", q: "What is indicated about the Brightwater Resort?", c: ["It is next to the hotel.", "It charges for pool use.", "It can be reached by a free bus.", "It is closed in June."], a: 2, ev: [4, 5], d: 1100, why: "A complimentary shuttle leaves ... every hour.complimentary(無料の)= free,shuttle = bus.リゾートは車で10分で,隣ではない." }
+    ]
+  },
+  {
+    id: "r49",
+    kind: "比較表",
+    title: "Office Chair Comparison — Purchasing Department",
+    target: 160,
+    s: [
+      "The purchasing department compared four office chairs before placing a large order for the new branch.",
+      { t: "table", head: ["Chair", "Price", "Adjustable arms", "Warranty", "Rating"], rows: [
+        ["Basic 10", "$90", "No", "1 year", "3.2"],
+        ["Comfort Plus", "$150", "Yes", "3 years", "4.5"],
+        ["ErgoMax", "$240", "Yes", "5 years", "4.7"],
+        ["Studio", "$130", "No", "2 years", "4.1"]
+      ] },
+      "The rating is the average score given by our employees who tested each chair for one week.",
+      "Our budget allows a maximum of $160 per chair, and adjustable arms were requested by most testers.",
+      "Based on these factors, the department recommends ordering 80 units of the chair that meets both conditions."
+    ],
+    ja: "購買部は,新しい支店向けに大量に注文する前に4種類の事務いすを比較した.[表:ベーシック10 90ドル 肘掛け調節なし 保証1年 評価3.2,コンフォートプラス 150ドル あり 3年 4.5,エルゴマックス 240ドル あり 5年 4.7,スタジオ 130ドル なし 2年 4.1] 評価は,各いすを1週間試した社員がつけた点数の平均.予算は1脚160ドルまでで,試した人の多くが肘掛けの調節を求めた.これらの要素から,購買部は両方の条件を満たすいすを80脚注文することを勧める.",
+    qs: [
+      { id: "r49q1", q: "How were the ratings determined?", c: ["By a consumer magazine", "By the manufacturers", "By employees who used the chairs", "By the purchasing manager alone"], a: 2, ev: [2], d: 600, why: "the average score given by our employees who tested each chair.社員が試してつけた点数." },
+      { id: "r49q2", q: "Which chair has the longest warranty?", c: ["Basic 10", "Comfort Plus", "ErgoMax", "Studio"], a: 2, ev: [[1, 2]], d: 400, why: "Warranty の列で最も長いのは ErgoMax の5年." },
+      { id: "r49q3", q: "How much will the recommended order cost in total?", c: ["$7,200", "$10,400", "$12,000", "$19,200"], a: 2, ev: [3, 4, [1, 1]], d: 1400, why: "条件は「1脚160ドル以下」と「肘掛けの調節あり」.両方を満たすのは Comfort Plus(150ドル)だけ.150 × 80 = 12,000ドル.条件で絞ってから計算する." }
+    ]
+  },
+  {
+    id: "r50",
+    kind: "記事",
+    title: "Regional Economy — Port Expansion Raises Hopes and Questions",
+    target: 190,
+    s: [
+      "After years of debate, construction has finally begun on a $300 million expansion of the Port of Westhaven.",
+      "Once completed in roughly four years, the project will double the number of container ships the port can handle at one time.",
+      "Supporters predict that the expansion will create about 1,200 permanent jobs and attract logistics companies that currently ship through larger ports to the north.",
+      "Not everyone shares this optimism.",
+      "Residents of the nearby Harborview district worry that increased truck traffic will worsen congestion and air quality in their neighborhood.",
+      "In an effort to address these concerns, the port authority has committed to building a dedicated road that will route trucks away from residential streets.",
+      "It has also promised to replace older cargo-handling equipment with electric models, which it says will cut emissions at the port by 40 percent.",
+      "Critics note, however, that the dedicated road has not yet been funded and may not be finished until two years after the port expansion opens."
+    ],
+    ja: "長年の議論の末,ウェストヘイブン港の3億ドルの拡張工事がついに始まった.およそ4年後に完成すれば,港が一度に受け入れられるコンテナ船の数は2倍になる.賛成派は,この拡張で約1200人の常勤の雇用が生まれ,今は北の大きな港を使っている物流会社を呼び込めると予測する.だれもがこの楽観を共有しているわけではない.近くのハーバービュー地区の住民は,トラックの交通量が増えて,地区の渋滞と空気の質が悪化することを心配している.こうした懸念に応えるため,港湾局は,トラックを住宅街から遠ざける専用道路の建設を約束した.また,古い荷役機器を電動のものに替えると約束し,これで港の排出ガスが40%減るとしている.しかし批判的な人々は,専用道路にはまだ予算がついておらず,港の拡張部分が開業してから2年後まで完成しないかもしれないと指摘する.",
+    qs: [
+      { id: "r50q1", q: "What will the expansion allow the port to do?", c: ["Build electric ships", "Handle more ships at once", "Move to a new location", "Reduce its number of employees"], a: 1, ev: [1], d: 900, why: "double the number of container ships the port can handle at one time.一度に扱える船の数が2倍 = より多くの船を同時に扱える." },
+      { id: "r50q2", q: "Why are some Harborview residents worried?", c: ["They expect more trucks near their homes.", "They will lose their jobs.", "Their homes will be torn down.", "Ship traffic will block their views."], a: 0, ev: [4], d: 1000, why: "increased truck traffic will worsen congestion and air quality in their neighborhood.近所でトラックが増えることを心配している." },
+      { id: "r50q3", q: "What problem do critics point out?", c: ["The electric equipment is too expensive.", "The port expansion will take longer than four years.", "The new road may not be ready when it is needed.", "The road will pass through residential streets."], a: 2, ev: [5, 7], d: 1600, why: "専用道路はまだ予算がなく,港の拡張部分の開業から2年後まで完成しないかもしれない.トラックが増える時点で道路が間に合わない,ということ.「住宅街を通る」は逆で,道路は住宅街を避けるためのもの." }
+    ]
   }
 ];
