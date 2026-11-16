@@ -96,8 +96,15 @@ tr.strong td { font-weight: 700; }
 .banner { background: var(--sunk); border-left: 4px solid var(--wa); border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; }
 
 /* 問題一覧 */
-.band { margin-bottom: 18px; }
-.band h3 { display: flex; align-items: center; gap: 6px; font-size: .95rem; margin: 0 0 8px; }
+details.band { margin-bottom: 14px; border-bottom: 0; padding: 0; }
+.band > summary { display: flex; align-items: center; gap: 6px; font-size: .95rem; font-weight: 700; padding: 8px 0; min-height: 40px; list-style: none; }
+.band > summary::-webkit-details-marker { display: none; }
+.band > summary::before { content: ""; flex: none; width: .5em; height: .5em; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); margin-right: 4px; transition: transform .15s; }
+.band[open] > summary::before { transform: rotate(45deg); }
+.band .bname { min-width: 0; }
+.band .bcount { margin-left: auto; font-weight: 400; white-space: nowrap; }
+.band .thm-s { margin: 0 0 8px; }
+.search { width: 100%; min-height: 44px; margin: 8px 0 4px; padding: 8px 12px; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 6px; }
 .chip { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 10px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
 .chip .cl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
@@ -174,5 +181,77 @@ summary { cursor: pointer; }
   .word { font-size: 1.7rem; }
   .sentence { font-size: 1.05rem; }
   .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .passage table { font-size: .82rem; }
+  .passage td, .passage th { padding: 6px 5px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* わからない(当てずっぽうを防ぐ選択肢) */
+.choice.idk { min-height: 44px; border-style: dashed; background: transparent; color: var(--muted); font-size: .92rem; }
+.choice.idk[aria-pressed="true"] { border-style: solid; color: var(--ink); }
+
+/* 解いた後の操作(解説を読んでいる間も下に残す) */
+.actions { margin-top: 16px; }
+.actions.stick { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--surface); padding: 10px 0; margin-bottom: -10px; border-top: 1px solid var(--line); }
+.btn.grow { flex: 1; }
+.qprog { height: 4px; background: var(--sunk); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+.qprog > span { display: block; height: 100%; background: var(--accent); transition: width .3s; }
+.speak { background: none; border: 0; padding: 6px; margin-left: 6px; cursor: pointer; color: var(--accent); vertical-align: middle; min-width: 40px; min-height: 40px; }
+.speak svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 推定 TOEIC スコア */
+.toeic { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 4px 0 14px; }
+.toeic .lab { font-size: .82rem; color: var(--muted); }
+.toeic .tv { font-size: 1rem; }
+.toeic .tv b { font-size: 1.9rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tbar { position: relative; height: 10px; background: var(--sunk); border-radius: 5px; margin: 8px 0 2px; }
+.tbar .range { position: absolute; top: 0; bottom: 0; background: var(--accent); opacity: .3; border-radius: 5px; }
+.tbar .now { position: absolute; top: -3px; width: 4px; height: 16px; margin-left: -2px; background: var(--accent); border-radius: 2px; }
+.tbar .goal { position: absolute; top: -4px; width: 2px; height: 18px; margin-left: -1px; background: var(--r-green); }
+.tscale { position: relative; display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); margin-bottom: 6px; }
+.tscale span:nth-child(2) { position: absolute; transform: translateX(-50%); color: var(--r-green); font-weight: 700; }
+
+/* ホーム:今日の進み具合とメニュー */
+.today { margin: 0 0 4px; }
+.today .trow { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.tile { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 68px; padding: 10px 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; }
+.tile b { font-size: 1rem; }
+.tile span { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+.tile.main { grid-column: 1 / -1; background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tile.main span { color: var(--on-accent); opacity: .85; }
+.tile.warn { border-color: var(--wa); }
+@media (hover: hover) { .tile:hover { border-color: var(--accent); } }
+
+/* 長文の図表 */
+.pdoc { font-family: "Zen Kaku Gothic New", sans-serif; font-size: .85rem; color: var(--muted); border-top: 1px dashed var(--line); margin: 14px 0 6px; padding-top: 10px; }
+.fig { margin: 10px 0; border-radius: 6px; }
+.fig.ev { outline: 3px solid var(--hl); background: var(--hl); }
+.fcap { font-weight: 600; font-size: .92rem; margin-bottom: 4px; }
+.tscroll { overflow-x: auto; }
+.passage table { font-size: .9rem; background: var(--surface); border: 1px solid var(--line); }
+.passage th { background: var(--sunk); color: var(--ink); font-weight: 600; }
+.passage td, .passage th { border: 1px solid var(--line); }
+.passage th, .passage td:first-child { white-space: nowrap; } /* 狭い画面では表の中を横に送る(ページ全体は動かさない) */
+.passage tr.ev td { background: var(--hl); }
+.bars { display: grid; gap: 6px; }
+.bar { display: grid; grid-template-columns: minmax(4.5em, auto) 1fr auto; gap: 8px; align-items: center; font-size: .9rem; padding: 1px 4px; border-radius: 4px; }
+.bar.ev { background: var(--hl); }
+.bar .bt { height: 14px; background: var(--sunk); border-radius: 3px; overflow: hidden; }
+.bar .bt > span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.bar .bv { font-variant-numeric: tabular-nums; }
+.evfig .fig { background: var(--bg); padding: 6px; }
+.evfig table { font-size: .88rem; }
+.evfig tr td { background: var(--hl); }
+
+/* 長文に出てきた単語 */
+.pvocab { margin-top: 12px; }
+.vlist { display: grid; gap: 2px; margin-top: 8px; }
+.vrow { display: grid; grid-template-columns: auto minmax(6.5em, auto) 1fr; gap: 6px; align-items: baseline; font-size: .9rem; padding: 3px 6px; border-radius: 6px; }
+.vrow.st-ac { background: var(--ac-bg); }
+.vrow.st-wa { background: var(--wa-bg); }
+
+/* 苦手な定理 */
+.weak { display: grid; gap: 6px; }
+.wrow { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px 6px 12px; }
+.wrow .wn { flex: 1; min-width: 0; font-size: .92rem; }

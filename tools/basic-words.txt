@@ -1,0 +1,38 @@
+# 基本語の一覧(tools/check.js が「長文に出てくるが単語データにない語」を数えるときに除く語)
+# 中学で習う程度の語,カタカナ語としてそのまま通じる語,固有名詞を入れる.
+# ここにない語が長文に出てきたら,data/vocab.js に単語として追加するか,ここに足す.
+
+# 機能語・ごく基本的な語
+the and but for nor not yes you your yours she her hers him his its our ours their them they this that these those there here what when where which who whom whose why how
+are was were been being have has had does did will would can could may might must shall should cannot
+about above after again ago all almost already also always any anyone anything around away back because before below between both down during each either else enough even ever every everyone everything
+far few from into just less many more most much never next none now off often once only other out over own same since some someone something soon still such than then through too under until upon very well while with without yet
+one two three four five six seven eight nine ten eleven twelve fifteen twenty thirty forty fifty hundred thousand million first second third fourth fifth half twice
+monday tuesday wednesday thursday friday saturday sunday mon tue wed thu fri sat sun january february march april june july august september october november december jan feb mar apr jun jul aug sep sept oct nov dec
+day days week weekend month year today tomorrow yesterday tonight morning afternoon evening night noon hour minute time date spring summer fall autumn winter season
+
+# 基本的な動詞
+ask answer become begin break bring build buy call carry change check choose clean close come cook cut drive drop eat end enjoy fall feel find finish follow forget get give grow happen hear help hope keep know learn leave let like listen live look lose love make meet miss move need open pass pick plan play put read run say see sell send set show sit sleep speak spend stand start stay stop study take talk teach tell thank think try turn understand use visit wait walk want wash watch wear win wish work write
+able add ready sorry sure glad happy unhappy welcome please
+
+# 基本的な名詞・形容詞
+air airport answer bag bank bed bike book box boy breakfast brother bus business car card chair child city class clothes clothing coffee color company computer country cup desk dinner door dress family farm father floor flower food friend front fruit game garden girl glass hand head home hospital hotel house idea job kitchen lake land language letter library life light line list lunch man map menu message money mother museum music name news number ocean office page paper park part party people person phone photo picture place point pool price problem question rain restaurant river road room school sea shop side size snow station store street sun table team test thing ticket town train trip vegetable water way weather woman word world
+bad best big black blue bright busy cheap clean cold dark dear different difficult dry early easy empty excellent fast fine free fresh friendly unfriendly full good great green hard healthy heavy high hot important kind large last late left light little long low main new nice noisy old quiet quick quickly red rich right safe short simple simply slow small strong sunny sweet tall thin true warm white whole wrong young
+north south east west near nearby online home homes inside outside together alone later least lot lots bit kind sort top bottom middle center
+
+# 追加の基本語
+another basic example forward hello myself yourself himself herself itself ourselves themselves note past print save space step though travel usually go do be service score college seat freeze tear hide helpful sentence single dining sale worker user driver speaker visitor meeting reopen unchanged unused cleanliness
+memo ink unit gift solar
+
+# カタカナ語としてそのまま通じる語・単位
+internet intranet web website site email mail video camera radio television taxi bus hotel restaurant café caf menu coffee tea juice pizza cake soap shampoo towel curtain lamp tent jacket shirt helmet
+microphone projector printer laptop computer server file data software screen cable battery model system program course lesson club gym sport sports fitness swimming camping cooking
+dollar dollars percent kilometer kilometers gigabyte gigabytes ton tons kilo meter meters page pages
+plaza lobby hall garage center mall studio plastic bottle bottles can tank
+graphic logo slide slides photo photos media social design designer
+whiteboard bookshelf bookshop cookbook kitchenware checkout log sum sender restart
+wedding weddings science history vacation holiday bonus
+
+# 本文に出てくる固有名詞(文頭や表の中では小文字にして調べるため)
+amy daniel david diane greg helen kenji laura marco nina olivia priya sara
+aldergate coral greenfield harbor harlow kessler lagoon lakeside northgate northgatemuseum pearl pine riverside riversidefurniture com

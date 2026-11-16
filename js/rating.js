@@ -58,7 +58,28 @@
   ];
   const tierOf = r => { let t = TIERS[0]; for (const x of TIERS) if (r >= x.min) t = x; return t; };
 
-  const api = { p, performance, rawPerformance, correction, aperf, rating, TIERS, tierOf };
+  // 推定 TOEIC スコア(目安).レートの色の境目を TOEIC の点数に対応させ,間は直線でつなぐ.
+  // 緑(800)= 550点 を基準にしている.実測で合わせた式ではないので,あくまで目安.
+  const TOEIC_MAP = [[0, 250], [400, 400], [800, 550], [1200, 700], [1600, 850], [2000, 950], [2400, 990]];
+  function toeic(r) {
+    r = Math.max(0, r);
+    for (let i = 1; i < TOEIC_MAP.length; i++) {
+      const [r0, s0] = TOEIC_MAP[i - 1], [r1, s1] = TOEIC_MAP[i];
+      if (r <= r1) return Math.round((s0 + (s1 - s0) * (r - r0) / (r1 - r0)) / 5) * 5;
+    }
+    return 990;
+  }
+  // perfs: 古い順のパフォーマンス列 → { score, lo, hi }.参加回数が少ないうちは幅を広くとる
+  function toeicEstimate(perfs) {
+    if (!perfs.length) return null;
+    const x = aperf(perfs); // perfs は 400 未満を写した後の値なので,そのまま使う
+    const w = 40 + 120 / Math.sqrt(perfs.length);
+    const clamp = s => Math.min(990, Math.max(10, Math.round(s / 5) * 5));
+    const score = toeic(x);
+    return { score, lo: clamp(score - w), hi: clamp(score + w) };
+  }
+
+  const api = { p, performance, rawPerformance, correction, aperf, rating, TIERS, tierOf, toeic, toeicEstimate };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.Rating = api;
 })(typeof window !== "undefined" ? window : this);

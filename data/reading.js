@@ -379,5 +379,409 @@ window.READING = [
       { id: "r18q2", q: "How many chairs did Wexford Accounting receive?", c: ["10", "12", "15", "85"], a: 1, ev: [3], d: 500, why: "Only twelve chairs were delivered.15は請求書の誤った数,85は1脚の値段." },
       { id: "r18q3", q: "What can be inferred about the order?", c: ["Its total was more than $1,000.", "It was delivered to the wrong office.", "It included desks as well as chairs.", "It was paid for in advance."], a: 0, ev: [2, 4], d: 1100, why: "85ドル × 12脚 = 1,020ドルで1,000ドルを超えるので,割引の対象になる.だからイングラムさんは割引がないことを指摘している.数字を組み合わせて推論する問題." }
     ]
+  },
+
+  // ---- ここから図表つきの長文(表は { t: "table" },グラフは { t: "bar" }.根拠 ev で行を指すときは [添字, 行]) ----
+  {
+    id: "r19",
+    kind: "予定表",
+    title: "Pacific Marketing Forum — Day 1 Schedule",
+    target: 120,
+    s: [
+      "Welcome to the Pacific Marketing Forum.",
+      "Please check the schedule below and arrive at each room at least five minutes before the session begins.",
+      { t: "table", head: ["Time", "Session", "Room", "Speaker"], rows: [
+        ["9:00 A.M.", "Opening remarks", "Main Hall", "Helen Ortiz"],
+        ["10:00 A.M.", "Social media advertising", "Room A", "David Chen"],
+        ["11:30 A.M.", "Understanding customer data", "Room B", "Priya Nair"],
+        ["1:30 P.M.", "Building a brand on a small budget", "Room A", "Marco Bell"],
+        ["3:00 P.M.", "Panel discussion", "Main Hall", "All speakers"]
+      ] },
+      "Lunch will be served in the lobby from 12:30 to 1:30 P.M. and is included in the registration fee.",
+      "Please note that the 11:30 session has been moved from Room C because of a problem with the projector.",
+      "Slides from all sessions will be available on our Web site after the event."
+    ],
+    ja: "パシフィック・マーケティング・フォーラムへようこそ.下の予定表を確認し,各セッションの開始5分前までに部屋へ.[表:9時 開会のあいさつ(メインホール),10時 SNS広告(A室),11時半 顧客データの理解(B室),1時半 少ない予算でのブランド作り(A室),3時 パネル討論(メインホール)] 昼食は12時半〜1時半にロビーで出され,参加費に含まれる.11時半のセッションはプロジェクターの不具合のため C 室から変更になった.全セッションのスライドは終了後に Web サイトで見られる.",
+    qs: [
+      { id: "r19q1", q: "Who will speak about advertising on social media?", c: ["Helen Ortiz", "David Chen", "Priya Nair", "Marco Bell"], a: 1, ev: [[2, 1]], d: 300, why: "表の Session の列から Social media advertising の行を探し,同じ行の Speaker を読む.表の問題は「行を見つけて横に読む」." },
+      { id: "r19q2", q: "Where will the session on customer data be held?", c: ["Main Hall", "Room A", "Room B", "Room C"], a: 2, ev: [[2, 2], 4], d: 500, why: "表では Room B.本文の has been moved from Room C は「C 室から移った」なので,Room C は元の部屋で引っかけ." },
+      { id: "r19q3", q: "What is indicated about lunch?", c: ["It costs extra.", "It will be served in Room A.", "It begins at noon.", "Attendees do not have to pay for it separately."], a: 3, ev: [3], d: 700, why: "is included in the registration fee(参加費に含まれる)を「別に払わなくてよい」と言い換えている.開始は12時半で noon(正午)ではない." }
+    ]
+  },
+  {
+    id: "r20",
+    kind: "請求書",
+    title: "Invoice — Maple Office Supplies",
+    target: 130,
+    s: [
+      "Invoice No. 2087 / Date: March 3",
+      "Bill to: Dalton Design Studio, 45 Pine Street",
+      { t: "table", head: ["Item", "Quantity", "Unit price", "Total"], rows: [
+        ["Copy paper (box)", "10", "$25.00", "$250.00"],
+        ["Ink cartridge (black)", "4", "$30.00", "$120.00"],
+        ["Desk lamp", "2", "$40.00", "$80.00"],
+        ["Delivery charge", "-", "-", "$0.00"],
+        ["Amount due", "", "", "$450.00"]
+      ] },
+      "Delivery is free for orders over $300.",
+      "Payment is due within 30 days of the invoice date.",
+      "A late fee of 5 percent will be added to payments received after the due date.",
+      "If you find an error on this invoice, please call our accounting team at 555-0142."
+    ],
+    ja: "請求書番号2087,日付3月3日.請求先:ダルトン・デザイン・スタジオ.[表:コピー用紙10箱 250ドル,黒インク4個 120ドル,デスクライト2台 80ドル,配送料 0ドル,請求額 450ドル] 300ドルを超える注文は配送無料.支払期限は請求日から30日以内.期限を過ぎた支払いには5%の延滞料が加算される.請求書に誤りがあれば経理(555-0142)まで.",
+    qs: [
+      { id: "r20q1", q: "How many ink cartridges were ordered?", c: ["2", "4", "10", "30"], a: 1, ev: [[2, 1]], d: 300, why: "Ink cartridge の行の Quantity(数量)は 4.30 は単価(Unit price)の数字なので引っかけ." },
+      { id: "r20q2", q: "Why was Dalton Design Studio not charged for delivery?", c: ["It picked up the items at the store.", "It is a new customer.", "It paid in advance.", "Its order was large enough."], a: 3, ev: [[2, 4], 3], d: 700, why: "Delivery is free for orders over $300 とあり,請求額は 450 ドル.表の数字と本文の条件を組み合わせて答える." },
+      { id: "r20q3", q: "What will happen if payment is made in May?", c: ["An additional charge will apply.", "The order will be canceled.", "A discount will be given.", "The items must be returned."], a: 0, ev: [0, 4, 5], d: 900, why: "請求日は3月3日で,期限は30日以内(4月初め).5月の支払いは期限後なので,5% の late fee(延滞料)= additional charge がかかる." }
+    ]
+  },
+  {
+    id: "r21",
+    kind: "料金表とメール",
+    title: "Harbor Business Center — Meeting Room Rates",
+    target: 170,
+    s: [
+      "Harbor Business Center offers four meeting rooms for rent.",
+      { t: "table", cap: "Meeting Room Rates", head: ["Room", "Capacity", "Rate per hour", "Equipment"], rows: [
+        ["Coral", "6 people", "$30", "Whiteboard"],
+        ["Pearl", "12 people", "$50", "Projector"],
+        ["Lagoon", "20 people", "$80", "Projector, video conferencing"],
+        ["Ocean", "40 people", "$120", "Projector, microphone"]
+      ] },
+      "Reservations of four hours or more receive a 10 percent discount.",
+      "Cancellations must be made at least 48 hours in advance to receive a full refund.",
+      { t: "doc", title: "E-mail — From: Nina Patel / To: Harbor Business Center / Subject: Room reservation" },
+      "Hello,",
+      "I would like to reserve a room for a training session on Thursday, June 12, from 1:00 to 4:00 P.M.",
+      "Fifteen people will attend, and we need to hold a video call with our London office during the session.",
+      "Could you also tell me whether parking is available for our guests?",
+      "Thank you,",
+      "Nina Patel, Brightway Consulting"
+    ],
+    ja: "ハーバー・ビジネスセンターは4つの会議室を貸し出している.[表:コーラル 6人 30ドル/時 ホワイトボード,パール 12人 50ドル プロジェクター,ラグーン 20人 80ドル プロジェクターとビデオ会議,オーシャン 40人 120ドル プロジェクターとマイク] 4時間以上の予約は10%引き.全額返金には48時間前までの取り消しが必要.[メール] 6月12日(木)午後1時〜4時に研修用の部屋を予約したい.15人が出席し,途中でロンドン支社とビデオ通話をする必要がある.来客用の駐車場があるかも教えてほしい.",
+    qs: [
+      { id: "r21q1", q: "What is the purpose of the e-mail?", c: ["To cancel a reservation", "To book a meeting space", "To ask for a refund", "To apply for a job"], a: 1, ev: [6], d: 400, why: "I would like to reserve a room とある.reserve a room を book a meeting space と言い換えている." },
+      { id: "r21q2", q: "Which room will Ms. Patel most likely reserve?", c: ["Coral", "Pearl", "Lagoon", "Ocean"], a: 2, ev: [7, [1, 2]], d: 900, why: "条件は「15人」と「ビデオ通話」.12人までの Pearl は入れず,ビデオ会議の設備があるのは Lagoon だけ.メールの条件を表に当てはめる(2つの文書を見比べる問題)." },
+      { id: "r21q3", q: "How much will Ms. Patel most likely pay?", c: ["$240", "$216", "$150", "$360"], a: 0, ev: [6, [1, 2], 2], d: 1200, why: "1時〜4時は3時間.Lagoon は1時間 80 ドルなので 240 ドル.10% 引きは「4時間以上」が条件なので当てはまらない($216 は割引した場合の引っかけ)." }
+    ]
+  },
+  {
+    id: "r22",
+    kind: "社内メモとグラフ",
+    title: "MEMO — Customer Survey Results: Sunrise Café",
+    target: 140,
+    s: [
+      "To: All store managers",
+      "From: Karen Brooks, Customer Experience Team",
+      "Last month, 400 customers answered our survey about what we should improve first.",
+      { t: "bar", cap: "What should we improve first? (number of answers)", items: [["Waiting time", 160], ["Seating", 100], ["Menu variety", 80], ["Prices", 40], ["Cleanliness", 20]] },
+      "As the results show, waiting time is by far the biggest concern.",
+      "Starting in October, we will therefore add one more staff member at the counter between 8:00 and 10:00 A.M., our busiest hours.",
+      "We are also planning to replace the chairs in our older stores next year.",
+      "Since few customers are unhappy with our prices, we will not change them for now.",
+      "Please share these results with your staff at your next meeting."
+    ],
+    ja: "全店長へ.先月,400人の客が「まず何を改善すべきか」のアンケートに答えた.[グラフ:待ち時間160,座席100,メニューの種類80,価格40,清潔さ20] 結果のとおり,待ち時間が飛び抜けて大きな不満だ.そこで10月から,最も混む午前8〜10時にカウンターの人員を1人増やす.来年には古い店舗のいすの交換も計画している.価格に不満な客は少ないので,当面は変えない.次の会議でスタッフに結果を共有してほしい.",
+    qs: [
+      { id: "r22q1", q: "How many customers took part in the survey?", c: ["160", "200", "400", "800"], a: 2, ev: [2], d: 300, why: "400 customers answered our survey とある.160 は「待ち時間」と答えた人数で,グラフの数字の引っかけ." },
+      { id: "r22q2", q: "According to the chart, what was the second most common answer?", c: ["Waiting time", "Seating", "Menu variety", "Prices"], a: 1, ev: [[3, 1]], d: 500, why: "グラフで2番目に長い棒は Seating(100).the second most common で「2番目に多い」." },
+      { id: "r22q3", q: "What does the company plan to do in October?", c: ["Lower its prices", "Buy new chairs", "Hire cleaning staff", "Increase staffing in the morning"], a: 3, ev: [5], d: 800, why: "Starting in October ... add one more staff member ... between 8:00 and 10:00 A.M. とある.いすの交換は next year(来年)なので時期が違う." }
+    ]
+  },
+  {
+    id: "r23",
+    kind: "旅程表",
+    title: "Travel Itinerary — Mr. Alan Reyes",
+    target: 150,
+    s: [
+      "Dear Mr. Reyes,",
+      "Here is the itinerary for your trip to Singapore next week.",
+      { t: "table", head: ["Date", "Time", "Details"], rows: [
+        ["Mon., Sept. 8", "9:40 A.M.", "Depart Tokyo (Flight SA 302)"],
+        ["Mon., Sept. 8", "4:00 P.M.", "Arrive Singapore; check in at the Marina Park Hotel"],
+        ["Tue., Sept. 9", "10:00 A.M.", "Meeting with Orchid Trading at their office"],
+        ["Wed., Sept. 10", "2:00 P.M.", "Factory tour in Jurong"],
+        ["Thu., Sept. 11", "11:15 A.M.", "Depart Singapore (Flight SA 305)"]
+      ] },
+      "A driver from the hotel will meet you at the airport, so you do not need to take a taxi.",
+      "Breakfast is included in your room rate, but other meals are not.",
+      "Ms. Tan of Orchid Trading has asked you to bring product samples to the meeting.",
+      "Please keep all receipts so that you can be reimbursed after you return.",
+      "Have a safe trip. — Yuki Sato, Travel Desk"
+    ],
+    ja: "レイエス様.来週のシンガポール出張の旅程です.[表:9月8日(月)9時40分 東京発,午後4時 シンガポール着・マリーナパークホテルにチェックイン,9日(火)10時 オーキッド商事のオフィスで会議,10日(水)午後2時 ジュロンで工場見学,11日(木)11時15分 シンガポール発] ホテルの運転手が空港で出迎えるので,タクシーは不要.朝食は宿泊料金に含まれるが,ほかの食事は含まれない.オーキッド商事のタンさんから,会議に製品サンプルを持ってくるよう頼まれている.帰国後に精算できるよう,領収書はすべて保管すること.",
+    qs: [
+      { id: "r23q1", q: "On what day will Mr. Reyes visit a factory?", c: ["Monday", "Tuesday", "Wednesday", "Thursday"], a: 2, ev: [[2, 3]], d: 400, why: "表の Factory tour の行は Wed., Sept. 10.Wed. は Wednesday の略." },
+      { id: "r23q2", q: "How will Mr. Reyes most likely travel from the airport to the hotel?", c: ["By hotel car", "By taxi", "By train", "By rental car"], a: 0, ev: [3], d: 600, why: "A driver from the hotel will meet you at the airport とある.タクシーは「乗る必要がない」と否定されている." },
+      { id: "r23q3", q: "What should Mr. Reyes take to his meeting on September 9?", c: ["His receipts", "A hotel voucher", "A factory map", "Examples of products"], a: 3, ev: [[2, 2], 5], d: 800, why: "9月9日の会議の相手は Orchid Trading.その Ms. Tan が product samples を持ってくるよう頼んでいる.samples を examples of products と言い換えている." }
+    ]
+  },
+  {
+    id: "r24",
+    kind: "報告書とグラフ",
+    title: "Verde Outdoor Gear — Third-Quarter Sales Summary",
+    target: 160,
+    s: [
+      "Total sales for the third quarter reached $9 million, an increase of 12 percent over the same period last year.",
+      { t: "bar", cap: "Third-quarter sales by region (millions of dollars)", items: [["North", 3.2], ["East", 2.5], ["South", 1.4], ["West", 1.9]] },
+      "The North region remained our strongest market, largely because of the new store that opened in Greyfield in July.",
+      "Sales in the East were flat compared with last year, while the West grew by 20 percent thanks to strong online orders.",
+      "The South was the only region where sales declined, mainly because of unusually heavy rain during the camping season.",
+      "To address this, we will launch a line of waterproof tents and jackets in the South next spring.",
+      "We expect fourth-quarter sales to be even higher, as demand for winter clothing typically peaks in December."
+    ],
+    ja: "第3四半期の売上は合計900万ドルで,前年同期より12%増えた.[グラフ:北部320万,東部250万,南部140万,西部190万ドル] 北部は,7月にグレイフィールドに開いた新店舗のおかげで引き続き最も強い市場だった.東部は前年並み,西部は好調なオンライン注文により20%伸びた.売上が減ったのは南部だけで,主な原因はキャンプの季節の異常な大雨だ.対策として,来春,南部で防水のテントと上着を発売する.冬物衣料の需要は例年12月に最も高まるので,第4四半期の売上はさらに伸びる見込みだ.",
+    qs: [
+      { id: "r24q1", q: "Which region had the lowest sales in the third quarter?", c: ["North", "East", "South", "West"], a: 2, ev: [[1, 2]], d: 500, why: "グラフでいちばん短い棒は South(1.4).lowest は「最も低い」." },
+      { id: "r24q2", q: "What is suggested about the West region?", c: ["Many of its customers shop on the Internet.", "A new store opened there in July.", "Its sales were the same as last year.", "It was affected by bad weather."], a: 0, ev: [3], d: 1000, why: "the West grew by 20 percent thanks to strong online orders から,ネットで買う客が多いと分かる.新店舗は北部,前年並みは東部,悪天候は南部の話(地域を入れ替えた引っかけ)." },
+      { id: "r24q3", q: "Why will the company introduce new products in the South?", c: ["To compete with a new store", "To respond to a drop in sales caused by weather", "To prepare for the winter season", "To increase online orders"], a: 1, ev: [4, 5], d: 1100, why: "南部は大雨で売上が減った.To address this(これに対処するため)防水の商品を出す,という流れ.this が指す内容を前の文から読み取る." }
+    ]
+  },
+  {
+    id: "r25",
+    kind: "注文確認",
+    title: "Order Confirmation — Luma Lighting",
+    target: 150,
+    s: [
+      "Thank you for your order, Ms. Grant.",
+      "Order number: LL-58213 / Order date: Tuesday, November 4",
+      { t: "table", head: ["Item", "Quantity", "Price"], rows: [
+        ["Floor lamp (white)", "1", "$89.00"],
+        ["LED bulbs (pack of 4)", "2", "$24.00"],
+        ["Shipping (Standard)", "", "$6.00"],
+        ["Total", "", "$119.00"]
+      ] },
+      { t: "table", cap: "Shipping options", head: ["Option", "Delivery time", "Cost"], rows: [
+        ["Standard", "5–7 business days", "$6.00"],
+        ["Express", "2–3 business days", "$15.00"],
+        ["Next-day", "1 business day", "$28.00"]
+      ] },
+      "You may change your shipping option at no extra handling charge until your order leaves our warehouse.",
+      "The floor lamp is currently out of stock and is expected to ship on November 12; the bulbs will be sent separately today.",
+      "Items may be returned within 30 days of delivery if they are unused and in their original packaging."
+    ],
+    ja: "グラント様,ご注文ありがとうございます.注文番号 LL-58213,注文日11月4日(火).[表:フロアランプ(白)1台 89ドル,LED 電球(4個入り)2パック 24ドル,送料(通常)6ドル,合計119ドル] [配送方法:通常 5〜7営業日 6ドル,速達 2〜3営業日 15ドル,翌日 1営業日 28ドル] 注文品が倉庫を出るまでは,手数料なしで配送方法を変更できる.フロアランプは現在在庫切れで,11月12日に発送の見込み.電球は別便で本日発送する.未使用で元の箱に入っていれば,配達から30日以内は返品できる.",
+    qs: [
+      { id: "r25q1", q: "How much did Ms. Grant pay for shipping?", c: ["$6.00", "$15.00", "$24.00", "$28.00"], a: 0, ev: [[2, 2]], d: 400, why: "注文の表の Shipping (Standard) の行は $6.00.下の配送方法の表には選ばなかった方法の料金も載っているので,どの表を見るかに注意." },
+      { id: "r25q2", q: "What is indicated about Ms. Grant's order?", c: ["It will be delivered the next day.", "It was placed on a weekend.", "It will arrive in more than one package.", "It includes a free gift."], a: 2, ev: [5], d: 900, why: "ランプは12日発送,電球は sent separately(別に送る).つまり荷物は2つに分かれて届く.注文日は Tuesday なので週末ではない." },
+      { id: "r25q3", q: "According to the confirmation, under what condition can an item be returned?", c: ["It must be damaged on arrival.", "It must not have been used.", "It must be returned within one week.", "It must be exchanged for another item."], a: 1, ev: [6], d: 700, why: "if they are unused and in their original packaging とある.unused(未使用)= must not have been used.期間は30日で1週間ではない." }
+    ]
+  },
+  {
+    id: "r26",
+    kind: "比較表とメール",
+    title: "Tessa Office Printers — Product Comparison",
+    target: 180,
+    s: [
+      "Compare our three most popular office printers.",
+      { t: "table", head: ["Model", "Price", "Pages per minute", "Color", "Warranty"], rows: [
+        ["T-100", "$180", "20", "No", "1 year"],
+        ["T-300", "$320", "35", "Yes", "2 years"],
+        ["T-500", "$540", "50", "Yes", "3 years"]
+      ] },
+      "All models can print on both sides of the paper automatically.",
+      "Customers who purchase an extended service plan receive free replacement parts for five years.",
+      { t: "doc", title: "E-mail — From: Omar Haddad / To: Tessa Sales Team / Subject: Printer for our office" },
+      "Hello,",
+      "Our accounting office prints about 3,000 pages a month, almost all of them black-and-white reports.",
+      "We do not need color, and our budget is limited to $200.",
+      "However, our current printer broke down twice last year, so reliability matters to us more than speed.",
+      "Could you recommend a model and tell me more about your service plan?",
+      "Regards, Omar Haddad"
+    ],
+    ja: "人気のオフィス用プリンター3機種の比較.[表:T-100 180ドル 毎分20枚 カラーなし 保証1年,T-300 320ドル 毎分35枚 カラーあり 保証2年,T-500 540ドル 毎分50枚 カラーあり 保証3年] 全機種が自動で両面印刷できる.延長サービスプランを購入すると,5年間,交換部品が無料になる.[メール] 当会計事務所は月に約3000ページを印刷し,ほぼすべて白黒の報告書だ.カラーは不要で,予算は200ドルまで.ただ,今のプリンターは昨年2回故障したので,速さよりも信頼性が大事だ.機種を薦めてほしい.サービスプランについても詳しく教えてほしい.",
+    qs: [
+      { id: "r26q1", q: "What feature do all three printers have?", c: ["Color printing", "A three-year warranty", "Two-sided printing", "Wireless connection"], a: 2, ev: [2], d: 600, why: "All models can print on both sides of the paper とある.on both sides を two-sided と言い換えている.カラーと3年保証は一部の機種だけ." },
+      { id: "r26q2", q: "Which model best fits Mr. Haddad's needs?", c: ["T-100", "T-300", "T-500", "None of the models"], a: 0, ev: [7, [1, 0]], d: 900, why: "条件は「カラー不要」「予算200ドルまで」.200ドル以下は T-100(180ドル)だけ." },
+      { id: "r26q3", q: "Why most likely does Mr. Haddad ask about the service plan?", c: ["He wants to print in color later.", "He is worried about repair problems.", "He needs a faster printer.", "He wants to pay in monthly installments."], a: 1, ev: [8, 3], d: 1200, why: "今のプリンターが2回故障し,reliability(信頼性)が大事だと書いている.サービスプランは交換部品が無料になるものなので,故障への備えとして尋ねていると推測できる." }
+    ]
+  },
+
+  // ---- 難しめの文章(1000 以上の設問を含む) ----
+  {
+    id: "r27",
+    kind: "記事",
+    title: "Business Weekly — Small Retailers Turn to Local Suppliers",
+    target: 170,
+    s: [
+      "Rising shipping costs are changing the way small retailers do business.",
+      "According to a survey released this week by the National Retail Association, nearly 60 percent of small store owners have switched at least one overseas supplier to a domestic one in the past two years.",
+      "The primary reason cited was not price but reliability: goods from distant factories often arrived weeks behind schedule.",
+      "\"We were losing customers because our shelves were empty,\" said Janet Cole, who runs a kitchenware shop in Dover.",
+      "Ms. Cole now buys most of her products from manufacturers within 200 kilometers of her store.",
+      "Although she pays about 15 percent more per item, she says the higher cost is offset by fewer lost sales.",
+      "Not everyone is convinced, however.",
+      "Economist Raj Mehta warns that domestic suppliers may raise their prices once demand grows, leaving retailers with thinner profit margins.",
+      "For now, though, most store owners surveyed said they have no plans to return to their former suppliers."
+    ],
+    ja: "輸送費の上昇が,小さな小売店の商売のやり方を変えている.全国小売業協会が今週発表した調査によると,小規模店の店主の6割近くが,過去2年間に海外の仕入先を少なくとも1社,国内の業者に切り替えた.挙げられた主な理由は価格ではなく確実さで,遠くの工場からの商品は予定より何週間も遅れることが多かった.ドーバーで台所用品店を営むコールさんは「棚が空で客を失っていた」と話す.今は商品の大半を店から200キロ以内のメーカーから仕入れている.1品あたり約15%高くつくが,売り逃しが減ることで埋め合わされているという.ただし,皆が納得しているわけではない.経済学者のメータ氏は,需要が増えれば国内の業者が値上げし,小売店の利幅が薄くなるかもしれないと警告する.それでも今のところ,調査に答えた店主の大半は,元の仕入先に戻る予定はないと答えた.",
+    qs: [
+      { id: "r27q1", q: "What is the article mainly about?", c: ["A change in where small stores buy their goods", "A new law on overseas shipping", "The opening of a kitchenware shop", "A decline in the number of small retailers"], a: 0, ev: [0, 1], d: 900, why: "最初の2文が主題:小売店が仕入先を海外から国内へ切り替えている.記事の主題は第1段落(冒頭)に書かれる." },
+      { id: "r27q2", q: "According to the survey, why did many store owners change suppliers?", c: ["Domestic goods were cheaper.", "Overseas factories closed.", "Deliveries were frequently late.", "Customers asked for local products."], a: 2, ev: [2], d: 1000, why: "not price but reliability(価格ではなく確実さ),often arrived weeks behind schedule(予定より遅れて届いた)とある.国内品はむしろ15%高いので A は逆." },
+      { id: "r27q3", q: "The word \"offset\" in the article is closest in meaning to", c: ["increased", "delayed", "explained", "balanced"], a: 3, ev: [5], d: 1400, why: "「15%高くつくが,売り逃しが減ることで offset される」.Although(〜だが)があるので,高い費用の悪い面が打ち消されるという意味になる.offset = 相殺する = balance.知らない単語は,文の論理(逆接)から意味を導く." }
+    ]
+  },
+  {
+    id: "r28",
+    kind: "お知らせ",
+    title: "Notice — Changes to Your CloudBox Storage Plan",
+    target: 170,
+    s: [
+      "Dear CloudBox customer,",
+      "We are writing to inform you of changes to our service terms, effective September 1.",
+      "First, the monthly fee for the Standard plan will rise from $8 to $10; the fee for the Basic plan will remain unchanged.",
+      "Second, storage for Standard plan users will double from 100 to 200 gigabytes at no additional cost beyond the new fee.",
+      "Third, accounts that have not been accessed for 24 consecutive months will be deleted after two written warnings.",
+      "Customers who paid for a full year in advance will not be charged the new rate until their current term expires.",
+      "If you do not wish to accept these changes, you may cancel your plan before September 1 and receive a refund for any unused months.",
+      "Continued use of the service after that date will be regarded as acceptance of the revised terms.",
+      "Sincerely, The CloudBox Team"
+    ],
+    ja: "クラウドボックスをご利用の皆様へ.9月1日から有効となる利用規約の変更をお知らせします.第1に,スタンダードプランの月額料金が8ドルから10ドルに上がる.ベーシックプランの料金は変わらない.第2に,スタンダードプランの保存容量が100ギガから200ギガへ倍になる(新料金のほかに追加費用はない).第3に,24か月続けて利用のないアカウントは,書面による2回の警告の後に削除される.1年分を前払いした客には,現在の契約期間が切れるまで新料金は適用されない.変更を受け入れたくない場合は,9月1日より前に解約すれば,未使用の月の分が返金される.その日以降も利用を続けた場合は,改定後の規約に同意したものとみなされる.",
+    qs: [
+      { id: "r28q1", q: "What is one change being announced?", c: ["The Basic plan will be discontinued.", "The price of one plan will increase.", "Storage space will be reduced.", "A new payment method will be introduced."], a: 1, ev: [2], d: 800, why: "the monthly fee for the Standard plan will rise from $8 to $10.値上がりするのはスタンダードプランだけ.容量は減るのではなく倍になる." },
+      { id: "r28q2", q: "Who will NOT be affected immediately by the new fee?", c: ["Customers who joined this year", "Customers who use more than 100 gigabytes", "Customers who received two warnings", "Customers who have already paid for twelve months"], a: 3, ev: [5], d: 1200, why: "Customers who paid for a full year in advance will not be charged the new rate until their current term expires.a full year in advance を have already paid for twelve months と言い換えている." },
+      { id: "r28q3", q: "What is implied about customers who keep using the service after September 1?", c: ["They are considered to have agreed to the changes.", "They must sign a new contract.", "They will receive a refund.", "They will be moved to the Basic plan."], a: 0, ev: [7], d: 1300, why: "Continued use ... will be regarded as acceptance of the revised terms.be regarded as 〜(〜とみなされる)= be considered,acceptance(受け入れ)= have agreed.硬い名詞の表現を動詞に直して読む." }
+    ]
+  },
+  {
+    id: "r29",
+    kind: "プレスリリース",
+    title: "Press Release — Aldergate Hotels",
+    target: 170,
+    s: [
+      "FOR IMMEDIATE RELEASE",
+      "Aldergate Hotels announced today that it will eliminate single-use plastic items from all 42 of its properties by the end of next year.",
+      "Small plastic bottles of shampoo and soap will be replaced with refillable containers, and plastic water bottles will give way to glass ones.",
+      "The company estimates that the initiative will keep roughly 30 tons of plastic out of landfills annually.",
+      "\"Our guests have told us repeatedly that they prefer to stay with companies that take the environment seriously,\" said Chief Operating Officer Lena Fischer.",
+      "The program was tested at three hotels in Vancouver last year, where guest satisfaction scores rose slightly and supply costs fell by 8 percent.",
+      "Encouraged by these results, the board approved the company-wide expansion in March.",
+      "Aldergate also plans to install solar panels at ten locations, although no timeline for that project has been set."
+    ],
+    ja: "即日発表.オルダーゲート・ホテルズは本日,来年末までに全42施設から使い捨てのプラスチック製品をなくすと発表した.シャンプーやせっけんの小さなプラスチック容器は詰め替え式の容器に,ペットボトルの水はガラス瓶に替わる.同社は,この取り組みで年間およそ30トンのプラスチックが埋め立て地に行かずに済むと見積もっている.最高執行責任者のフィッシャー氏は「お客様から,環境に真剣に取り組む会社に泊まりたいと繰り返し言われてきた」と述べた.この計画は昨年バンクーバーの3つのホテルで試され,客の満足度はわずかに上がり,備品の費用は8%下がった.この結果に後押しされ,取締役会は3月に全社への拡大を承認した.同社は10か所に太陽光パネルを設置する計画もあるが,その日程は決まっていない.",
+    qs: [
+      { id: "r29q1", q: "What does Aldergate Hotels plan to do?", c: ["Open 42 new hotels", "Raise its room rates", "Stop using disposable plastic products", "Move its headquarters to Vancouver"], a: 2, ev: [1], d: 800, why: "eliminate single-use plastic items(使い捨てプラスチック製品をなくす).eliminate = stop using,single-use = disposable.42 は今ある施設の数で,新しく開くわけではない." },
+      { id: "r29q2", q: "What was a result of the trial in Vancouver?", c: ["Guests complained about the changes.", "Spending on supplies decreased.", "Three hotels were closed.", "Solar panels were installed."], a: 1, ev: [5], d: 1100, why: "supply costs fell by 8 percent(備品の費用が8%下がった)= Spending on supplies decreased.満足度は上がったので A は逆." },
+      { id: "r29q3", q: "What is indicated about the solar panel project?", c: ["It was completed in March.", "It will cost less than expected.", "It was rejected by the board.", "Its schedule has not been decided."], a: 3, ev: [7], d: 1200, why: "no timeline for that project has been set(その計画の日程は決まっていない).timeline = schedule,set = decided.3月に承認されたのはプラスチック削減の方." }
+    ]
+  },
+  {
+    id: "r30",
+    kind: "メール2通",
+    title: "E-mails — Delayed furniture delivery",
+    target: 180,
+    s: [
+      "From: Gloria Kim / To: Hartwell Furniture Customer Care / Date: May 6",
+      "I ordered a dining table and four chairs from your Web site on April 20 and was promised delivery within ten days.",
+      "The chairs arrived on April 28, but the table still has not come.",
+      "I have guests visiting on May 17, so I need the table before then.",
+      "If it cannot be delivered in time, I would like to cancel that part of the order.",
+      { t: "doc", title: "From: Daniel Ross / To: Gloria Kim / Date: May 7" },
+      "Dear Ms. Kim,",
+      "Please accept our sincere apologies for the delay.",
+      "The table you ordered was damaged at our warehouse, and a replacement had to be requested from the manufacturer.",
+      "It is now scheduled to reach you on May 14.",
+      "To make up for the inconvenience, we have refunded the $40 delivery fee to your credit card.",
+      "Should the table fail to arrive by that date, we will of course cancel it and return your payment in full."
+    ],
+    ja: "[1通目:5月6日 キムさんから] 4月20日に Web サイトで食卓といす4脚を注文し,10日以内に届けると約束された.いすは4月28日に届いたが,食卓はまだ来ない.5月17日に来客があるので,それまでに食卓が必要だ.間に合わないなら,その分の注文を取り消したい.[2通目:5月7日 ロスさんから] 遅れを心からおわびします.ご注文の食卓は当社の倉庫で破損し,メーカーに代わりの品を頼まなければならなかった.5月14日に届く予定だ.おわびとして,配送料40ドルをクレジットカードに返金した.万一その日までに届かなければ,もちろん注文を取り消し,代金を全額返金する.",
+    qs: [
+      { id: "r30q1", q: "Why did Ms. Kim write to Hartwell Furniture?", c: ["Some chairs were damaged.", "She was charged twice.", "Part of her order had not arrived.", "She wanted to order more chairs."], a: 2, ev: [2], d: 600, why: "the table still has not come.いすは届いたが食卓が届かない = 注文の一部が届いていない." },
+      { id: "r30q2", q: "What caused the delay?", c: ["The table was damaged before shipping.", "The manufacturer went out of business.", "The address was incorrect.", "The payment was not confirmed."], a: 0, ev: [8], d: 900, why: "The table ... was damaged at our warehouse(倉庫で破損した).倉庫にある = まだ発送前.原因は2通目(返信)に書かれている." },
+      { id: "r30q3", q: "What will most likely happen if the table arrives on May 14?", c: ["Ms. Kim will receive a full refund.", "Ms. Kim will pay another delivery fee.", "Ms. Kim will have to return the chairs.", "Ms. Kim will be able to use it when her guests visit."], a: 3, ev: [3, 9], d: 1100, why: "来客は5月17日(1通目),到着予定は5月14日(2通目).14日に届けば来客に間に合う.全額返金は「届かなかった場合」の話.2通の日付をつないで答える." }
+    ]
+  },
+  {
+    id: "r31",
+    kind: "社内メモ",
+    title: "MEMO — To: All staff / From: Human Resources / Re: Revised remote work policy",
+    target: 170,
+    s: [
+      "Beginning April 1, the company will adopt a revised policy on working from home.",
+      "Full-time employees who have completed their six-month probation period may work remotely up to two days per week.",
+      "Requests must be approved by your department head, and remote days may not fall on Mondays, when team meetings are held.",
+      "Employees working from home are expected to be reachable by phone and e-mail during core hours, from 10:00 A.M. to 3:00 P.M.",
+      "The company will lend each remote worker a laptop but will not cover home Internet or electricity costs.",
+      "Managers may withdraw approval if an employee's performance declines.",
+      "The policy will be reviewed after one year, at which point the number of remote days may be increased.",
+      "Questions should be directed to Hana Mori in Human Resources."
+    ],
+    ja: "4月1日から,会社は在宅勤務についての改定した方針を採用する.6か月の試用期間を終えた正社員は,週に2日まで在宅で働ける.申請には部長の承認が必要で,チーム会議のある月曜日は在宅勤務の日にできない.在宅で働く社員は,コアタイム(午前10時〜午後3時)に電話とメールで連絡がつくようにすること.会社は在宅勤務者にノートパソコンを貸すが,自宅のインターネット代や電気代は負担しない.社員の業績が下がった場合,管理職は承認を取り消すことができる.方針は1年後に見直し,その時点で在宅勤務の日数を増やす可能性がある.質問は人事部の森まで.",
+    qs: [
+      { id: "r31q1", q: "Who is eligible to work remotely under the new policy?", c: ["All employees from their first day", "Full-time staff who have finished their trial period", "Part-time staff only", "Department heads only"], a: 1, ev: [1], d: 900, why: "Full-time employees who have completed their six-month probation period.probation period(試用期間)= trial period,completed = finished." },
+      { id: "r31q2", q: "What is NOT stated as a condition of working from home?", c: ["Getting a manager's approval", "Being available during certain hours", "Avoiding a particular day of the week", "Submitting a weekly report"], a: 3, ev: [2, 3], d: 1200, why: "承認(approved by your department head),連絡がつく時間(core hours),月曜を避ける(may not fall on Mondays)は本文にある.週報の提出はどこにもない.NOT 問題は,本文にある3つを消す." },
+      { id: "r31q3", q: "What will the company provide to remote workers?", c: ["A computer", "Internet service", "Money for electricity", "A mobile phone"], a: 0, ev: [4], d: 800, why: "will lend each remote worker a laptop.laptop を computer と言い換えている.インターネット代と電気代は will not cover(負担しない)." }
+    ]
+  },
+  {
+    id: "r32",
+    kind: "求人広告とメール",
+    title: "Northgate Museum of Science — Events Coordinator",
+    target: 190,
+    s: [
+      "Northgate Museum of Science is seeking an Events Coordinator to plan and manage its public programs.",
+      "The successful candidate will organize lectures, school visits, and seasonal exhibitions, and will supervise a team of ten volunteers.",
+      "Applicants must have at least three years of experience in event planning and be available to work on weekends.",
+      "Fluency in a second language is preferred but not required.",
+      "To apply, send a résumé and two letters of reference to jobs@northgatemuseum.example by October 15.",
+      "Interviews will be held during the last week of October.",
+      { t: "doc", title: "E-mail — From: Elena Vasquez / To: jobs@northgatemuseum.example / Date: October 9" },
+      "Dear Hiring Manager,",
+      "I am writing to apply for the Events Coordinator position.",
+      "For the past five years I have planned conferences and weddings at the Regent Hotel, where I also trained new staff.",
+      "I speak Spanish and English, and I am free to work any day of the week.",
+      "My résumé is attached; my former supervisor will send a letter of reference to you directly.",
+      "I look forward to hearing from you."
+    ],
+    ja: "ノースゲート科学博物館は,一般向けの催しを企画・運営するイベント担当者を募集している.採用された人は,講演,学校の見学,季節の展示を企画し,10人のボランティアを監督する.応募者には,イベント企画の経験が3年以上あり,週末に働けることが必要だ.第二言語が流ちょうであることが望ましいが,必須ではない.応募するには,10月15日までに履歴書と推薦状2通を送ること.面接は10月の最終週に行う.[メール:10月9日 バスケスさんから] イベント担当者の職に応募します.過去5年間,リージェントホテルで会議や結婚式を企画し,新人の研修も担当した.スペイン語と英語を話し,週のどの日でも働ける.履歴書を添付した.以前の上司が推薦状を直接そちらに送る.ご連絡をお待ちしています.",
+    qs: [
+      { id: "r32q1", q: "What is one duty of the Events Coordinator?", c: ["Selling tickets", "Repairing exhibits", "Managing volunteers", "Teaching science classes"], a: 2, ev: [1], d: 700, why: "will supervise a team of ten volunteers.supervise(監督する)= manage." },
+      { id: "r32q2", q: "What is suggested about Ms. Vasquez?", c: ["She has worked at a museum before.", "She meets the experience requirement.", "She cannot work on weekends.", "She has already been interviewed."], a: 1, ev: [2, 9], d: 1100, why: "求人の条件は「イベント企画の経験3年以上」.メールには「5年間,会議や結婚式を企画した」とある.条件(求人)と事実(メール)を照らし合わせる.職場はホテルで博物館ではない." },
+      { id: "r32q3", q: "What does Ms. Vasquez's application appear to be missing?", c: ["A résumé", "A cover letter", "Language skills", "One of the required reference letters"], a: 3, ev: [4, 11], d: 1400, why: "求人は two letters of reference(推薦状2通)を求めているが,メールで触れているのは a letter of reference(1通)だけ.数の食い違いに気づく問題.履歴書は添付してある." }
+    ]
+  },
+  {
+    id: "r33",
+    kind: "営業時間の表",
+    title: "Riverton Fitness Club — New Opening Hours from January 5",
+    target: 90,
+    s: [
+      { t: "table", head: ["Day", "Gym", "Pool"], rows: [
+        ["Monday–Friday", "6:00 A.M.–10:00 P.M.", "7:00 A.M.–9:00 P.M."],
+        ["Saturday", "8:00 A.M.–8:00 P.M.", "9:00 A.M.–6:00 P.M."],
+        ["Sunday", "8:00 A.M.–6:00 P.M.", "Closed"]
+      ] },
+      "The pool is closed on Sundays for cleaning.",
+      "Members may bring one guest for free on Saturdays.",
+      "Towels can be rented at the front desk for $2."
+    ],
+    ja: "リバートン・フィットネスクラブ:1月5日からの新しい営業時間.[表:月〜金 ジム 6時〜22時・プール 7時〜21時,土曜 ジム 8時〜20時・プール 9時〜18時,日曜 ジム 8時〜18時・プール 休み] プールは清掃のため日曜は休み.会員は土曜に限り,同伴者を1人無料で連れてこられる.タオルは受付で2ドルで借りられる.",
+    qs: [
+      { id: "r33q1", q: "What time does the gym open on Saturday?", c: ["6:00 A.M.", "7:00 A.M.", "8:00 A.M.", "9:00 A.M."], a: 2, ev: [[0, 1]], d: 300, why: "Saturday の行の Gym の列は 8:00 A.M.–8:00 P.M.9:00 は Pool の列なので,列を間違えないこと." },
+      { id: "r33q2", q: "When is the pool NOT available?", c: ["On Monday", "On Friday", "On Saturday", "On Sunday"], a: 3, ev: [[0, 2], 1], d: 300, why: "Sunday の行の Pool は Closed.本文にも closed on Sundays とある." },
+      { id: "r33q3", q: "What can members do on Saturdays?", c: ["Bring a visitor at no cost", "Rent towels for free", "Use the pool until 9:00 P.M.", "Take a swimming lesson"], a: 0, ev: [2], d: 500, why: "Members may bring one guest for free on Saturdays.guest = visitor,for free = at no cost.タオルは2ドルかかる." }
+    ]
+  },
+  {
+    id: "r34",
+    kind: "記事",
+    title: "Millbrook Journal — Downtown Plaza Plan Draws Mixed Reactions",
+    target: 180,
+    s: [
+      "The Millbrook City Council voted 5 to 2 on Monday to convert two downtown parking lots into a public plaza.",
+      "Supporters argue that the plaza will draw more pedestrians to the area and, in turn, boost sales at nearby shops.",
+      "Opponents, including several restaurant owners, counter that the loss of 180 parking spaces will discourage customers who drive in from the suburbs.",
+      "In response to these concerns, the council amended the original proposal to include a free shuttle bus from the Elm Street garage, which is rarely more than half full.",
+      "Council member Dana Whitfield, who cast one of the two dissenting votes, said the shuttle was \"a step in the right direction\" but insufficient on its own.",
+      "Construction is slated to begin in June, provided that the state approves a grant covering roughly a third of the $2.4 million cost.",
+      "Should the grant be denied, the council would have to either scale back the design or postpone the project."
+    ],
+    ja: "ミルブルック市議会は月曜日,中心街の2つの駐車場を公共の広場に作り変える案を5対2で可決した.賛成派は,広場が歩行者を呼び込み,その結果,近くの店の売上を伸ばすと主張する.数人の飲食店主を含む反対派は,駐車スペースが180台分なくなれば,郊外から車で来る客の足が遠のくと反論する.こうした懸念を受けて,議会は元の案を修正し,エルム通りの立体駐車場からの無料シャトルバスを加えた.この駐車場は半分以上埋まることがめったにない.反対票を投じた2人のうちの1人,ホイットフィールド議員は,シャトルは「正しい方向への一歩」だが,それだけでは不十分だと述べた.工事は6月に始まる予定だが,それは240万ドルの費用のおよそ3分の1をまかなう補助金を州が承認することが条件だ.補助金が認められなければ,議会は設計を縮小するか,計画を延期しなければならない.",
+    qs: [
+      { id: "r34q1", q: "What did the city council decide to do?", c: ["Build a new parking garage", "Turn parking areas into a public space", "Close several restaurants", "Raise parking fees downtown"], a: 1, ev: [0], d: 1000, why: "convert two downtown parking lots into a public plaza.convert A into B(A を B に作り変える)= turn A into B,plaza = public space." },
+      { id: "r34q2", q: "What is suggested about the Elm Street garage?", c: ["It will be torn down in June.", "It is owned by restaurant owners.", "It charges high fees.", "It usually has many empty spaces."], a: 3, ev: [3], d: 1300, why: "which is rarely more than half full(半分以上埋まることはめったにない)= たいてい空きが多い.rarely(めったに〜ない)という否定の語に注意して読み替える." },
+      { id: "r34q3", q: "What is true about the start of construction?", c: ["It depends on funding from the state.", "It has been postponed until next year.", "It was opposed by all council members.", "It will cost the state $2.4 million."], a: 0, ev: [5, 6], d: 1500, why: "provided that the state approves a grant(州が補助金を承認するという条件で).provided that 〜 = 〜という条件で,なので工事の開始は州の資金次第.240万ドルは費用の全体で,州が出すのはその3分の1." }
+    ]
   }
 ];
