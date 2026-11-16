@@ -264,3 +264,9 @@ summary { cursor: pointer; }
 .cwrow { display: grid; grid-template-columns: minmax(7em, auto) 1fr; gap: 8px; padding: 4px 8px; border-radius: 6px; background: var(--bg); font-size: .92rem; }
 .cwrow.right { background: var(--ac-bg); }
 .cwrow.wrong { background: var(--wa-bg); }
+
+/* データの削除 */
+.dels { display: grid; gap: 8px; }
+.del { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.del > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.btn.danger { color: var(--wa); border-color: var(--wa); flex: none; }

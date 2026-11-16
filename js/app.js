@@ -938,9 +938,13 @@ function renderRecord() {
     ${S.legacy ? `<p class="small muted" style="margin-top:16px">旧方式(Elo)の本番 ${S.legacy.history.length} 回分の記録は,レート計算方式の変更により新しいレートには含めていません.</p>` : ""}
     <h2>データの引き継ぎ</h2>
     <p class="small muted">進捗はこの端末のブラウザに保存されます.別の端末に移すときは,書き出したファイルを移した先で読み込んでください.</p>
-    <div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>`;
+    <div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>
+    <h2>データの削除</h2>
+    <p class="small muted">消したデータは元に戻せません.念のため,先に「書き出す」でバックアップを取っておくと安心です.</p>
+    <div class="dels">${Object.entries(DELETE).map(([k, d]) => `<div class="del"><div><b>${d.name}</b><span class="small muted">${d.desc}</span></div><button class="btn ghost sm danger" data-del="${k}">削除</button></div>`).join("")}</div>`;
   m.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { chartKey = b.dataset.k; renderRecord(); });
   $("#exp-btn").onclick = exportData;
+  m.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteData(b.dataset.del));
   $("#imp-file").onchange = e => { const f = e.target.files[0]; if (f) importData(f); };
   bindGo();
   const box = $("#chart");
@@ -954,6 +958,26 @@ function exportData() {
   a.download = `eigo-judge-${dateKey(Date.now())}.json`;
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+/* データの削除.レートは本番の記録から計算するので,本番の記録を消すとレートと推定スコアも消える */
+const DELETE = {
+  contests: { name: "本番の記録", desc: "本番の履歴を消します.レート・推定 TOEIC スコア・グラフも消えます.問題ごとの AC / WA は残ります.",
+    run: () => { S.contests = []; S.live = null; S.legacy = null; cState = null; } },
+  results: { name: "問題の結果", desc: "問題ごとの AC / WA,単語の復習の予定,長文の所要時間を消します.すべて未挑戦に戻ります.レートは残ります.",
+    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; } },
+  all: { name: "すべてのデータ", desc: "本番の記録,問題の結果,学習日数,実績,設定をすべて消して,最初の状態に戻します.",
+    run: () => { S = freshState(); cState = null; } }
+};
+function deleteData(k) {
+  const d = DELETE[k];
+  if (!confirm(`「${d.name}」を削除します.元に戻せません.よろしいですか?`)) return;
+  if (k === "all" && !confirm("本当にすべてのデータを削除しますか?")) return;
+  stopTimer(); pState = null;
+  d.run();
+  // 実績は今の状態から付け直す(消した記録で解除された実績が残らないように)
+  if (k !== "all") { S.badges = {}; const c = badgeCtx(); BADGES.forEach(b => { if (b.ok(c)) S.badges[b.id] = Date.now(); }); }
+  save(); render(); window.scrollTo(0, 0);
+  toast(`「${esc(d.name)}」を削除しました.`);
 }
 function importData(file) {
   file.text().then(txt => {
