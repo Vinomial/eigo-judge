@@ -490,7 +490,7 @@ function ratingCells() {
 }
 function heroHTML() {
   const r = ratingOf("all");
-  if (r == null) return `<div class="hero"><div class="lab">総合レート</div><div class="big muted">-</div><p class="small muted" style="margin:4px 0 0">本番を1回解くと,レートがつきます.</p></div>`;
+  if (r == null) return `<button class="hero0" data-go="contest"><b>総合レートはまだありません</b><span class="small muted">本番を1回解くと,レートと推定 TOEIC スコアがつきます →</span></button>`;
   const t = tierOf(r), next = TIERS.find(x => x.min > r);
   const pct = next ? Math.round(100 * (r - t.min) / (next.min - t.min)) : 100;
   return `<div class="hero" style="${rc(r)}">
@@ -534,10 +534,10 @@ function homeHTML() {
   const unseen = WORDS.filter(w => !S.srs[w.id]).length;
   const gLeft = GRAM.filter(q => statusOf(q.id) !== "AC").length, rLeft = READING.filter(p => passageStatus(p) !== "AC").length;
   const tile = (attrs, title, sub, cls = "") => `<button class="tile ${cls}" ${attrs}><b>${title}</b><span>${sub}</span></button>`;
+  const rated = ratingOf("all") != null || Object.keys(DOMAINS).some(k => ratingOf(k) != null);
   return `
   ${heroHTML()}
-  ${toeicHTML()}
-  <div class="ratings">${ratingCells()}</div>
+  ${rated ? toeicHTML() + `<div class="ratings">${ratingCells()}</div>` : ""}
   <div class="today">
     <div class="trow"><span><b>今日 ${sk.today}</b> / ${GOAL} 問</span><span class="small muted">${sk.cur} 日連続 · 学習 ${sk.total} 日</span></div>
     <div class="pbar"><span style="width:${Math.min(100, 100 * sk.today / GOAL).toFixed(0)}%"></span></div>
@@ -678,7 +678,7 @@ function startSolve(dom, id, ids, label, from) {
 // queue: [{dom, id}] の順に解く(分野が混ざっていてもよい).null ならおまかせ
 function startQueue(queue, dom, id, label, from) {
   stopTimer();
-  pState = { queue, dom, id, label: label || "", from: from || "list" };
+  pState = { queue, dom, id, label: label || "", from: from || "list", sess: { n: 0, ac: 0 } };
   setupItem();
   view = "list"; pendingNav = null; render(); window.scrollTo(0, 0);
 }
@@ -716,6 +716,7 @@ function startTheorem(k, from) {
 }
 function setupItem() {
   const { dom, id } = pState;
+  S.prefs.notes = (S.prefs.notes || 0) + 1;
   pState.prev = unitStatus(dom, id); // 開いた時点の結果(解いた後も「前回」として表示する)
   if (dom === "reading") {
     const p = PASS_BY.get(id);
@@ -725,18 +726,32 @@ function setupItem() {
     pState.item = { dom, q }; pState.st = newSt(pState.item); pState.done = false;
   }
 }
+let autoT = null; // 「AC なら自動で次へ」のタイマー
 function nextSolve() {
-  stopTimer();
+  stopTimer(); clearTimeout(autoT);
   const { dom, queue, id } = pState;
   if (queue) {
     const i = queuePos();
-    if (i < 0 || i + 1 >= queue.length) { toast("最後まで解きました."); backToList(); return; }
+    if (i < 0 || i + 1 >= queue.length) { backToList(true); return; }
     pState.dom = queue[i + 1].dom; pState.id = queue[i + 1].id;
   } else pState.id = autoPick(dom, id);
   setupItem(); render(); window.scrollTo(0, 0);
 }
 const queuePos = () => pState.queue.findIndex(x => x.dom === pState.dom && x.id === pState.id);
-function backToList() { stopTimer(); const to = pState ? pState.from : "list"; pState = null; go(to); }
+// やめるとき(最後まで解いたときも),今回の成績を知らせる
+function backToList(finished) {
+  stopTimer(); clearTimeout(autoT);
+  const to = pState ? pState.from : "list", z = pState && pState.sess;
+  pState = null; go(to);
+  if (z && z.n) toast(`${finished === true ? "最後まで解きました." : ""}今回は ${z.n} 問中 <b>${z.ac} 問 AC</b>(${Math.round(100 * z.ac / z.n)}%)でした.`);
+  else if (finished === true) toast("最後まで解きました.");
+}
+// 今回(続けて解いている間)の成績
+function sessText() {
+  const z = pState.sess;
+  if (!z.n) return "練習モード";
+  return `今回 ${z.n} 問 · <b class="up">AC ${z.ac}</b>${z.n - z.ac ? ` · <span class="down">WA ${z.n - z.ac}</span>` : ""}`;
+}
 function solveTop() {
   const { dom, queue, label } = pState;
   const pos = queue ? `${queuePos() + 1} / ${queue.length}` : "おまかせ";
@@ -749,7 +764,16 @@ function solveTop() {
 }
 function renderSolve() {
   const m = $("#main");
-  m.innerHTML = solveTop() + `<p class="mode-note">練習モード:${pState.dom === "reading" ? "全問に答えて提出すると判定します" : "1問ごとにすぐ判定します"}.分からないときは「わからない」を選ぶと,当てずっぽうの AC を防げます.レートは動きません.</p><div class="card" id="qcard"></div>`;
+  // 説明は最初の数問だけ詳しく出し,慣れたら1行にする(問題を画面の上の方に出すため)
+  const long = (S.prefs.notes || 0) < 5;
+  const note = long
+    ? `練習モード:${pState.dom === "reading" ? "全問に答えて提出すると判定します" : "1問ごとにすぐ判定します"}.分からないときは「わからない」を選ぶと,当てずっぽうの AC を防げます.レートは動きません.`
+    : "";
+  // 単語・文法は「AC なら自動で次へ」を選べる(テンポよく解くため.WA のときは解説を読めるよう止まる)
+  const auto = pState.dom !== "reading" ? `<label class="autonext"><input type="checkbox" id="auto-next"${S.prefs.autoNext ? " checked" : ""}> AC なら自動で次へ</label>` : "";
+  m.innerHTML = solveTop() + `<div class="notebar">${note ? `<p class="mode-note">${note}</p>` : `<span class="small muted" id="sess">${sessText()}</span>`}${auto}</div><div class="card" id="qcard"></div>`;
+  const an = $("#auto-next");
+  if (an) an.onchange = () => { S.prefs.autoNext = an.checked; save(); };
   $("#back-btn").onclick = backToList;
   if (pState.dom === "reading") renderSolveReading(); else renderSolveSingle();
 }
@@ -770,14 +794,21 @@ function renderSolveSingle() {
     const bar = $(".qprog > span");
     if (bar && pState.queue) bar.style.width = (100 * (queuePos() + 1) / pState.queue.length).toFixed(1) + "%";
     if (fresh) $("#verdict").scrollIntoView({ block: "nearest", behavior: "smooth" });
+    if (fresh && ok && S.prefs.autoNext) {
+      const me = pState;
+      clearTimeout(autoT);
+      autoT = setTimeout(() => { if (pState === me && pState.st === st && view === "list") nextSolve(); }, 900);
+    }
   };
   if (st.done) { show(false); return; }
   bindChoices(card, st, () => {
     st.done = true;
     const ok = isCorrect(item, st);
+    pState.sess.n++; if (ok) pState.sess.ac++;
     record(item.q.id, ok);
     if (item.dom === "word") updateSrs(item.q.id, ok);
     save(); show(true); checkBadges();
+    const se = $("#sess"); if (se) se.innerHTML = sessText();
   });
 }
 function renderSolveReading() {
@@ -786,7 +817,7 @@ function renderSolveReading() {
   const evs = done ? p.qs.flatMap(q => q.ev) : [];
   card.innerHTML = `
     <div class="timebar"><span class="muted">${esc(p.kind)} · 目標 ${fmtSec(p.target)}</span><span class="timer" id="ptimer"></span></div>
-    ${passageHTML(p, evs, { fill: done })}
+    ${passageHTML(p, evs, { fill: done, box: !done })}
     ${p.qs.map((q, k) => `<div class="rq" data-k="${k}">${metaHTML("reading", q.d)}<p class="qtext en">${qLabel(p, k)}</p>${choicesHTML(q.c, sts[k], true)}<div class="rres"></div></div>`).join("")}
     <div id="rsum"></div>
     <div class="row actions" id="actions"></div>`;
@@ -810,6 +841,7 @@ function renderSolveReading() {
     $("#list-btn").onclick = backToList;
     return;
   }
+  bindPbox(card);
   blocks.forEach((el, k) => bindChoices(el, sts[k], refresh));
   $("#actions").innerHTML = `<button class="btn" id="submit-btn">提出する</button><span class="small muted" id="left"></span>`;
   function refresh() {
@@ -822,7 +854,7 @@ function renderSolveReading() {
     stopTimer();
     pState.elapsed = (Date.now() - pState.start) / 1000;
     pState.done = true;
-    p.qs.forEach((q, k) => record(q.id, isCorrect({ dom: "reading", q }, sts[k])));
+    p.qs.forEach((q, k) => { const ok = isCorrect({ dom: "reading", q }, sts[k]); pState.sess.n++; if (ok) pState.sess.ac++; record(q.id, ok); });
     (S.readTimes[p.id] = S.readTimes[p.id] || []).push(Math.round(pState.elapsed));
     save(); renderSolve(); checkBadges();
     const sum = $("#rsum"); if (sum) sum.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -848,7 +880,17 @@ function passageHTML(p, evs, opt = {}) {
   const ev = evMap(evs);
   let html = p.s.map((b, i) => blockHTML(b, ev.get(i))).join("");
   html = p6Blanks(html, p, opt);
-  return `<div class="passage en"><div class="ptitle">${esc(p.kind)}:${esc(p.title)}</div>${html}</div>`;
+  const body = `<div class="passage en${opt.box ? " pbox" : ""}"><div class="ptitle">${esc(p.kind)}:${esc(p.title)}</div>${html}</div>`;
+  return opt.box ? `<div class="pwrap">${body}<button class="pmore" type="button" hidden>本文を広げる ▼</button></div>` : body;
+}
+// 本文の枠:はみ出すときだけ「本文を広げる」を出す
+function bindPbox(root) {
+  (root || document).querySelectorAll(".pwrap").forEach(w => {
+    const box = w.querySelector(".pbox"), btn = w.querySelector(".pmore");
+    if (!box || !btn) return;
+    if (box.scrollHeight > box.clientHeight + 4) btn.hidden = false;
+    btn.onclick = () => { const open = box.classList.toggle("open"); btn.textContent = open ? "本文をたたむ ▲" : "本文を広げる ▼"; };
+  });
 }
 // Part 6 の空所 [n] を描く(fill なら正解を入れる)
 function p6Blanks(html, p, opt) {
@@ -875,7 +917,7 @@ function itemHTML(item, st) {
     return metaHTML("grammar", q.d) + `<p class="sentence en">${esc(q.q).replace("____", '<span class="blank">&nbsp;</span>')}</p>` + choicesHTML(q.c, st, true);
   }
   const k = item.p.qs.indexOf(q);
-  return metaHTML("reading", q.d) + passageHTML(item.p, null, { cur: k + 1 }) + `<p class="qtext en"><b>${qLabel(item.p, k)}</b></p>` + choicesHTML(q.c, st, true);
+  return metaHTML("reading", q.d) + passageHTML(item.p, null, { cur: k + 1, box: true }) + `<p class="qtext en"><b>${qLabel(item.p, k)}</b></p>` + choicesHTML(q.c, st, true);
 }
 function editorialHTML(item) {
   const q = item.q;
@@ -1068,6 +1110,7 @@ function renderContest() {
     </div>`;
   contestTick();
   const moveTo = j => { cState.i = j; cState.confirming = false; persistContest(); renderContest(); };
+  bindPbox($("#qcard"));
   bindChoices($("#qcard"), st, () => {
     persistContest();
     $("#left-count").textContent = `(未解答 ${unanswered()})`;

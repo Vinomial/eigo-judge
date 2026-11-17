@@ -1842,5 +1842,119 @@ window.READING = [
       { id: "r82q2", q: "The phrase \"hinges ... on\" in the fourth sentence is closest in meaning to", c: ["comments on", "focuses on", "insists on", "depends on"], a: 3, ev: [3], d: 2600, why: "hinge は「ちょうつがい」.hinge on 〜 で「〜にかかっている・〜次第だ」.future hinges on regulation =「将来は規制次第」.", x: ["「〜について述べる」では意味が合わない.", "「〜に集中する」では意味が合わない.", "「〜を主張する」では意味が合わない.", ""] },
       { id: "r82q3", q: "What can be inferred about some governments?", c: ["They have indicated plans to restrict single-use plastics.", "They have already banned all plastics.", "They directly fund research on fungi.", "They oppose the use of the new materials."], a: 0, ev: [4], d: 2900, why: "as several have signaled they will(いくつかの政府はそうすると示している)の they will は impose stricter limits を指す.省略された部分を補って読む必要がある.", x: ["", "すべてのプラスチックを禁止したとは書かれていない.規制が厳しくなる可能性の話.", "研究への資金提供は書かれていない.", "新しい素材への反対は書かれていない."] }
     ]
+  },
+
+  // ---- 易しい長文(灰・茶) ----
+  {
+    id: "r83",
+    kind: "お知らせ",
+    title: "Notice — Sunny Café",
+    target: 60,
+    s: [
+      "Sunny Café will be closed on Monday, May 6, for cleaning.",
+      "We will open again on Tuesday at 8:00 A.M.",
+      "Our hours on weekdays are 8:00 A.M. to 6:00 P.M.",
+      "On weekends, we are open from 9:00 A.M. to 4:00 P.M.",
+      "Thank you!"
+    ],
+    ja: "サニーカフェは5月6日(月)は清掃のため休業します.火曜日の午前8時に再開します.平日の営業時間は午前8時から午後6時,週末は午前9時から午後4時です.",
+    qs: [
+      { id: "r83q1", q: "Why will the café be closed on May 6?", c: ["For a holiday", "For cleaning", "For a party", "For new staff"], a: 1, ev: [0], d: 200, why: "for cleaning(清掃のため)とある.", x: ["休日のためとは書かれていない.", "", "パーティーのためとは書かれていない.", "新しい職員のためとは書かれていない."] },
+      { id: "r83q2", q: "What time will the café open on Tuesday?", c: ["6:00 P.M.", "9:00 A.M.", "4:00 P.M.", "8:00 A.M."], a: 3, ev: [1], d: 150, why: "We will open again on Tuesday at 8:00 A.M. とある.", x: ["6時は平日の閉店時刻.", "9時は週末の開店時刻.", "4時は週末の閉店時刻.", ""] },
+      { id: "r83q3", q: "When does the café close on Saturdays?", c: ["At 4:00 P.M.", "At 6:00 P.M.", "At 8:00 A.M.", "At 9:00 A.M."], a: 0, ev: [3], d: 300, why: "土曜日は週末(weekend).週末は from 9:00 A.M. to 4:00 P.M. なので4時に閉まる.Saturday を weekend と結びつける.", x: ["", "6時は平日の閉店時刻.", "8時は平日の開店時刻.", "9時は週末の開店時刻."] }
+    ]
+  },
+  {
+    id: "r84",
+    kind: "チャット",
+    title: "Text message chain — Ken Ito and Mia Ross",
+    target: 60,
+    s: [
+      "Ken Ito [9:05 A.M.]: Hi Mia. My train is late. I will be at the office at about 9:40.",
+      "Mia Ross [9:06 A.M.]: OK. The meeting with the client starts at 10:00, so you have time.",
+      "Ken Ito [9:07 A.M.]: Great. Can you print the slides for me?",
+      "Mia Ross [9:08 A.M.]: Sure. I'll put them on your desk."
+    ],
+    ja: "伊藤:おはよう,ミア.電車が遅れていて,事務所には9時40分ごろに着きます.ロス:分かりました.顧客との会議は10時からなので間に合いますね.伊藤:よかった.スライドを印刷してもらえますか.ロス:もちろん.机に置いておきます.",
+    qs: [
+      { id: "r84q1", q: "Why will Mr. Ito be late?", c: ["He is sick.", "He forgot the slides.", "His train is late.", "The meeting was moved."], a: 2, ev: [0], d: 150, why: "My train is late. とある.", x: ["病気だとは書かれていない.", "スライドを忘れたとは書かれていない.", "", "会議の時間は変わっていない."] },
+      { id: "r84q2", q: "What time does the meeting start?", c: ["At 9:40", "At 9:05", "At 10:00", "At 9:08"], a: 2, ev: [1], d: 200, why: "The meeting with the client starts at 10:00 とある.メッセージの時刻と混同しない.", x: ["9時40分は伊藤さんが事務所に着く時刻.", "9時5分は最初のメッセージの時刻.", "", "9時8分は最後のメッセージの時刻."] },
+      { id: "r84q3", q: "What will Ms. Ross most likely do next?", c: ["Print some slides", "Call the client", "Change the meeting time", "Meet Mr. Ito at the station"], a: 0, ev: [2,  3], d: 300, why: "伊藤さんの「スライドを印刷してもらえますか」に Sure.(もちろん)と答えている.", x: ["", "顧客に電話するとは書かれていない.", "会議の時間を変えるとは書かれていない.", "駅で会うとは書かれていない."] }
+    ]
+  },
+  {
+    id: "r85",
+    kind: "社内メール",
+    title: "From: Lisa Grant / To: All staff / Subject: New water machine",
+    target: 70,
+    s: [
+      "Hello everyone,",
+      "A new water machine has been put in the kitchen on the second floor.",
+      "It gives both hot and cold water.",
+      "Please do not put cups in the sink; there is a box for used cups next to the machine.",
+      "If the machine stops working, please call Tom in the office at extension 25.",
+      "Thanks, Lisa"
+    ],
+    ja: "皆さんへ.2階の給湯室に新しい給水機を置きました.お湯も冷水も出ます.使ったカップは流しに置かず,給水機の横の箱に入れてください.給水機が動かなくなったら,事務所のトム(内線25)に電話してください.",
+    qs: [
+      { id: "r85q1", q: "Where is the new machine?", c: ["Next to the elevator", "In the lobby", "In Tom's office", "In the kitchen on the second floor"], a: 3, ev: [1], d: 200, why: "in the kitchen on the second floor とある.", x: ["エレベーターの横とは書かれていない.", "ロビーとは書かれていない.", "トムは連絡先で,置き場所ではない.", ""] },
+      { id: "r85q2", q: "What should staff do with used cups?", c: ["Wash them in the sink", "Put them in a box", "Take them home", "Give them to Lisa"], a: 1, ev: [3], d: 400, why: "there is a box for used cups next to the machine.流しではなく箱に入れる.", x: ["流しに置かないよう書かれている.", "", "持ち帰るとは書かれていない.", "リサに渡すとは書かれていない."] },
+      { id: "r85q3", q: "Why would staff call Tom?", c: ["If the machine is not working", "To order more cups", "To get hot water", "To clean the kitchen"], a: 0, ev: [4], d: 400, why: "If the machine stops working, please call Tom.stops working を is not working と言い換えている.", x: ["", "カップの注文については書かれていない.", "お湯は機械から出る.", "掃除については書かれていない."] }
+    ]
+  },
+  {
+    id: "r86",
+    kind: "料金表",
+    title: "City Bike Rental — Prices",
+    target: 80,
+    s: [
+      "City Bike Rental is open every day from 7:00 A.M. to 8:00 P.M.",
+      {t:  "table", cap:  "Prices", head:  ["Time", "Adult", "Child"], rows:  [["1 hour", "$5", "$3"], ["3 hours", "$12", "$7"], ["1 day", "$20", "$12"]]},
+      "Helmets are free.",
+      "Please bring a photo ID when you rent a bike."
+    ],
+    ja: "シティ自転車レンタルは毎日午前7時から午後8時まで営業.[表:1時間 大人5ドル・子ども3ドル/3時間 大人12ドル・子ども7ドル/1日 大人20ドル・子ども12ドル]ヘルメットは無料.自転車を借りるときは写真付きの身分証明書を持ってきてください.",
+    qs: [
+      { id: "r86q1", q: "How much does it cost for one adult to rent a bike for three hours?", c: ["$5", "$12", "$7", "$20"], a: 1, ev: [[1,  1]], d: 300, why: "表の 3 hours の行と Adult の列が交わる所.$12.", x: ["5ドルは大人1時間の料金.", "", "7ドルは子ども3時間の料金.", "20ドルは大人1日の料金."] },
+      { id: "r86q2", q: "What is free?", c: ["Water", "Maps", "Helmets", "Locks"], a: 2, ev: [2], d: 200, why: "Helmets are free. とある.", x: ["水は書かれていない.", "地図は書かれていない.", "", "鍵は書かれていない."] },
+      { id: "r86q3", q: "What must customers bring?", c: ["A credit card", "A helmet", "A map", "A photo ID"], a: 3, ev: [3], d: 300, why: "Please bring a photo ID とある.", x: ["クレジットカードは書かれていない.", "ヘルメットは無料で借りられる.", "地図は書かれていない.", ""] }
+    ]
+  },
+  {
+    id: "r87",
+    kind: "求人広告",
+    title: "Help Wanted — Green Leaf Restaurant",
+    target: 70,
+    s: [
+      "Green Leaf Restaurant is looking for a part-time server.",
+      "The job is on Friday and Saturday evenings from 5:00 to 10:00 P.M.",
+      "No experience is needed; we will train you.",
+      "Staff get a free dinner on each work day.",
+      "Please visit the restaurant and talk to the manager, Ms. Park."
+    ],
+    ja: "グリーンリーフ・レストランはパートの接客係を募集しています.勤務は金曜と土曜の夜,午後5時から10時.経験は不要で,研修があります.勤務日は夕食が無料.応募はレストランに来て,店長のパクさんに話してください.",
+    qs: [
+      { id: "r87q1", q: "What job is being advertised?", c: ["A driver", "A cook", "A manager", "A server"], a: 3, ev: [0], d: 200, why: "looking for a part-time server とある.", x: ["運転手とは書かれていない.", "料理人とは書かれていない.", "店長(パクさん)は応募の相手.", ""] },
+      { id: "r87q2", q: "What is true about the job?", c: ["It is on weekday mornings.", "It is a full-time job.", "Experience is not needed.", "Staff must pay for dinner."], a: 2, ev: [2], d: 400, why: "No experience is needed とある.NOT ではなく本文と合うものを選ぶ問題は,選択肢を1つずつ本文と照らし合わせる.", x: ["金曜と土曜の夜の仕事.", "part-time(パート)とある.", "", "勤務日の夕食は無料."] },
+      { id: "r87q3", q: "How should people apply for the job?", c: ["By sending an e-mail", "By going to the restaurant", "By calling Ms. Park", "By filling out a form online"], a: 1, ev: [4], d: 500, why: "Please visit the restaurant and talk to the manager.visit を going to と言い換えている.", x: ["メールとは書かれていない.", "", "電話ではなく,店に来て話す.", "ネットの用紙とは書かれていない."] }
+    ]
+  },
+  {
+    id: "r88",
+    kind: "お知らせ",
+    title: "Notice — Elevator Repair",
+    target: 60,
+    s: [
+      "The elevator in Building B will be repaired on Thursday, June 12.",
+      "The work will start at 9:00 A.M. and finish at about 3:00 P.M.",
+      "During this time, please use the stairs or the elevator in Building A.",
+      "We are sorry for the trouble."
+    ],
+    ja: "B 棟のエレベーターは6月12日(木)に修理します.作業は午前9時から午後3時ごろまで.その間は階段か A 棟のエレベーターを使ってください.ご迷惑をおかけします.",
+    qs: [
+      { id: "r88q1", q: "What will happen on June 12?", c: ["An elevator will be repaired.", "A new building will open.", "The stairs will be closed.", "Building A will be cleaned."], a: 0, ev: [0], d: 200, why: "The elevator in Building B will be repaired on Thursday, June 12. とある.", x: ["", "新しい建物については書かれていない.", "階段は使える.", "A 棟の清掃については書かれていない."] },
+      { id: "r88q2", q: "How long will the work take?", c: ["About three hours", "About two hours", "About six hours", "All day"], a: 2, ev: [1], d: 400, why: "9:00 A.M. から 3:00 P.M. まで.時刻の差を計算すると約6時間.", x: ["3時は終わる時刻で,かかる時間ではない.", "午前9時から午後3時までなので約6時間.", "", "午後3時ごろに終わる."] },
+      { id: "r88q3", q: "What are people asked to do?", c: ["Stay in Building B", "Use the stairs or another elevator", "Call the office", "Come back on Friday"], a: 1, ev: [2], d: 300, why: "please use the stairs or the elevator in Building A.A 棟のエレベーターを another elevator と言い換えている.", x: ["B 棟にいるようにとは書かれていない.", "", "事務所に電話するとは書かれていない.", "金曜日に来るようにとは書かれていない."] }
+    ]
   }
 ];

@@ -338,3 +338,19 @@ summary { cursor: pointer; }
 /* 端末間の同期 */
 .syncform { display: grid; gap: 8px; margin: 10px 0 6px; max-width: 420px; }
 .syncform .search { width: 100%; }
+
+/* ホーム:レートがまだないとき */
+.hero0 { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; cursor: pointer; }
+/* 練習:今回の成績 */
+
+/* 長文:本文の枠(設問と一緒に見られるように高さを決める) */
+.pwrap { position: relative; margin-bottom: 16px; }
+.pwrap .passage { margin-bottom: 0; }
+.passage.pbox { max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.passage.pbox.open { max-height: none; }
+.pmore { display: block; width: 100%; margin-top: 6px; padding: 8px; min-height: 40px; background: transparent; border: 1px dashed var(--line); border-radius: 8px; color: var(--accent); font-size: .88rem; cursor: pointer; }
+/* 練習:説明と「AC なら自動で次へ」 */
+.notebar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; margin: 4px 0 12px; }
+.notebar .mode-note { margin: 0; flex: 1 1 14em; }
+.autonext { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); min-height: 36px; cursor: pointer; }
+.autonext input { width: 18px; height: 18px; accent-color: var(--accent); }
