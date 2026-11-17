@@ -334,3 +334,7 @@ summary { cursor: pointer; }
 .logent h3 { font-size: 1rem; margin: 2px 0 6px; }
 .logent ul { margin: 0; padding-left: 1.2em; }
 .logent li { margin: 3px 0; font-size: .92rem; }
+
+/* 端末間の同期 */
+.syncform { display: grid; gap: 8px; margin: 10px 0 6px; max-width: 420px; }
+.syncform .search { width: 100%; }

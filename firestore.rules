@@ -1,0 +1,24 @@
+rules_version = '2';
+// 英語ジャッジのアクセス規則.Firebase の管理画面(Firestore → ルール)にこのまま貼り付けて公開する.
+// - users/{uid} は本人(その uid でログインしている人)だけが読み書き・削除できる.
+// - 中身は { data: 進捗の JSON 文字列, updatedAt: 数, ver: 数 } だけ.data は 900KB まで(いたずらで大きくされないように).
+// - それ以外の場所は誰も読み書きできない(何も書かなければ拒否になる).
+// 変えたら tools/rules-test に従って,エミュレーターで確かめてから公開する.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validDoc() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['data', 'updatedAt', 'ver'])
+          && d.data is string && d.data.size() <= 900000
+          && d.updatedAt is int
+          && d.ver is int;
+      }
+      allow get, delete: if isOwner();
+      allow create, update: if isOwner() && validDoc();
+    }
+  }
+}

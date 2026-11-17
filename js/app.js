@@ -16,7 +16,8 @@ const CONTESTS = {
 };
 const DAY = 86400000;
 const GOAL = 20;        // 1日の目安の問題数
-const TOEIC_GOAL = 550; // 目標の TOEIC スコア
+const TOEIC_GOAL_DEFAULT = 550; // 目標の TOEIC スコア(「記録」画面で変えられる.S.goal)
+const toeicGoal = () => (S.goal && S.goal.v) || TOEIC_GOAL_DEFAULT;
 const IDK = -1;         // 「わからない」を選んだときの sel(WA として扱う)
 const { tierOf, TIERS } = Rating;
 
@@ -27,7 +28,8 @@ const { tierOf, TIERS } = Rating;
 const LS_KEY = "eigo-judge-v1";
 function freshState() {
   // live: 解答中の本番(再読み込みやタブが閉じられても続きから再開・採点するため)
-  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0 };
+  // wipe: 削除した時刻 { contests, results, all }.del.scores: 消した点数の時刻.goal: 目標の点数 { v, t }(端末間の同期で使う.js/merge.js)
+  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0, wipe: {}, del: {}, goal: null };
 }
 function migrate(o) {
   const s = freshState();
@@ -51,9 +53,10 @@ function migrate(o) {
 }
 let S = freshState();
 try { const raw = localStorage.getItem(LS_KEY); if (raw) S = migrate(JSON.parse(raw)); } catch (e) { /* 保存領域が使えない環境では毎回初期状態 */ }
-function save() {
+function save(fromSync) {
   S.updatedAt = Date.now();
   try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* noop */ }
+  if (!fromSync && window.Sync) Sync.dirty();
 }
 
 /* ---------------- 共通 ---------------- */
@@ -340,6 +343,7 @@ function updateSrs(id, ok) {
   const s = S.srs[id] || { box: 0, due: 0 };
   if (ok) { s.box = Math.min(s.box + 1, INTERVAL.length - 1); s.due = Date.now() + INTERVAL[s.box] * DAY; }
   else { s.box = 0; s.due = Date.now() + 10 * 60000; }
+  s.t = Date.now(); // 最後に解いた時刻(端末間で合わせるとき,新しい方を採る)
   S.srs[id] = s;
 }
 const dueWords = () => WORDS.filter(w => S.srs[w.id] && S.srs[w.id].due <= Date.now());
@@ -515,14 +519,14 @@ function toeicEst() {
   return { score: cl(e.score), lo: cl(e.lo), hi: cl(e.hi), off, raw: e.score };
 }
 function toeicHTML() {
-  const e = toeicEst(), goalPos = (100 * TOEIC_GOAL / 990).toFixed(1);
+  const e = toeicEst(), goalPos = (100 * toeicGoal() / 990).toFixed(1);
   if (!e) return `<div class="toeic"><div class="lab">推定 TOEIC スコア</div><div class="tv muted">-</div><div class="small muted">本番を1回解くと表示されます.</div></div>`;
   return `<div class="toeic">
     <div class="lab">推定 TOEIC スコア(目安)</div>
     <div class="tv">約 <b>${e.score}</b> 点 <span class="small muted">${e.lo}〜${e.hi} 点の範囲</span></div>
-    <div class="tbar" role="img" aria-label="推定 ${e.score} 点.目標 ${TOEIC_GOAL} 点"><span class="range" style="left:${(100 * e.lo / 990).toFixed(1)}%;width:${(100 * (e.hi - e.lo) / 990).toFixed(1)}%"></span><span class="now" style="left:${(100 * e.score / 990).toFixed(1)}%"></span><span class="goal" style="left:${goalPos}%"></span></div>
-    <div class="tscale"><span>10</span><span style="left:${goalPos}%">目標 ${TOEIC_GOAL}</span><span>990</span></div>
-    <div class="small muted">${e.score >= TOEIC_GOAL ? `目標の ${TOEIC_GOAL} 点に届く出来です.` : `目標の ${TOEIC_GOAL} 点まで,あと約 ${TOEIC_GOAL - e.score} 点.`}総合の本番 ${allPerfs().length} 回の出来からの換算です.${e.off ? `実際の点数の記録で ${e.off > 0 ? "+" : ""}${e.off} 点補正しています(補正前 ${e.raw} 点).` : "リスニングは測っていないので,「記録」画面で実際の点数を入れると補正されます."}</div>
+    <div class="tbar" role="img" aria-label="推定 ${e.score} 点.目標 ${toeicGoal()} 点"><span class="range" style="left:${(100 * e.lo / 990).toFixed(1)}%;width:${(100 * (e.hi - e.lo) / 990).toFixed(1)}%"></span><span class="now" style="left:${(100 * e.score / 990).toFixed(1)}%"></span><span class="goal" style="left:${goalPos}%"></span></div>
+    <div class="tscale"><span>10</span><span style="left:${goalPos}%">目標 ${toeicGoal()}</span><span>990</span></div>
+    <div class="small muted">${e.score >= toeicGoal() ? `目標の ${toeicGoal()} 点に届く出来です.` : `目標の ${toeicGoal()} 点まで,あと約 ${toeicGoal() - e.score} 点.`}総合の本番 ${allPerfs().length} 回の出来からの換算です.${e.off ? `実際の点数の記録で ${e.off > 0 ? "+" : ""}${e.off} 点補正しています(補正前 ${e.raw} 点).` : "リスニングは測っていないので,「記録」画面で実際の点数を入れると補正されます."}</div>
   </div>`;
 }
 function homeHTML() {
@@ -1159,6 +1163,8 @@ function renderRecord() {
     ${heatmapHTML()}
     <h2>難易度の推定</h2>
     ${estHTML()}
+    <h2>目標の点数</h2>
+    <div class="row sform"><input type="number" id="goal-v" class="search" min="10" max="990" step="5" value="${toeicGoal()}" inputmode="numeric"><button class="btn ghost" id="goal-set">変更する</button></div>
     <h2>実際の TOEIC の点数</h2>
     <p class="small muted">公式問題集や本番の点数を入れると,その日までの本番の出来と比べて,推定スコアを補正します(新しい記録ほど重く).</p>
     <div class="row sform"><input type="number" id="sc-score" class="search" min="10" max="990" step="5" placeholder="点数(10〜990)" inputmode="numeric"><input type="date" id="sc-date" class="search" value="${dateKey(Date.now())}"><button class="btn" id="sc-add">記録する</button></div>
@@ -1174,8 +1180,10 @@ function renderRecord() {
     <h2>実績 <span class="small muted">${BADGES.filter(b => S.badges[b.id] || b.ok(c)).length}/${BADGES.length}</span></h2>
     <div class="badges">${badges}</div>
     ${S.legacy ? `<p class="small muted" style="margin-top:16px">旧方式(Elo)の本番 ${S.legacy.history.length} 回分の記録は,レート計算方式の変更により新しいレートには含めていません.</p>` : ""}
+    <h2>端末間の同期</h2>
+    <div id="sync-box">${syncHTML()}</div>
     <h2>データの引き継ぎ</h2>
-    <p class="small muted">進捗はこの端末のブラウザに保存されます.別の端末に移すときは,書き出したファイルを移した先で読み込んでください.</p>
+    <p class="small muted">進捗はこの端末のブラウザに保存されます.ログインしない場合は,書き出したファイルを別の端末で読み込むと,その端末の記録と合わせられます.</p>
     <div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>
     <h2>データの削除</h2>
     <p class="small muted">消したデータは元に戻せません.念のため,先に「書き出す」でバックアップを取っておくと安心です.</p>
@@ -1196,9 +1204,17 @@ function renderRecord() {
   };
   m.querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => {
     if (!confirm("この点数の記録を削除しますか?")) return;
-    S.scores = S.scores.filter(x => String(x.t) !== b.dataset.sdel); save(); renderRecord();
+    S.scores = S.scores.filter(x => String(x.t) !== b.dataset.sdel);
+    S.del = Object.assign({}, S.del, { scores: [...((S.del && S.del.scores) || []), +b.dataset.sdel] }); // 他の端末から復活させない
+    save(); renderRecord();
   });
   $("#imp-file").onchange = e => { const f = e.target.files[0]; if (f) importData(f); };
+  $("#goal-set").onclick = () => {
+    const v = Math.round(+$("#goal-v").value / 5) * 5;
+    if (!(v >= 10 && v <= 990)) { toast("10〜990 の点数を入れてください."); return; }
+    S.goal = { v, t: Date.now() }; save(); renderRecord(); toast(`目標を ${v} 点にしました.`);
+  };
+  bindSync();
   bindGo();
   const box = $("#chart");
   box.dataset.w = box.clientWidth;
@@ -1250,6 +1266,71 @@ function estHTML() {
     ${rows.join("")}${thmList}${list}
     <label class="estsw"><input type="checkbox" id="est-toggle" ${S.prefs.estD ? "checked" : ""}> 推定した難易度を使う <span class="small muted">(問題一覧の色・おまかせ・本番の出題とパフォーマンスに反映.いつでも戻せます)</span></label>`;
 }
+/* ---------------- 端末間の同期(js/sync.js,js/merge.js) ---------------- */
+// js/sync.js から呼ばれる.同期の結果を反映するときも,もう一度手元と合わせる(通信中に解いた記録を消さないため)
+window.App = {
+  getState: () => S,
+  applyState(m) {
+    const next = Merge.merge(S, m);
+    const txt = x => JSON.stringify(Merge.shareable(x));
+    const forServer = txt(next) !== txt(m), forView = txt(next) !== txt(S);
+    S = next; save(true);
+    if (forServer && window.Sync) Sync.dirty(); // 通信中に増えた記録は,あとで送る
+    if (forView) {
+      D_EST = null; applyEstD(); checkBadges();
+      if (!pState && !contestRunning()) render(); else renderHeader();
+    }
+  }
+};
+function syncHTML() {
+  if (!window.Sync) return `<p class="small muted">同期の機能を読み込めませんでした.</p>`;
+  const z = Sync.state();
+  const msg = z.msg ? `<p class="small ${z.err ? "down" : "muted"}" role="status">${esc(z.msg)}</p>` : "";
+  if (z.user) return `
+    <p class="small" style="margin:0">ログイン中:<b>${esc(z.email || "(メールアドレスなし)")}</b></p>
+    <p class="small muted" style="margin:2px 0 8px">${z.busy ? "同期しています…" : z.last ? `最後の同期:${new Date(z.last).toLocaleString("ja-JP")}` : "まだ同期していません."}</p>
+    ${msg}
+    <div class="row"><button class="btn" id="sync-now"${z.busy ? " disabled" : ""}>今すぐ同期</button><button class="btn ghost" id="sync-out">ログアウト</button></div>
+    <details class="small" style="margin-top:10px"><summary>サーバーの記録を削除する</summary>
+      <p class="muted">サーバーに保存した記録を消して,ログアウトします.この端末の記録は残ります.ほかの端末でログインしたままだと,その端末の記録がまた保存されます.</p>
+      <button class="btn ghost sm danger" id="sync-del">サーバーの記録を削除してログアウト</button></details>`;
+  return `
+    <p class="small muted" style="margin-top:0">ログインすると,スマホと PC など複数の端末で記録を自動でそろえます.どちらの端末で解いた記録も消えません.ログインしなくても,今まで通りこの端末だけで使えます.</p>
+    ${msg}
+    <div class="row"><button class="btn" id="sync-google">Google でログイン</button></div>
+    <div class="syncform">
+      <input type="email" id="sync-email" class="search" placeholder="メールアドレス" autocomplete="email" value="${esc(z.email)}">
+      <input type="password" id="sync-pw" class="search" placeholder="パスワード(6文字以上)" autocomplete="current-password">
+      <div class="row"><button class="btn ghost" id="sync-in">ログイン</button><button class="btn ghost" id="sync-up">新規登録</button><button class="btn ghost sm" id="sync-reset">パスワードを忘れた</button></div>
+    </div>
+    <p class="small muted">ホーム画面に追加したアプリで Google のログインがうまくいかないときは,メールアドレスで登録してください.</p>
+    <details class="small"><summary>保存するもの・しないもの</summary>
+      <p class="muted">保存するのは,解いた問題と正誤,本番の記録,実績,目標と実際の点数です.名前やメールアドレスは記録に入れません(メールアドレスはログインだけに使います).記録はあなたしか読み書きできませんが,アプリの管理者(作者)はサーバーの管理画面から見ることができます.</p></details>`;
+}
+function bindSync() {
+  const box = $("#sync-box"); if (!box || !window.Sync) return;
+  const on = (id, f) => { const b = box.querySelector("#" + id); if (b) b.onclick = f; };
+  const cred = () => [($("#sync-email") || {}).value || "", ($("#sync-pw") || {}).value || ""];
+  on("sync-google", () => Sync.google());
+  on("sync-in", () => { const [e, p] = cred(); Sync.signIn(e.trim(), p); });
+  on("sync-up", () => { const [e, p] = cred(); if (confirm(`${e.trim()} で新しく登録します.よろしいですか?`)) Sync.signUp(e.trim(), p); });
+  on("sync-reset", () => { const [e] = cred(); if (!e.trim()) { toast("メールアドレスを入れてから押してください."); return; } Sync.reset(e.trim()); });
+  on("sync-now", async () => { if (await Sync.syncNow("button")) toast("同期しました."); });
+  on("sync-out", () => { if (confirm("ログアウトしますか?この端末の記録はそのまま残ります.")) Sync.signOut(); });
+  on("sync-del", async () => {
+    if (!confirm("サーバーに保存した記録を削除して,ログアウトします.この端末の記録は残ります.よろしいですか?")) return;
+    try { await Sync.deleteRemote(); await Sync.signOut(); toast("サーバーの記録を削除しました."); } catch (e) { toast("削除できませんでした.通信できる所でもう一度試してください."); }
+  });
+}
+// 同期の状態が変わったら,記録画面の同期の欄だけ描き直す(入力中のメールアドレスは残す)
+function onSyncChange() {
+  const box = $("#sync-box"); if (!box) return;
+  const email = ($("#sync-email") || {}).value, pw = ($("#sync-pw") || {}).value;
+  box.innerHTML = syncHTML(); bindSync();
+  if (email != null && $("#sync-email")) $("#sync-email").value = email;
+  if (pw != null && $("#sync-pw")) $("#sync-pw").value = pw;
+}
+
 function exportData() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" }));
@@ -1260,11 +1341,11 @@ function exportData() {
 /* データの削除.レートは本番の記録から計算するので,本番の記録を消すとレートと推定スコアも消える */
 const DELETE = {
   contests: { name: "本番の記録", desc: "本番の履歴を消します.レート・推定 TOEIC スコア・グラフも消えます.問題ごとの AC / WA と,実際の TOEIC の点数は残ります.",
-    run: () => { S.contests = []; S.live = null; S.legacy = null; cState = null; } },
+    run: () => { S.contests = []; S.live = null; S.legacy = null; cState = null; S.wipe = Object.assign({}, S.wipe, { contests: Date.now() }); } },
   results: { name: "問題の結果", desc: "問題ごとの AC / WA,解答の履歴(草と難易度の推定に使う),単語の復習の予定,長文の所要時間を消します.すべて未挑戦に戻ります.レートは残ります.",
-    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; S.att = []; S.dayAc = {}; D_EST = null; applyEstD(); } },
+    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; S.att = []; S.dayAc = {}; D_EST = null; applyEstD(); S.wipe = Object.assign({}, S.wipe, { results: Date.now() }); } },
   all: { name: "すべてのデータ", desc: "本番の記録,問題の結果,学習日数,実績,設定をすべて消して,最初の状態に戻します.",
-    run: () => { S = freshState(); cState = null; D_EST = null; applyEstD(); } }
+    run: () => { S = freshState(); S.wipe = { all: Date.now() }; cState = null; D_EST = null; applyEstD(); } }
 };
 function deleteData(k) {
   const d = DELETE[k];
@@ -1281,9 +1362,9 @@ function importData(file) {
   file.text().then(txt => {
     const o = JSON.parse(txt);
     if (!o || typeof o !== "object" || !(o.res || o.stats)) throw new Error("bad");
-    if (!confirm("今の進捗を,読み込んだデータで置き換えます.よろしいですか?")) return;
-    stopTimer(); cState = null; pState = null;
-    S = migrate(o); S.live = null; D_EST = null; applyEstD(); save(); render(); toast("読み込みました.");
+    if (!confirm("読み込んだデータを,今の記録に合わせます(どちらの記録も残ります).よろしいですか?")) return;
+    stopTimer(); pState = null;
+    S = migrate(Merge.merge(S, migrate(o))); D_EST = null; applyEstD(); checkBadges(); save(); render(); toast("読み込んで,今の記録と合わせました.");
   }).catch(() => toast("このファイルは読み込めませんでした."));
 }
 
@@ -1313,7 +1394,7 @@ function drawChart(box, key) {
   }
   if (key === "all") { // 目標の目安(緑 = TOEIC 550点)
     el("line", { x1: M.l, x2: W - M.r, y1: y(800), y2: y(800), stroke: "var(--r-green)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, svg);
-    el("text", { x: W - M.r - 4, y: y(800) - 5, "text-anchor": "end", class: "ax" }, svg).textContent = `TOEIC ${TOEIC_GOAL} の目安`;
+    el("text", { x: W - M.r - 4, y: y(800) - 5, "text-anchor": "end", class: "ax" }, svg).textContent = `TOEIC 550 の目安`;
   }
   const nt = Math.min(4, h.length);
   for (let i = 0; i < nt; i++) {
@@ -1413,3 +1494,4 @@ try { if (navigator.storage && navigator.storage.persist) navigator.storage.pers
 applyEstD();
 restoreContest();
 render();
+if (window.Sync) { Sync.on(onSyncChange); Sync.start(); }
