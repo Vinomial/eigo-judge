@@ -1720,5 +1720,127 @@ window.READING = [
       { id: "r76q3", q: "(3)", c: ["First-time customers also receive 15 percent off their first order.", "Delivery is not available on weekends.", "Our prices will increase next month.", "We have closed our showroom."], a: 0, ev: [2, 3], d: 1000, why: "前の文から特典(無料配達)の話が続いている.さらに特典を加える文が自然.also がつながりの手がかり.", x: ["", "週末の配達の話は,特典の流れの中で唐突で,否定的な内容になる.", "広告の中で値上げを告げるのは,前後の宣伝の流れに合わない.", "ショールームの話は出てこず,前後とつながらない."] },
       { id: "r76q4", q: "(4)", c: ["request", "requests", "requested", "requesting"], a: 0, ev: [5], d: 600, why: "to + 動詞の原形.request(申し込む).", x: ["", "to の後ろに3人称単数の形は置けない.", "to の後ろに過去分詞は置けない.", "to の後ろに -ing は置けない(この to は不定詞の to)."] }
     ]
+  },
+
+  // ---- 難しい長文(1500〜2900) ----
+  {
+    id: "r77",
+    kind: "記事",
+    title: "Industry Review — The Hidden Cost of Fast Shipping",
+    target: 150,
+    s: [
+      "Over the past decade, retailers have competed fiercely to offer ever faster delivery, with some promising orders within hours.",
+      "Yet a growing body of research suggests that the race for speed carries costs that rarely appear on a company's balance sheet.",
+      "Because express orders are often shipped in partially filled vans, fuel use per package can be more than double that of standard delivery.",
+      "Warehouse staff, meanwhile, report that tight deadlines leave little room for error, contributing to higher turnover.",
+      "Several firms have begun to offer modest discounts to customers who choose slower shipping, and early results indicate that many shoppers are willing to wait when given a reason to do so.",
+      "Analysts caution, however, that such programs will succeed only if retailers are transparent about why the slower option exists."
+    ],
+    ja: "この10年,小売業者はより速い配送を競い,数時間で届けると約束する会社もある.しかし,速さの競争には決算書にはほとんど表れない費用があることが,研究で分かってきた.急ぎの注文は荷台が半分しか埋まっていない車で送られることが多く,荷物1つあたりの燃料は通常配送の2倍を超えることもある.倉庫の職員も,厳しい期限のために失敗の余地がなく,離職率の上昇につながっていると話す.遅い配送を選んだ客に少し割引をする会社も出てきており,理由が示されれば待ってもよいという客が多いことが初期の結果から分かっている.ただし専門家は,遅い配送の選択肢がある理由を小売業者が率直に示さなければ,うまくいかないと注意している.",
+    qs: [
+      { id: "r77q1", q: "What is the main point of the article?", c: ["Customers are unwilling to wait for their orders.", "Retailers should stop offering express delivery.", "Faster delivery has costs that are not always obvious.", "Warehouse staff prefer working under tight deadlines."], a: 2, ev: [1], d: 1700, why: "2文目の Yet 以下が主張.速さには決算書に表れない(not always obvious)費用がある.具体例(燃料・離職)は主張を支える部分.", x: ["本文では,理由があれば待つ客が多いとされている.", "記事は急ぎの配送をやめるべきだとまでは言っていない.", "", "職員は厳しい期限が負担だと話している."] },
+      { id: "r77q2", q: "According to the article, why does express delivery use more fuel per package?", c: ["Vans are often not fully loaded.", "Vans travel longer distances.", "Express packages are heavier.", "Drivers make more return trips."], a: 0, ev: [2], d: 1900, why: "shipped in partially filled vans(荷台が一部しか埋まっていない車で送られる)を not fully loaded と言い換えている.", x: ["", "距離については書かれていない.", "荷物の重さについては書かれていない.", "往復の回数については書かれていない."] },
+      { id: "r77q3", q: "What do analysts suggest is necessary for slower-shipping programs to succeed?", c: ["Government regulation of delivery times", "Larger discounts than currently offered", "Faster warehouse operations", "Clear explanations from retailers"], a: 3, ev: [5], d: 2400, why: "succeed only if retailers are transparent about why ...(理由を率直に示す場合に限り成功する).transparent を clear explanations と言い換えている.", x: ["政府の規制については書かれていない.", "割引額を増やすべきだとは書かれていない.", "倉庫の作業の速さは条件として挙げられていない.", ""] }
+    ]
+  },
+  {
+    id: "r78",
+    kind: "お知らせ",
+    title: "Notice of Revised Terms — Clearwater Cloud Storage",
+    target: 150,
+    s: [
+      "Effective March 1, the following changes to our Terms of Service will apply to all accounts.",
+      "Accounts that have been inactive for 24 consecutive months will be deemed dormant, and files stored in such accounts may be deleted after a 60-day notice period.",
+      "Previously, this period of inactivity was 36 months.",
+      "Business subscribers who pay annually are exempt from this provision, provided that their payment information remains current.",
+      "Users who do not consent to the revised terms may close their accounts at any time before March 1 and will receive a prorated refund of any prepaid fees.",
+      "Continued use of the service after that date will constitute acceptance of the new terms."
+    ],
+    ja: "3月1日から,利用規約の次の変更をすべてのアカウントに適用する.24か月続けて使われていないアカウントは休眠とみなし,60日前の通知の後,保存されたファイルを削除することがある.これまでは36か月だった.年払いの法人契約者は,支払い情報が最新である限り,この規定の対象外.改定に同意しない利用者は3月1日より前ならいつでも解約でき,前払いの料金は日割りで返金される.その日以降も使い続けると,新しい規約に同意したことになる.",
+    qs: [
+      { id: "r78q1", q: "What change is being announced?", c: ["Storage fees will increase.", "The time before an inactive account is considered dormant will be shortened.", "Business accounts will be closed.", "Files will be deleted without notice."], a: 1, ev: [1,  2], d: 1800, why: "休眠とみなすまでの期間が36か月から24か月に変わる.2文を見比べて「短くなる」と分かる.", x: ["料金の値上げは書かれていない.", "", "法人アカウントの閉鎖は書かれていない.", "削除の前に60日前の通知がある."] },
+      { id: "r78q2", q: "Which user is exempt from the new provision?", c: ["A user who pays monthly", "A personal user who logs in once a year", "A business subscriber whose credit card has expired", "A business subscriber who pays every year and keeps payment details up to date"], a: 3, ev: [3], d: 2300, why: "exempt は「(規定の)対象外の」.条件は2つ:年払いの法人契約者であること,支払い情報が最新(current)であること(provided that は「〜という条件で」).", x: ["対象外になるのは年払い(annually)の法人契約者.", "個人利用者は対象外になっていない.", "支払い情報が最新(current)であることが条件なので,期限切れのカードでは対象外にならない.", ""] },
+      { id: "r78q3", q: "The word \"constitute\" in the last sentence is closest in meaning to", c: ["replace", "establish", "amount to", "delay"], a: 2, ev: [5], d: 2600, why: "Continued use ... will constitute acceptance で「使い続けることは同意に当たる」.constitute を amount to(〜に等しい・〜に当たる)に置き換えると意味が通る.", x: ["「取り替える」では意味が通らない.", "「設立する」の意味もあるが,この文では合わない.", "", "「遅らせる」では意味が通らない."] }
+    ]
+  },
+  {
+    id: "r79",
+    kind: "記事",
+    title: "Opinion — Why Small Towns Should Rethink Tourism",
+    target: 150,
+    s: [
+      "For years, towns across the region have measured the success of tourism by a single figure: the number of visitors.",
+      "That figure has grown steadily, yet many residents insist that their quality of life has declined.",
+      "Narrow streets are congested on weekends, and rents have risen as homes are converted into short-term rentals.",
+      "The problem is not tourism itself but a strategy that treats every additional visitor as a gain.",
+      "Towns would be better served by tracking how much visitors spend locally and how long they stay, figures that reveal whether tourism actually sustains local businesses.",
+      "A smaller number of visitors who stay longer may bring more benefit, and far less disruption, than crowds of day-trippers."
+    ],
+    ja: "長年,地域の町は観光の成功を「来訪者数」という1つの数字で測ってきた.その数は着実に増えたが,生活の質は下がったと多くの住民が訴える.週末には狭い道が混雑し,住宅が短期の貸し部屋に変わるにつれて家賃も上がった.問題は観光そのものではなく,来訪者が1人増えるごとに得だとみなす戦略だ.町は,来訪者が地元でいくら使い,どれくらい滞在するかを追った方がよい.それで観光が本当に地元の店を支えているかが分かる.長く滞在する少ない来訪者の方が,日帰り客の群れより,恩恵が大きく混乱もはるかに少ないかもしれない.",
+    qs: [
+      { id: "r79q1", q: "What is the writer's main argument?", c: ["Towns should measure tourism's success differently.", "Tourism should be banned in small towns.", "Short-term rentals should be encouraged.", "Visitor numbers are falling too quickly."], a: 0, ev: [3,  4], d: 1800, why: "人数だけで測るのをやめ,地元での消費額や滞在期間で測るべきだ,というのが主張.problem is not tourism itself but a strategy ... が手がかり.", x: ["", "問題は観光そのものではない,と書かれている.", "短期の貸し部屋は家賃上昇の原因として挙げられている.", "来訪者数は着実に増えている."] },
+      { id: "r79q2", q: "What does the writer imply about day-trippers?", c: ["They spend more money than longer-stay visitors.", "They may cause more disruption relative to their benefit.", "They are the main source of local rent increases.", "They prefer to stay in short-term rentals."], a: 1, ev: [5], d: 2500, why: "長く滞在する客の方が more benefit, and far less disruption.裏返すと,日帰り客は恩恵の割に混乱が大きい.比較の文から言外の意味を読み取る問題.", x: ["長期滞在の客の方が恩恵が大きいかもしれない,と書かれている.", "", "家賃の上昇は短期の貸し部屋と結びつけられている.", "日帰り客は泊まらない(day-trip)."] },
+      { id: "r79q3", q: "According to the article, what has contributed to higher rents?", c: ["An increase in local business taxes", "The conversion of homes into short-term rentals", "The construction of new hotels", "A decline in the number of residents"], a: 1, ev: [2], d: 1600, why: "rents have risen as homes are converted into short-term rentals.converted を conversion と名詞にして言い換えている.", x: ["税については書かれていない.", "", "ホテルの建設については書かれていない.", "住民の数の減少については書かれていない."] }
+    ]
+  },
+  {
+    id: "r80",
+    kind: "社内メモと表",
+    title: "MEMO — Packaging supplier",
+    target: 160,
+    s: [
+      "To: Purchasing Team / From: Elena Ruiz / Re: Packaging supplier",
+      "As discussed, our current supplier will discontinue the boxes we use for our premium product line at the end of June.",
+      "We need a replacement that can deliver within five business days, because our storage space does not allow us to hold large amounts of stock.",
+      "For the same reason, the minimum order should not exceed 2,000 units.",
+      "Among the suppliers that meet these conditions, please select the one with the lowest unit price.",
+      {t:  "table", cap:  "Supplier comparison", head:  ["Supplier", "Unit price", "Delivery", "Minimum order"], rows:  [["Apex Pack", "$0.42", "3 days", "5,000"], ["BoxLine", "$0.48", "4 days", "1,000"], ["CraftCase", "$0.45", "7 days", "1,500"], ["Duro Boxes", "$0.51", "2 days", "500"]]}
+    ],
+    ja: "購買チームへ.話したとおり,今の仕入れ先が6月末で高級品の箱の製造をやめる.保管場所が狭く在庫を多く持てないので,5営業日以内に届けられる代わりの仕入れ先が必要だ.同じ理由で,最低注文数は2,000個を超えないこと.条件を満たす仕入れ先のうち,単価が最も安いところを選んでほしい.[表:Apex Pack 0.42ドル・3日・5,000個/BoxLine 0.48ドル・4日・1,000個/CraftCase 0.45ドル・7日・1,500個/Duro Boxes 0.51ドル・2日・500個]",
+    qs: [
+      { id: "r80q1", q: "Why does the company need a new supplier?", c: ["The current supplier's deliveries are often late.", "The current supplier raised its prices.", "The company is launching a new product line.", "A product the company uses will no longer be available."], a: 3, ev: [1], d: 1500, why: "our current supplier will discontinue the boxes(今の仕入れ先がその箱の製造をやめる).discontinue を will no longer be available と言い換えている.", x: ["配達の遅れについては書かれていない.", "値上げについては書かれていない.", "新しい製品群の発売は書かれていない.", ""] },
+      { id: "r80q2", q: "Why is the minimum order an important condition?", c: ["Larger orders require approval from managers.", "The company wants to test the boxes first.", "The company has limited storage space.", "The budget for June is small."], a: 2, ev: [2,  3], d: 1900, why: "For the same reason は前の文の理由(保管場所が足りない)を指す.前の文とつなげて読む.", x: ["承認については書かれていない.", "試しに使いたいとは書かれていない.", "", "予算については書かれていない."] },
+      { id: "r80q3", q: "Which supplier should the team most likely choose?", c: ["BoxLine", "Apex Pack", "CraftCase", "Duro Boxes"], a: 0, ev: [2,  3,  4,  [5,  0],  [5,  1],  [5,  2],  [5,  3]], d: 2500, why: "条件は「5営業日以内」「最低注文数2,000個以下」.Apex(5,000個)と CraftCase(7日)が外れ,残る BoxLine(0.48ドル)と Duro(0.51ドル)のうち安い BoxLine.表と本文の条件を組み合わせて絞り込む問題.", x: ["", "最も安いが,最低注文数が5,000個で2,000個を超える.", "配達に7日かかり,5営業日以内という条件を満たさない.", "条件は満たすが,BoxLine より単価が高い."] }
+    ]
+  },
+  {
+    id: "r81",
+    kind: "手紙",
+    title: "Letter — Response to a Proposal",
+    target: 140,
+    s: [
+      "Dear Mr. Okafor,",
+      "Thank you for your detailed proposal to redesign our company's Web site.",
+      "Your team's ideas for simplifying the ordering process were particularly well received by our sales department.",
+      "However, after reviewing our budget for the coming year, we have concluded that a full redesign is not feasible at this time.",
+      "We would instead like to discuss a smaller project focused solely on the ordering pages, which could be completed before our busy holiday season.",
+      "If this interests you, please send a revised estimate by October 15 so that we can present it to our board at its next meeting.",
+      "Sincerely, Grace Lindqvist, Director of Operations"
+    ],
+    ja: "オカフォー様.当社の Web サイトの全面改修について,詳しいご提案をありがとうございました.注文手続きを簡単にする案は,特に営業部に好評でした.しかし来年度の予算を検討した結果,今は全面改修はできないと判断しました.代わりに,注文ページだけに絞った小さな計画について相談したいと思います.それなら繁忙期の年末商戦の前に終えられそうです.ご関心があれば,次の取締役会で示せるよう,10月15日までに修正した見積もりをお送りください.",
+    qs: [
+      { id: "r81q1", q: "What is the purpose of the letter?", c: ["To propose a reduced version of a project", "To accept a proposal without changes", "To reject a proposal and end the relationship", "To complain about the quality of a Web site"], a: 0, ev: [3,  4], d: 1700, why: "全面改修は無理だが,注文ページだけの小さな計画を相談したい.reduced version(縮小版)と言い換えている.", x: ["", "全面改修はできないと書かれている.", "断るだけでなく,小さな計画を提案している.", "サイトの質への苦情ではない."] },
+      { id: "r81q2", q: "What is implied about the company's board?", c: ["It has already approved the full redesign.", "It must review the revised estimate.", "It meets only once a year.", "It disliked Mr. Okafor's ideas."], a: 1, ev: [5], d: 2000, why: "so that we can present it to our board(取締役会に示せるように)から,見積もりは取締役会の確認を経ると分かる.", x: ["全面改修はできないと判断している.", "", "会議の頻度は書かれていない.", "取締役会の評価は書かれておらず,営業部には好評だった."] },
+      { id: "r81q3", q: "Why most likely does Ms. Lindqvist want the work finished before the holiday season?", c: ["The budget expires at the end of the year.", "Her staff will be on vacation then.", "Mr. Okafor's team will be unavailable later.", "Her company expects many orders during that period."], a: 3, ev: [4], d: 2800, why: "改修するのは注文ページで,年末は busy holiday season(繁忙期).忙しい時期に注文が増えるので,その前に注文の仕組みを良くしておきたい,と推測できる.本文に直接は書かれていない理由を,2つの情報を結びつけて推し量る問題.", x: ["予算の期限については書かれていない.", "休暇とは書かれておらず,busy(忙しい)時期だとある.", "オカフォー氏側の都合は書かれていない.", ""] }
+    ]
+  },
+  {
+    id: "r82",
+    kind: "記事",
+    title: "Science & Business — Lab-Grown Materials Enter the Market",
+    target: 150,
+    s: [
+      "Materials grown from fungi, once confined to university laboratories, are beginning to appear in commercial products, from packaging to furniture.",
+      "Proponents note that such materials can be produced with a fraction of the energy required for plastics and decompose within weeks once discarded.",
+      "Skeptics counter that production remains difficult to scale and that costs, though falling, are still well above those of conventional alternatives.",
+      "Both camps agree, however, that the materials' future hinges less on technology than on regulation.",
+      "If governments impose stricter limits on single-use plastics, as several have signaled they will, demand could rise quickly enough to justify the investment needed to expand production."
+    ],
+    ja: "かつて大学の研究室に限られていた,菌類から育てる素材が,包装材から家具まで商品に使われ始めている.支持する人々は,この素材はプラスチックのごく一部のエネルギーで作れ,捨てれば数週間で分解されると指摘する.懐疑的な人々は,生産の規模を広げるのは今も難しく,費用は下がってきたものの従来の素材よりまだかなり高いと反論する.ただし両者とも,この素材の将来は技術よりも規制にかかっているという点では一致している.いくつかの政府が示しているように使い捨てプラスチックの規制が厳しくなれば,需要は生産拡大の投資に見合うほど速く伸びるかもしれない.",
+    qs: [
+      { id: "r82q1", q: "What do skeptics say about the new materials?", c: ["They break down too slowly.", "They are harmful to the environment.", "They are still costly and hard to produce in large quantities.", "They require more energy than plastics."], a: 2, ev: [2], d: 2000, why: "difficult to scale(規模を広げにくい)と costs ... still well above(費用はまだかなり高い)の2点.scale を produce in large quantities と言い換えている.", x: ["数週間で分解されると書かれている.", "環境への害については書かれていない.", "", "プラスチックよりずっと少ないエネルギーで作れる."] },
+      { id: "r82q2", q: "The phrase \"hinges ... on\" in the fourth sentence is closest in meaning to", c: ["comments on", "focuses on", "insists on", "depends on"], a: 3, ev: [3], d: 2600, why: "hinge は「ちょうつがい」.hinge on 〜 で「〜にかかっている・〜次第だ」.future hinges on regulation =「将来は規制次第」.", x: ["「〜について述べる」では意味が合わない.", "「〜に集中する」では意味が合わない.", "「〜を主張する」では意味が合わない.", ""] },
+      { id: "r82q3", q: "What can be inferred about some governments?", c: ["They have indicated plans to restrict single-use plastics.", "They have already banned all plastics.", "They directly fund research on fungi.", "They oppose the use of the new materials."], a: 0, ev: [4], d: 2900, why: "as several have signaled they will(いくつかの政府はそうすると示している)の they will は impose stricter limits を指す.省略された部分を補って読む必要がある.", x: ["", "すべてのプラスチックを禁止したとは書かれていない.規制が厳しくなる可能性の話.", "研究への資金提供は書かれていない.", "新しい素材への反対は書かれていない."] }
+    ]
   }
 ];

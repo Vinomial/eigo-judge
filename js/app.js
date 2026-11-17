@@ -450,6 +450,7 @@ function render() {
   else if (view === "list") renderList();
   else if (view === "contest") renderContest();
   else if (view === "record") renderRecord();
+  else if (view === "log") renderLog();
   else $("#main").innerHTML = defsHTML();
   bindGo();
 }
@@ -548,7 +549,35 @@ function homeHTML() {
   </div>
   <p class="small muted">練習ではレートは動きません.本番を解くとレートと推定スコアが変動します.</p>
   <h2>進捗(今 AC の問題)</h2>
-  ${progressHTML()}`;
+  ${progressHTML()}
+  ${newsHTML()}`;
+}
+
+/* ---------------- 更新履歴(data/changelog.js) ---------------- */
+const LOG = window.CHANGELOG || [];
+const unreadLog = () => LOG.length && (S.prefs.seenLog || 0) < LOG[0].id;
+function fmtYmd(s) { const [y, m, d] = s.split("-").map(Number); return `${y}/${m}/${d}`; }
+function newsHTML() {
+  if (!LOG.length) return "";
+  const e = LOG[0];
+  return `<h2>お知らせ</h2>
+  <button class="news" data-go="log">
+    <span class="small muted">${fmtYmd(e.date)}${unreadLog() ? ` <span class="newbadge">NEW</span>` : ""}</span>
+    <b>${esc(e.title)}</b>
+    <span class="small" style="color:var(--accent)">更新履歴を見る →</span>
+  </button>`;
+}
+function renderLog() {
+  $("#main").innerHTML = `
+    <div class="row" style="margin-bottom:12px"><button class="btn ghost sm" data-go="home">← ホーム</button></div>
+    <h2 style="margin-top:0">更新履歴</h2>
+    ${LOG.map(e => `<section class="logent">
+      <div class="small muted">${fmtYmd(e.date)}${(S.prefs.seenLog || 0) < e.id ? ` <span class="newbadge">NEW</span>` : ""}</div>
+      <h3>${esc(e.title)}</h3>
+      <ul>${e.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    </section>`).join("")}`;
+  // 開いた時点で既読にする(NEW は次に開いたときに消える)
+  if (unreadLog()) { S.prefs.seenLog = LOG[0].id; save(); }
 }
 function progressHTML() {
   const rq = READING.flatMap(p => p.qs);
@@ -888,13 +917,16 @@ function markChoices(root, item, st) {
     if (right) b.classList.add("right"); else if (i === st.sel) b.classList.add("wrong");
     // 単語:判定後,各選択肢がどの単語か(逆向きならその意味)を示す.誤答の選択肢もついでに覚えられる
     const w = item.dom === "word" && i >= 0 && (st.rev ? WORD_BY.get(st.choices[i]) : WORD_BY_M.get(st.choices[i]));
-    if (w && !b.querySelector(".cw")) b.insertAdjacentHTML("beforeend", choiceWordHTML(w, w.id !== item.q.id, st.rev));
+    if (w && !b.querySelector(".cw")) b.insertAdjacentHTML("beforeend", choiceWordHTML(w, st.rev));
+    // 正解と自分の解答を文字でも示す(色だけに頼らない)
+    if (!b.querySelector(".cmark") && (right || i === st.sel)) {
+      b.insertAdjacentHTML("beforeend", `<span class="cmark ${right ? "ok" : "ng"}">${right ? "正解" : "あなたの解答"}</span>`);
+    }
   });
 }
-// badge: その単語の今の状態(AC / WA)を付けるか.今解いた単語には付けない
-function choiceWordHTML(w, badge, rev) {
-  const s = badge && statusOf(w.id);
-  return `<span class="cw">${rev ? `<span class="jm">${esc(w.m)}</span>` : `<b class="en">${esc(w.w)}</b>`}${s ? ` <span class="verdict ${s.toLowerCase()} xs">${s}</span>` : ""}</span>`;
+// 誤答の選択肢には,その単語の過去の状態(AC / WA)を付けない.今回の正誤と紛らわしいため
+function choiceWordHTML(w, rev) {
+  return `<span class="cw">${rev ? `<span class="jm">${esc(w.m)}</span>` : `<b class="en">${esc(w.w)}</b>`}</span>`;
 }
 // 本番の結果など,選択肢を表示しない画面で使う一覧
 function choiceWordsHTML(item, st) {

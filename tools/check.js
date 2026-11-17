@@ -15,7 +15,7 @@ const { AFFIX, ROOT, WORDS, THM, GRAM, READING, IRREG } = ctx.window;
 
 const errors = [];
 const err = (id, msg) => errors.push(`${id}: ${msg}`);
-const dRange = (id, d) => { if (!(typeof d === "number" && d >= 100 && d <= 2000)) err(id, `難易度 d が不正 (${d})`); };
+const dRange = (id, d) => { if (!(typeof d === "number" && d >= 100 && d <= 3200)) err(id, `難易度 d が不正 (${d})`); };
 const ids = new Set();
 const uniqueId = (id, re) => {
   if (!re.test(id)) err(id, `id の形式が不正 (${re})`);
@@ -163,12 +163,12 @@ for (const r of READING) {
 const pos = [0, 0, 0, 0];
 GRAM.forEach(g => pos[g.a]++);
 READING.forEach(r => r.qs.forEach(q => pos[q.a]++));
-const bands = a => [0, 400, 800, 1200, 1600].map(m => a.filter(d => d >= m && d < m + 400).length).join(" / ");
+const bands = a => [0, 400, 800, 1200, 1600, 2000, 2400, 2800].map(m => a.filter(d => d >= m && (m === 2800 || d < m + 400)).length).join(" / ");
 const perThm = Object.keys(THM).map(k => GRAM.filter(g => g.t === k).length);
 const plainN = WORDS.filter(w => !w.p.length).length;
 
 console.log(`単語 ${WORDS.length} 語(語根から導く ${WORDS.length - plainN},語根なし ${plainN}.語根 ${Object.keys(ROOT).length},接辞 ${Object.keys(AFFIX).length}) / 文法 ${GRAM.length} 問(定理 ${Object.keys(THM).length}) / 長文 ${READING.length} 題 ${READING.reduce((a, r) => a + r.qs.length, 0)} 問(図表つき ${READING.filter(r => r.s.some(b => typeof b !== "string" && b.t !== "doc")).length} 題)`);
-console.log(`難易度の分布(灰 / 茶 / 緑 / 水 / 青): 単語 ${bands(WORDS.map(w => w.d))} ・ 文法 ${bands(GRAM.map(g => g.d))} ・ 長文の設問 ${bands(READING.flatMap(r => r.qs.map(q => q.d)))}`);
+console.log(`難易度の分布(灰 / 茶 / 緑 / 水 / 青 / 黄 / 橙 / 赤): 単語 ${bands(WORDS.map(w => w.d))} ・ 文法 ${bands(GRAM.map(g => g.d))} ・ 長文の設問 ${bands(READING.flatMap(r => r.qs.map(q => q.d)))}`);
 console.log(`定理ごとの問題数: 最少 ${Math.min(...perThm)} / 最多 ${Math.max(...perThm)}`);
 console.log(`誤答の説明つき: 文法 ${GRAM.filter(g => g.x).length} 問 / 長文 ${READING.flatMap(r => r.qs).filter(q => q.x).length} 問 / Part 6 ${READING.filter(r => r.part6).length} 題`);
 console.log(`文法・長文の正解位置: A ${pos[0]} / B ${pos[1]} / C ${pos[2]} / D ${pos[3]}`);

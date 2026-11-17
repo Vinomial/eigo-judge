@@ -54,7 +54,9 @@
     { min: 800, color: "--r-green", name: "緑", title: "中級" },
     { min: 1200, color: "--r-cyan", name: "水", title: "上級" },
     { min: 1600, color: "--r-blue", name: "青", title: "熟練" },
-    { min: 2000, color: "--r-yellow", name: "黄", title: "達人" }
+    { min: 2000, color: "--r-yellow", name: "黄", title: "達人" },
+    { min: 2400, color: "--r-orange", name: "橙", title: "名人" },
+    { min: 2800, color: "--r-red", name: "赤", title: "伝説" }
   ];
   const tierOf = r => { let t = TIERS[0]; for (const x of TIERS) if (r >= x.min) t = x; return t; };
 
