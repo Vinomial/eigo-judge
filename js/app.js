@@ -27,7 +27,7 @@ const { tierOf, TIERS } = Rating;
 const LS_KEY = "eigo-judge-v1";
 function freshState() {
   // live: 解答中の本番(再読み込みやタブが閉じられても続きから再開・採点するため)
-  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], live: null, legacy: null, updatedAt: 0 };
+  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0 };
 }
 function migrate(o) {
   const s = freshState();
@@ -38,6 +38,14 @@ function migrate(o) {
       if (st && (st.ac || st.wa)) s.res[id] = { ac: st.ac || 0, wa: st.wa || 0, last: st.ac ? "AC" : "WA", t: o.updatedAt || 0 };
     }
     if (o.history && o.history.length) s.legacy = { ratings: o.ratings || {}, history: o.history };
+  }
+  // 解答の履歴(att)がない古いデータ:1回だけ解いた問題はその結果を最初の解答とみなし,AC した日も最後の結果から近似する
+  if (!o.att) {
+    for (const [id, r] of Object.entries(s.res)) {
+      if (r.ac + r.wa === 1 && r.t) s.att.push([id, r.t, r.last === "AC" ? 1 : 0]);
+      if (r.last === "AC" && r.t) { const k = dateKey(r.t); s.dayAc[k] = (s.dayAc[k] || 0) + 1; }
+    }
+    s.att.sort((a, b) => a[1] - b[1]);
   }
   return s;
 }
@@ -66,13 +74,90 @@ const WORD_BY_M = new Map(WORDS.map(w => [w.m, w])); // 意味 → 単語(意味
 const GRAM_BY = new Map(GRAM.map(g => [g.id, g]));
 const PASS_BY = new Map(READING.map(p => [p.id, p]));
 const passageD = p => Math.round(avg(p.qs.map(q => q.d)));
+const Q_PASSAGE = new Map(READING.flatMap(p => p.qs.map(q => [q.id, p])));
+
+/* ---------------- 難易度の推定 ----------------
+ * 問題の難易度 d は作った人の見積もり(d0).自分の解答から推定し直す(AtCoder Problems と同じ考え方).
+ * 1. 各問題の「最初の解答」だけを使う(解説を見た後の解き直しは正解しやすく,難易度を低く見積もってしまうため).
+ * 2. その時点の実力 θ:分野ごとに解答を時刻順に BLOCK 件ずつ区切り,その区切りの中の d0 と正誤からパフォーマンスと同じ式で求める.
+ * 3. グループのずれ δ:同じ定理の文法問題・同じ長文の設問は,見積もりが同じ方向にずれやすい.
+ *    グループ内の観測をまとめて,d0 + δ の δ を推定する(事前分布の標準偏差 GROUP_SD).
+ * 4. 各問題の推定値:d0 + δ を中心とした事前分布(標準偏差 PRIOR_SD)と,観測 (θ, 正誤) の尤度をかけて,最も確からしい d を求める.
+ *    1問の観測は1件だけなので,1問ごとの動きは小さい.グループのずれと,色帯ごとの正答率の比較の方があてになる. */
+const ALLQ = [...WORDS.map(q => ["word", q]), ...GRAM.map(q => ["grammar", q]), ...READING.flatMap(p => p.qs.map(q => ["reading", q]))];
+ALLQ.forEach(([, q]) => { q.d0 = q.d; });
+const Q_BY = new Map(ALLQ.map(([dom, q]) => [q.id, { dom, q }]));
+const BLOCK = 60, PRIOR_SD = 200, GROUP_SD = 250, MIN_ATT = 30;
+const groupOf = (dom, q) => (dom === "grammar" ? q.t : dom === "reading" ? Q_PASSAGE.get(q.id).id : null);
+// 尤度 Π p^ok (1-p)^(1-ok) と,中心 c・標準偏差 sd の事前分布をかけたものを最大にするずれ x を二分法で求める.
+// obs: [{th, d, ok}](d に x を足したものが難易度).導関数 K Σ(p - ok) - (x - c) / sd² は x について単調減少.
+function mapShift(obs, c, sd) {
+  const K = Math.LN10 / 400;
+  let lo = c - 1500, hi = c + 1500;
+  for (let k = 0; k < 50; k++) {
+    const mid = (lo + hi) / 2;
+    const g = K * obs.reduce((a, o) => a + Rating.p(o.th, o.d + mid) - o.ok, 0) - (mid - c) / (sd * sd);
+    if (g > 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+let D_EST = null;
+function estimateD() {
+  if (D_EST) return D_EST;
+  const first = new Map();
+  for (const [id, t, ok] of S.att) if (Q_BY.has(id) && !first.has(id)) first.set(id, { id, t, ok, ...Q_BY.get(id) });
+  const out = { items: new Map(), dom: {} };
+  for (const dom of Object.keys(DOMAINS)) {
+    const xs = [...first.values()].filter(x => x.dom === dom).sort((a, b) => a.t - b.t);
+    out.dom[dom] = { n: xs.length, ok: xs.length >= MIN_ATT, bands: [] };
+    if (xs.length < MIN_ATT) continue;
+    for (let i = 0; i < xs.length; i += BLOCK) {
+      let blk = xs.slice(i, i + BLOCK);
+      if (blk.length < BLOCK / 2 && i) blk = xs.slice(Math.max(0, xs.length - BLOCK)); // 最後の短い区切りは前とまとめる
+      const th = Rating.rawPerformance(blk.map(x => ({ d: x.q.d0, ok: x.ok })));
+      xs.slice(i, i + BLOCK).forEach(x => { x.th = th; });
+    }
+    // グループのずれ
+    const groups = new Map();
+    xs.forEach(x => { const g = groupOf(dom, x.q); if (g) (groups.get(g) || groups.set(g, []).get(g)).push(x); });
+    const shift = new Map();
+    groups.forEach((g, k) => shift.set(k, mapShift(g.map(x => ({ th: x.th, d: x.q.d0, ok: x.ok })), 0, GROUP_SD)));
+    out.dom[dom].groups = [...groups].map(([k, g]) => ({ k, n: g.length, shift: Math.round(shift.get(k) / 10) * 10 }));
+    for (const x of xs) {
+      const c = shift.get(groupOf(dom, x.q)) || 0;
+      const sh = mapShift([{ th: x.th, d: x.q.d0, ok: x.ok }], c, PRIOR_SD);
+      out.items.set(x.id, { dom, d0: x.q.d0, est: Math.round((x.q.d0 + sh) / 10) * 10, ok: x.ok, th: x.th });
+    }
+    // 色帯ごとの比較:予想正答率(その時点の実力と d0 から)と実際の正答率
+    out.dom[dom].bands = TIERS.map((t, i) => {
+      const hi = TIERS[i + 1] ? TIERS[i + 1].min : Infinity, b = xs.filter(x => x.q.d0 >= t.min && x.q.d0 < hi);
+      return { t, n: b.length, exp: b.length ? avg(b.map(x => Rating.p(x.th, x.q.d0))) : 0, act: b.length ? avg(b.map(x => x.ok)) : 0 };
+    }).filter(b => b.n);
+  }
+  return (D_EST = out);
+}
+// 「推定した難易度を使う」が有効なら,推定のある問題の d を推定値に置き換える(色・問題一覧・出題・パフォーマンスに反映)
+function applyEstD() {
+  const on = !!S.prefs.estD, E = on ? estimateD() : null;
+  const gs = {};
+  if (E) Object.keys(DOMAINS).forEach(dom => (E.dom[dom].groups || []).forEach(g => { gs[dom + g.k] = g.shift; }));
+  ALLQ.forEach(([dom, q]) => {
+    if (!E || !E.dom[dom].ok) { q.d = q.d0; return; }
+    const e = E.items.get(q.id);
+    q.d = e ? e.est : Math.round((q.d0 + (gs[dom + groupOf(dom, q)] || 0)) / 10) * 10; // 未挑戦の問題は,同じグループのずれだけを足す
+  });
+}
 
 /* 問題ごとの状態(最後の結果) */
+// att: 解答の履歴 [id, 時刻, 正解なら1].難易度の推定に使う
 function record(id, ok, t = Date.now()) {
   const r = S.res[id] || (S.res[id] = { ac: 0, wa: 0 });
   ok ? r.ac++ : r.wa++;
   r.last = ok ? "AC" : "WA"; r.t = t;
   const k = dateKey(t); S.days[k] = (S.days[k] || 0) + 1;
+  if (ok) S.dayAc[k] = (S.dayAc[k] || 0) + 1;
+  S.att.push([id, t, ok ? 1 : 0]);
+  D_EST = null;
 }
 const statusOf = id => (S.res[id] && S.res[id].last) || null;
 function passageStatus(p) {
@@ -853,7 +938,6 @@ function persistContest() {
   save();
 }
 // 起動時:途中の本番があれば再開する.時間切れなら採点する
-const Q_PASSAGE = new Map(READING.flatMap(p => p.qs.map(q => [q.id, p])));
 function restoreContest() {
   const L = S.live;
   if (!L) return;
@@ -1038,6 +1122,11 @@ function renderRecord() {
     ${toeicHTML()}
     <div class="ratings">${ratingCells()}</div>
     <div class="streak"><div><b>${sk.cur}</b><span>日連続</span></div><div><b>${sk.max}</b><span>最長連続</span></div><div><b>${sk.total}</b><span>学習日数</span></div></div>
+    <h2>学習の記録(草)</h2>
+    <div class="seg sm" role="group" aria-label="数える対象">${[["ac", "AC した数"], ["all", "解いた数"]].map(([k, v]) => `<button data-hm="${k}" aria-pressed="${hmKey === k}">${v}</button>`).join("")}</div>
+    ${heatmapHTML()}
+    <h2>難易度の推定</h2>
+    ${estHTML()}
     <h2>実際の TOEIC の点数</h2>
     <p class="small muted">公式問題集や本番の点数を入れると,その日までの本番の出来と比べて,推定スコアを補正します(新しい記録ほど重く).</p>
     <div class="row sform"><input type="number" id="sc-score" class="search" min="10" max="990" step="5" placeholder="点数(10〜990)" inputmode="numeric"><input type="date" id="sc-date" class="search" value="${dateKey(Date.now())}"><button class="btn" id="sc-add">記録する</button></div>
@@ -1062,6 +1151,11 @@ function renderRecord() {
   m.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { chartKey = b.dataset.k; renderRecord(); });
   $("#exp-btn").onclick = exportData;
   m.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteData(b.dataset.del));
+  m.querySelectorAll("[data-hm]").forEach(b => b.onclick = () => { hmKey = b.dataset.hm; renderRecord(); });
+  m.querySelectorAll(".hm i[data-day]").forEach(c => c.onclick = () => { const el = $("#hm-info"); if (el) el.textContent = c.getAttribute("aria-label"); });
+  const est = $("#est-toggle");
+  if (est) est.onchange = () => { S.prefs.estD = est.checked; save(); applyEstD(); renderRecord(); toast(est.checked ? "推定した難易度を使います." : "元の難易度に戻しました."); };
+  m.querySelectorAll("[data-estq]").forEach(b => b.onclick = () => { const x = Q_BY.get(b.dataset.estq); startSolve(x.dom, x.dom === "reading" ? Q_PASSAGE.get(x.q.id).id : x.q.id, null, "", "record"); });
   $("#sc-add").onclick = () => {
     const v = Math.round(+$("#sc-score").value / 5) * 5, d = $("#sc-date").value;
     if (!(v >= 10 && v <= 990) || !d) { toast("点数(10〜990)と日付を入れてください."); return; }
@@ -1079,6 +1173,51 @@ function renderRecord() {
   drawChart(box, chartKey);
   if (chartRO) chartRO.observe(box);
 }
+/* 草:日ごとの AC 数(または解いた数)を色の濃さで並べる.列が週,行が曜日(日〜土).直近26週 */
+let hmKey = "ac";
+const HM_WEEKS = 26, HM_LV = [1, 5, 10, 20]; // 色の段階の境目(AtCoder Problems の草に近い区切り)
+function heatmapHTML() {
+  const src = hmKey === "ac" ? S.dayAc : S.days;
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const start = new Date(today.getTime() - ((HM_WEEKS - 1) * 7 + today.getDay()) * DAY);
+  const cells = [], months = [];
+  let total = 0, active = 0, best = 0;
+  for (let w = 0; w < HM_WEEKS; w++) {
+    for (let d = 0; d < 7; d++) {
+      const t = start.getTime() + (w * 7 + d) * DAY, k = dateKey(t), n = src[k] || 0;
+      if (t > today.getTime()) { cells.push(`<i class="out"></i>`); continue; }
+      total += n; if (n) active++; best = Math.max(best, n);
+      const lv = HM_LV.filter(x => n >= x).length;
+      const label = `${fmtDate(t)}(${"日月火水木金土"[d]}):${hmKey === "ac" ? "AC" : "解いた数"} ${n}${hmKey === "ac" ? "" : ` · AC ${S.dayAc[k] || 0}`}`;
+      cells.push(`<i class="l${lv}" data-day="${k}" aria-label="${label}" title="${label}"></i>`);
+      if (d === 0 && new Date(t).getDate() <= 7) months.push(`<span style="grid-column:${w + 1}">${new Date(t).getMonth() + 1}月</span>`);
+    }
+  }
+  return `<div class="hmwrap"><div class="hmm" style="grid-template-columns:repeat(${HM_WEEKS},1fr)">${months.join("")}</div>
+    <div class="hm" style="grid-template-columns:repeat(${HM_WEEKS},1fr)">${cells.join("")}</div>
+    <div class="hmleg"><span class="small muted" id="hm-info">マスを押すと,その日の数が出ます.</span><span class="small muted">少 <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> 多</span></div></div>
+    <p class="small muted">直近${HM_WEEKS}週で ${total} ${hmKey === "ac" ? "AC" : "問"} · ${active} 日 · 1日の最高 ${best}.${hmKey === "ac" ? "色の濃さは 1 / 5 / 10 / 20 問以上." : ""}</p>`;
+}
+function estHTML() {
+  const E = estimateD(), rows = [];
+  for (const dom of Object.keys(DOMAINS)) {
+    const x = E.dom[dom];
+    if (!x.ok) { rows.push(`<p class="small muted">${DOMAINS[dom]}:最初の解答 ${x.n} 件(${MIN_ATT} 件たまると推定します).</p>`); continue; }
+    rows.push(`<h3 class="esth">${DOMAINS[dom]} <span class="small muted">最初の解答 ${x.n} 件</span></h3>
+      <div style="overflow-x:auto"><table class="estt"><thead><tr><th>色帯</th><th>問題</th><th>予想の正答率</th><th>実際</th><th></th></tr></thead><tbody>${x.bands.map(b => {
+        const diff = b.act - b.exp, note = b.n < 10 ? `<span class="muted">少ない</span>` : diff <= -0.15 ? `<span class="down">見積もりより難しい</span>` : diff >= 0.15 ? `<span class="up">見積もりより易しい</span>` : "おおむね妥当";
+        return `<tr><td><span class="dot" style="--rc:var(${b.t.color})"></span>${b.t.name}</td><td>${b.n}</td><td>${Math.round(100 * b.exp)}%</td><td>${Math.round(100 * b.act)}%</td><td class="small">${note}</td></tr>`;
+      }).join("")}</tbody></table></div>`);
+  }
+  const G = E.dom.grammar.ok ? E.dom.grammar.groups.filter(g => Math.abs(g.shift) >= 50).sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift)).slice(0, 8) : [];
+  const thmList = G.length ? `<h3 class="esth">見積もりがずれている定理</h3><div class="weak">${G.map(g => `<div class="wrow"><span class="wn">${esc(THM[g.k].name)}</span><span class="small ${g.shift > 0 ? "down" : "up"}">${g.shift > 0 ? "+" : ""}${g.shift}(${g.shift > 0 ? "難しい" : "易しい"})</span><button class="btn ghost sm" data-go="thm" data-thm="${g.k}">練習</button></div>`).join("")}</div>` : "";
+  const big = [...E.items].filter(([, e]) => E.dom[e.dom].ok && Math.abs(e.est - e.d0) >= 100).sort((a, b) => Math.abs(b[1].est - b[1].d0) - Math.abs(a[1].est - a[1].d0)).slice(0, 15);
+  const name = id => { const { dom, q } = Q_BY.get(id); return dom === "word" ? `<span class="en">${esc(q.w)}</span>` : dom === "grammar" ? `G${id.slice(1)} ${esc(THM[q.t].name)}` : `${id.toUpperCase().replace("Q", " 問")}`; };
+  const list = big.length ? `<h3 class="esth">見積もりと大きく違う問題</h3><div class="estlist">${big.map(([id, e]) => `<button class="chip" data-estq="${id}"><span class="dot" style="${rc(e.est)}"></span><span class="cl">${name(id)}</span><span class="cd">${e.d0} → <b>${e.est}</b> ${e.ok ? "AC" : "WA"}</span></button>`).join("")}</div>` : "";
+  return `<p class="small muted">各問題の最初の解答と,その時点の実力から,問題の難易度を推定し直します(AtCoder Problems の difficulty と同じ考え方).1人分の解答なので,1問ごとの推定は d0 から少ししか動きません.色帯ごとの正答率の比較の方があてになります.</p>
+    ${rows.join("")}${thmList}${list}
+    <label class="estsw"><input type="checkbox" id="est-toggle" ${S.prefs.estD ? "checked" : ""}> 推定した難易度を使う <span class="small muted">(問題一覧の色・おまかせ・本番の出題とパフォーマンスに反映.いつでも戻せます)</span></label>`;
+}
 function exportData() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" }));
@@ -1090,10 +1229,10 @@ function exportData() {
 const DELETE = {
   contests: { name: "本番の記録", desc: "本番の履歴を消します.レート・推定 TOEIC スコア・グラフも消えます.問題ごとの AC / WA と,実際の TOEIC の点数は残ります.",
     run: () => { S.contests = []; S.live = null; S.legacy = null; cState = null; } },
-  results: { name: "問題の結果", desc: "問題ごとの AC / WA,単語の復習の予定,長文の所要時間を消します.すべて未挑戦に戻ります.レートは残ります.",
-    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; } },
+  results: { name: "問題の結果", desc: "問題ごとの AC / WA,解答の履歴(草と難易度の推定に使う),単語の復習の予定,長文の所要時間を消します.すべて未挑戦に戻ります.レートは残ります.",
+    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; S.att = []; S.dayAc = {}; D_EST = null; applyEstD(); } },
   all: { name: "すべてのデータ", desc: "本番の記録,問題の結果,学習日数,実績,設定をすべて消して,最初の状態に戻します.",
-    run: () => { S = freshState(); cState = null; } }
+    run: () => { S = freshState(); cState = null; D_EST = null; applyEstD(); } }
 };
 function deleteData(k) {
   const d = DELETE[k];
@@ -1112,7 +1251,7 @@ function importData(file) {
     if (!o || typeof o !== "object" || !(o.res || o.stats)) throw new Error("bad");
     if (!confirm("今の進捗を,読み込んだデータで置き換えます.よろしいですか?")) return;
     stopTimer(); cState = null; pState = null;
-    S = migrate(o); S.live = null; save(); render(); toast("読み込みました.");
+    S = migrate(o); S.live = null; D_EST = null; applyEstD(); save(); render(); toast("読み込みました.");
   }).catch(() => toast("このファイルは読み込めませんでした."));
 }
 
@@ -1239,5 +1378,6 @@ document.addEventListener("keydown", e => {
 
 // ブラウザに保存データを消されにくくする(対応している環境のみ)
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* noop */ }
+applyEstD();
 restoreContest();
 render();

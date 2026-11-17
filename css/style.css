@@ -296,3 +296,28 @@ summary { cursor: pointer; }
 
 /* 実際の点数の入力 */
 .sform .search { flex: 1 1 8em; width: auto; margin: 0; }
+
+/* 草(日別のヒートマップ) */
+.hmwrap { margin-top: 10px; }
+.hm, .hmm { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, auto); gap: 2px; }
+.hmm { grid-template-rows: auto; grid-auto-flow: row; font-size: .62rem; color: var(--muted); height: 1.2em; margin-bottom: 2px; }
+.hmm span { white-space: nowrap; }
+.hm i, .hmleg i { display: block; aspect-ratio: 1; border-radius: 2px; background: var(--sunk); }
+.hm i.out { background: transparent; }
+.hm i[data-day] { cursor: pointer; }
+.l1 { background: color-mix(in srgb, var(--ac) 30%, var(--sunk)) !important; }
+.l2 { background: color-mix(in srgb, var(--ac) 55%, var(--sunk)) !important; }
+.l3 { background: color-mix(in srgb, var(--ac) 80%, var(--sunk)) !important; }
+.l4 { background: var(--ac) !important; }
+.hmleg { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.hmleg > span:last-child { display: inline-flex; align-items: center; gap: 3px; }
+.hmleg i { display: inline-block; width: 11px; }
+
+/* 難易度の推定 */
+.esth { font-size: .95rem; margin: 14px 0 4px; }
+.estt td, .estt th { white-space: nowrap; }
+.estlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 6px; }
+.estlist .cd b { color: var(--ink); }
+.estsw { display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.estsw input { width: 20px; height: 20px; margin-top: 3px; flex: none; }
+@media (max-width: 480px) { .estlist { grid-template-columns: 1fr; } }
