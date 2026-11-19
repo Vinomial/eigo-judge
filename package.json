@@ -1,0 +1,18 @@
+{
+  "name": "eigo-judge",
+  "private": true,
+  "description": "英語ジャッジ.アプリ自体はビルド不要(index.html を開くだけ).ここにあるのはテスト用の道具だけ.",
+  "scripts": {
+    "test": "node tools/check.js && node tools/test-merge.js && node tools/test-ui.js",
+    "test:ui": "node tools/test-ui.js",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-eigo \"node tools/test-rules.js\"",
+    "test:sync": "firebase emulators:exec --only firestore,auth --project eigo-judge \"node tools/test-sync.js\"",
+    "browser": "playwright-core install chromium"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.12.2",
+    "firebase-tools": "^13.29.1",
+    "playwright-core": "1.48.2"
+  }
+}

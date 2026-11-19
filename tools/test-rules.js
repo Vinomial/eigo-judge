@@ -1,8 +1,6 @@
 // Firestore のアクセス規則(firestore.rules)のテスト.エミュレーターで動かす.
-// 準備(リポジトリの外の作業用フォルダで.Java が必要):
-//   npm install firebase-tools@13 @firebase/rules-unit-testing@3 firebase@10
-// 実行(作業用フォルダで):
-//   NODE_PATH=./node_modules npx firebase emulators:exec --only firestore --project demo-eigo "node <このファイルのパス>"
+// 使い方: npm run test:rules   (Java が必要.初回は npm install)
+// エミュレーターは firebase.json の設定で起動する.
 "use strict";
 const fs = require("fs");
 const path = require("path");

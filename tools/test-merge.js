@@ -5,7 +5,7 @@ const { merge, shareable } = require("../js/merge.js");
 
 const DAY = 86400000, T0 = Date.UTC(2026, 10, 1, 3); // 2026-11-01 12:00 JST
 const S = o => Object.assign({ ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0, wipe: {}, del: {}, goal: null }, o);
-// 解答を記録した状態を作る(app.js の record と同じ数え方)
+// 解答を記録した状態を作る(js/core.js の record と同じ数え方)
 function play(s, list) {
   s = JSON.parse(JSON.stringify(s));
   for (const [id, t, ok] of list) {

@@ -1,0 +1,96 @@
+// 端末間の同期のテスト(2台の端末を,Firebase のエミュレーター相手に実際のブラウザで動かす).
+// 使い方: npm run test:sync   (Java が必要.エミュレーターは firebase.json の設定で起動する)
+// 本番の Firebase には通信しない(アプリに window.EIGO_EMULATOR を入れてエミュレーターにつなぐ).
+"use strict";
+const assert = require("assert");
+const { serve, launch, suite } = require("./browser");
+
+const T = suite("同期のテスト(エミュレーター)");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let ctx, A, B;
+
+async function device() {
+  const c = await ctx.browser.newContext({ viewport: { width: 390, height: 844 } });
+  await c.addInitScript(() => { window.EIGO_EMULATOR = true; });
+  const p = await c.newPage();
+  p.errs = [];
+  p.on("pageerror", e => p.errs.push(e.message));
+  p.on("dialog", d => d.accept());
+  await p.goto(ctx.url + "index.html");
+  return p;
+}
+async function synced(p, since) {
+  for (let i = 0; i < 100; i++) {
+    const z = await p.evaluate(() => Sync.state());
+    if (z.user && !z.busy && z.last > since) return z;
+    await sleep(150);
+  }
+  throw new Error("同期が終わらない: " + JSON.stringify(await p.evaluate(() => Sync.state())));
+}
+async function syncNow(p) { const t = Date.now(); await p.evaluate(() => Sync.syncNow("test")); return synced(p, t); }
+const solve = (p, list) => p.evaluate(list => { const t0 = Date.now(); list.forEach(([id, ok], i) => record(id, !!ok, t0 + i)); save(); }, list);
+const ids = p => p.evaluate(() => S.att.map(x => x[0]).sort().join(","));
+const EMAIL = `tester${Date.now()}@example.com`, PW = "secret123";
+
+T.test("スマホで登録すると,手元の記録がサーバーに送られる", async () => {
+  await solve(A, [["w1", 1], ["g1", 0]]);
+  const t = Date.now();
+  await A.evaluate(([e, p]) => Sync.signUp(e, p), [EMAIL, PW]);
+  await synced(A, t);
+  assert.strictEqual(await ids(A), "g1,w1");
+});
+
+T.test("PC でログインすると,両方の記録がそろう(設定した目標も届く)", async () => {
+  await solve(B, [["w2", 1], ["g2", 1]]);
+  await B.evaluate(() => { S.goal = { v: 650, t: Date.now() }; save(); });
+  const t = Date.now();
+  await B.evaluate(([e, p]) => Sync.signIn(e, p), [EMAIL, PW]);
+  await synced(B, t);
+  assert.strictEqual(await ids(B), "g1,g2,w1,w2");
+  await syncNow(A);
+  assert.strictEqual(await ids(A), "g1,g2,w1,w2");
+  assert.strictEqual(await A.evaluate(() => toeicGoal()), 650);
+});
+
+T.test("片方で解いた問題が,もう片方に届く", async () => {
+  await solve(A, [["w3", 1]]);
+  await syncNow(A); await syncNow(B);
+  assert.match(await ids(B), /w3/);
+});
+
+T.test("削除(問題の結果)は,もう片方の端末から復活しない", async () => {
+  await B.evaluate(() => deleteData("results"));
+  await solve(B, [["w9", 1]]);
+  await syncNow(B); await syncNow(A);
+  assert.strictEqual(await ids(A), "w9");
+  assert.strictEqual(await ids(B), "w9");
+});
+
+T.test("再読み込みしてもログインと同期が続く", async () => {
+  await A.reload();
+  const z = await synced(A, 0);
+  assert.ok(z.user);
+  assert.strictEqual(await ids(A), "w9");
+});
+
+T.test("ログアウトしても端末の記録は残り,間違ったパスワードは日本語で知らせる", async () => {
+  await A.evaluate(() => Sync.signOut()); await sleep(800);
+  assert.strictEqual(await A.evaluate(() => !!Sync.state().user), false);
+  assert.strictEqual(await ids(A), "w9");
+  await A.evaluate(e => Sync.signIn(e, "wrongpass"), EMAIL); await sleep(1500);
+  assert.match(await A.evaluate(() => Sync.state().msg), /パスワードが違います/);
+});
+
+T.test("どちらの端末でもページのエラーが出ていない", async () => {
+  assert.deepStrictEqual(A.errs, []); assert.deepStrictEqual(B.errs, []);
+});
+
+(async () => {
+  const srv = await serve();
+  const browser = await launch();
+  ctx = { browser, url: srv.url };
+  A = await device(); B = await device();
+  const ng = await T.run(ctx);
+  await browser.close(); srv.close();
+  process.exit(ng ? 1 : 0);
+})().catch(e => { console.error(e); process.exit(1); });

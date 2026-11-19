@@ -58,7 +58,7 @@ for (const w of WORDS) {
   spellings.set(w.w.toLowerCase(), w.id);
   if (meanings.has(w.m)) err(w.id, `意味 m が ${meanings.get(w.m)} と同じ(判定できない)`);
   meanings.set(w.m, w.id);
-  // 例文で太字になる語(app.js と同じ規則)
+  // 例文で太字になる語(js/solve.js と同じ規則)
   const m = (w.ex || "").match(new RegExp("\\b(" + reEsc(w.w.slice(0, -1)) + "\\w*)", "i"));
   if (!m) err(w.id, "例文に単語が含まれていない");
   else if (!m[1].toLowerCase().startsWith(w.w.slice(0, Math.min(w.w.length, 4)).toLowerCase())) err(w.id, `例文で太字になる語が違う (${m[1]})`);

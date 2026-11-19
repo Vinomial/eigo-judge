@@ -1956,5 +1956,90 @@ window.READING = [
       { id: "r88q2", q: "How long will the work take?", c: ["About three hours", "About two hours", "About six hours", "All day"], a: 2, ev: [1], d: 400, why: "9:00 A.M. から 3:00 P.M. まで.時刻の差を計算すると約6時間.", x: ["3時は終わる時刻で,かかる時間ではない.", "午前9時から午後3時までなので約6時間.", "", "午後3時ごろに終わる."] },
       { id: "r88q3", q: "What are people asked to do?", c: ["Stay in Building B", "Use the stairs or another elevator", "Call the office", "Come back on Friday"], a: 1, ev: [2], d: 300, why: "please use the stairs or the elevator in Building A.A 棟のエレベーターを another elevator と言い換えている.", x: ["B 棟にいるようにとは書かれていない.", "", "事務所に電話するとは書かれていない.", "金曜日に来るようにとは書かれていない."] }
     ]
+  },
+
+  // ---- 中くらいの長文(緑〜水.記事,予定表とメール,Part 6,お知らせ) ----
+  {
+    id: "r89",
+    kind: "記事",
+    title: "Brightfield News — Employees Give Back",
+    target: 140,
+    s: [
+      "Every year, employees at Lane Software are given two paid days off to volunteer in the community.",
+      "Last year, more than 80 percent of the staff took part, helping at food banks, schools, and parks.",
+      "The program began in 2019 after several employees suggested it during a company meeting.",
+      "According to human resources manager Paula Kim, the program has also improved teamwork.",
+      "\"People who volunteer together come back to the office with new energy,\" she said.",
+      "This year, the company plans to let employees choose their own volunteer activities instead of selecting from a fixed list."
+    ],
+    ja: "レーン・ソフトウェアの社員は毎年,地域でボランティアをするための有給休暇を2日もらえる.昨年は8割以上の社員が参加し,フードバンクや学校,公園で手伝った.この制度は2019年,社内の会議で何人かの社員が提案して始まった.人事部長のポーラ・キム氏によると,チームワークもよくなったという.「一緒にボランティアをした人は,新しい活力を持って職場に戻ってくる」.今年は,決められた一覧から選ぶのではなく,社員が自分で活動を選べるようにする予定だ.",
+    qs: [
+      { id: "r89q1", q: "What is the article mainly about?", c: ["A change in working hours", "A new software product", "A company program that lets staff volunteer", "A charity that needs donations"], a: 2, ev: [0], d: 800, why: "1文目が主題.社員がボランティアをするための休暇の制度.", x: ["勤務時間の変更は書かれていない.", "会社はソフトウェア会社だが,記事は製品の話ではない.", "", "寄付を求める慈善団体の話ではない."] },
+      { id: "r89q2", q: "How did the program start?", c: ["Employees proposed it.", "A charity asked for help.", "The government required it.", "A manager read about it in the news."], a: 0, ev: [2], d: 1000, why: "after several employees suggested it.suggested を proposed と言い換えている.", x: ["", "慈善団体からの依頼とは書かれていない.", "政府の義務とは書かれていない.", "ニュースで知ったとは書かれていない."] },
+      { id: "r89q3", q: "What will change this year?", c: ["Only managers will be able to join.", "Staff will get more days off.", "The program will end.", "Employees will be able to pick their own activities."], a: 3, ev: [5], d: 1200, why: "let employees choose their own volunteer activities.choose を pick と言い換えている.", x: ["管理職だけになるとは書かれていない.", "休暇の日数が増えるとは書かれていない.", "制度が終わるとは書かれていない.", ""] }
+    ]
+  },
+  {
+    id: "r90",
+    kind: "予定表とメール",
+    title: "Training Schedule / E-mail",
+    target: 160,
+    s: [
+      "The following training sessions will be held at the Main Office in June.",
+      {t:  "table", cap:  "June sessions", head:  ["Date", "Topic", "Room"], rows:  [["June 3", "Handling complaints", "201"], ["June 10", "Phone skills", "305"], ["June 17", "Writing e-mails", "201"], ["June 24", "Product knowledge", "Hall A"]]},
+      {t:  "doc", title:  "E-mail — From: Ken Mori / To: Lisa Grant"},
+      "Hi Lisa, I'm sorry, but I can't attend the session on phone skills because I will be on a business trip that week.",
+      "Could I join the same session next month instead?",
+      "Also, I would like to suggest a topic for a future session: using the new customer database.",
+      "Thanks, Ken"
+    ],
+    ja: "6月に本社で次の研修を行う.[表:6月3日 苦情への対応・201号室/6月10日 電話の応対・305号室/6月17日 メールの書き方・201号室/6月24日 製品知識・Aホール]森さんのメール:申し訳ないのですが,その週は出張なので電話の応対の研修には出られません.代わりに来月の同じ研修に出られますか.それから,今後の研修のテーマとして,新しい顧客データベースの使い方を提案したいです.",
+    qs: [
+      { id: "r90q1", q: "On what date is the session that Mr. Mori will miss?", c: ["June 3", "June 10", "June 17", "June 24"], a: 1, ev: [[1,  1],  3], d: 1300, why: "メールで出られないのは phone skills の研修.表で Phone skills の行を見ると June 10.2つの文書を見比べる問題.", x: ["6月3日は苦情への対応の研修.", "", "6月17日はメールの書き方の研修.", "6月24日は製品知識の研修."] },
+      { id: "r90q2", q: "Where will the session on writing e-mails be held?", c: ["Room 305", "Room 201", "Hall A", "At Mr. Mori's office"], a: 1, ev: [[1,  2]], d: 900, why: "表の Writing e-mails の行の Room は 201.", x: ["305号室は電話の応対の研修.", "", "Aホールは製品知識の研修.", "研修はすべて本社で行われる."] },
+      { id: "r90q3", q: "What does Mr. Mori suggest?", c: ["Holding the sessions online", "Moving all sessions to Hall A", "Canceling the June sessions", "A session on using a database"], a: 3, ev: [5], d: 1100, why: "suggest a topic ...: using the new customer database.今後のテーマとして,データベースの使い方を提案している.", x: ["ネットでの研修は提案していない.", "会場の変更は提案していない.", "研修の中止は提案していない.", ""] }
+    ]
+  },
+  {
+    id: "r91", part6: true,
+    kind: "Part 6 メール",
+    title: "E-mail — Your order of office chairs",
+    target: 150,
+    s: [
+      "Dear Ms. Patel,",
+      "Thank you for your order of 20 office chairs.",
+      "Unfortunately, the color you selected is [1] out of stock.",
+      "We expect to receive new stock [2] two weeks.",
+      "[3]",
+      "If you would prefer a different color, please let us know, and we will ship your order [4].",
+      "Sincerely, Mark Lee, Customer Service"
+    ],
+    ja: "パテル様.事務用椅子20脚のご注文ありがとうございます.あいにく,お選びの色は現在在庫切れです.2週間以内に入荷する見込みです.(椅子が届きしだいご連絡します.)別の色がよろしければお知らせください.すぐに発送いたします.",
+    qs: [
+      { id: "r91q1", q: "(1)", c: ["currently", "current", "currency", "currents"], a: 0, ev: [2], d: 900, why: "is と out of stock(在庫切れで)の間で,状態がいつのことかを表す副詞 currently(現在).", x: ["", "is と out of stock の間には,形容詞ではなく副詞が入る.", "currency は「通貨」という名詞.", "currents は名詞の複数形."] },
+      { id: "r91q2", q: "(2)", c: ["since", "during", "within", "until"], a: 2, ev: [3], d: 1000, why: "within + 期間 で「〜以内に」.2週間以内に入荷する見込み.", x: ["since は「〜以来」で,未来の見込みと合わない.", "during は「〜の間ずっと」で,「2週間以内に入荷する」という意味にならない.", "", "until は「〜までずっと」で,入荷する時点を表せない."] },
+      { id: "r91q3", q: "(3)", c: ["Our store is closed on weekends.", "The chairs were delivered last Monday.", "Thank you for paying in cash.", "We will contact you as soon as the chairs arrive."], a: 3, ev: [3,  4,  5], d: 1300, why: "前の文は「2週間以内に入荷する見込み」,後ろの文は「別の色ならすぐ送る」.入荷したら連絡する,という文が自然につながる.", x: ["営業日の話は前後とつながらない.", "在庫切れで届いていないので矛盾する.", "支払い方法の話は前後とつながらない.", ""] },
+      { id: "r91q4", q: "(4)", c: ["immediacy", "immediate", "immediately", "more immediate"], a: 2, ev: [5], d: 800, why: "we will ship your order ___ の空所は動詞 ship を修飾する位置.副詞 immediately(すぐに).", x: ["immediacy は名詞.", "動詞 ship を修飾するので,形容詞ではなく副詞.", "", "形容詞の比較級で,動詞を修飾できない."] }
+    ]
+  },
+  {
+    id: "r92",
+    kind: "お知らせ",
+    title: "Notice — Employee Parking Policy",
+    target: 150,
+    s: [
+      "Starting July 1, employees who wish to park in the company garage must apply for a parking permit.",
+      "Permits will be issued based on the distance between an employee's home and the office.",
+      "Those who live within two kilometers of the office will not be eligible, as they can walk or bicycle to work.",
+      "However, employees who carpool with at least two coworkers will receive priority, regardless of distance.",
+      "Applications are due by June 15 and can be submitted through the HR portal.",
+      "Questions should be directed to the facilities office."
+    ],
+    ja: "7月1日から,会社の駐車場を使いたい社員は駐車許可を申請しなければならない.許可は自宅と会社の距離に基づいて出す.会社から2キロ以内に住む人は,歩きか自転車で通えるので対象外.ただし,2人以上の同僚と相乗りする社員は,距離にかかわらず優先される.申請は6月15日までに人事のサイトから出すこと.質問は施設管理の担当へ.",
+    qs: [
+      { id: "r92q1", q: "Why was the notice written?", c: ["To announce the opening of a new garage", "To explain a new rule for using the garage", "To encourage staff to buy cars", "To introduce a new HR manager"], a: 1, ev: [0], d: 1000, why: "駐車場を使うには許可の申請が必要になる,という新しい決まりを知らせている.", x: ["新しい駐車場の開設ではない.", "", "車の購入を勧めてはいない.", "人事の担当者の紹介ではない."] },
+      { id: "r92q2", q: "Which employee will most likely NOT be able to get a permit?", c: ["One who lives one kilometer away and drives alone", "One who lives ten kilometers away", "One who shares rides with three coworkers", "One who applies on June 10"], a: 0, ev: [2,  3], d: 1600, why: "2キロ以内に住む人は対象外.ただし相乗りなら優先される.1キロで1人で通う人は,どちらの条件でも許可が出ない.条件を組み合わせて考える問題.", x: ["", "2キロより遠いので対象になる.", "2人以上と相乗りすれば,距離にかかわらず優先される.", "締め切りの6月15日より前なので問題ない."] },
+      { id: "r92q3", q: "What is indicated about employees who share rides to work?", c: ["They will be given preference for permits.", "They must live within two kilometers.", "They do not need to apply.", "They must park outside the garage."], a: 0, ev: [3], d: 1500, why: "carpool ... will receive priority.priority を preference と言い換えている.", x: ["", "距離の条件はない(regardless of distance).", "申請が不要とは書かれていない.", "駐車場の外に止めるとは書かれていない."] }
+    ]
   }
 ];
