@@ -372,7 +372,15 @@ function autoPick(dom, avoid) {
 /* 1問を表す共通の形: {dom, q, p?}  p は長文のときの本文 */
 // 意味に同じ漢字を含む語は紛らわしい(含む/含める,延期する/先送りする)ので選択肢に並べない
 const KANJI = /[一-鿿]/g;
-function overlaps(a, b) { const s = new Set(a.match(KANJI) || []); return (b.match(KANJI) || []).some(c => s.has(c)); }
+// 意味の語句:かっこ書きを除き「・」で区切ったもの(「すぐに」「めったに〜ない」など,かなだけの意味の重なりを見つけるため)
+const mTokens = m => m.replace(/[(\uFF08][^)\uFF09]*[)\uFF09]/g, "").split("・").map(x => x.trim()).filter(Boolean);
+// 2つの意味が紛らわしいか:同じ漢字を含む,または同じ語句がある
+function overlaps(a, b) {
+  const s = new Set(a.match(KANJI) || []);
+  if ((b.match(KANJI) || []).some(c => s.has(c))) return true;
+  const t = new Set(mTokens(a));
+  return mTokens(b).some(x => t.has(x));
+}
 // つづりの近さ(文字の2つ組の重なり.0〜1)
 const bigrams = w => { const t = w.toLowerCase(), b = new Set(); for (let i = 0; i < t.length - 1; i++) b.add(t.slice(i, i + 2)); return b; };
 const BIG = new Map(WORDS.map(w => [w.id, bigrams(w.w)]));
@@ -648,7 +656,7 @@ function renderList() {
     </div>
     ${dom === "grammar" ? `<div class="seg sm" role="group" aria-label="並べ方" style="margin:6px 0">${[["d", "難易度順"], ["thm", "定理別"]].map(([k, v]) => `<button data-g="${k}" aria-pressed="${(LIST.group || "d") === k}">${v}</button>`).join("")}</div>` : ""}
     ${dom === "word" ? `<div class="seg sm" role="group" aria-label="出題の向き" style="margin:6px 0">${[["mix", "混ぜる"], ["ej", "英語→意味"], ["je", "意味→英語"]].map(([k, v]) => `<button data-wd="${k}" aria-pressed="${(S.prefs.wdir || "mix") === k}">${v}</button>`).join("")}</div>` : ""}
-    ${dom === "word" ? `<input type="search" id="wsearch" class="search en" placeholder="単語を検索(つづり)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="単語を検索">` : ""}
+    ${dom === "word" ? `<input type="search" id="wsearch" class="search" placeholder="単語を検索(つづり・意味)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="単語を検索"><p id="wnone" class="small muted" hidden>見つかりませんでした.「すべて」に切り替えると,AC 済みの単語も探せます.</p>` : ""}
     <p class="mode-note">AC ${cnt("AC")} · WA ${cnt("WA")} · 未挑戦 ${all.length - cnt("AC") - cnt("WA")}(全 ${all.length}${dom === "reading" ? "題" : "問"}).最後に解いた結果を表示します.問題を押すと練習モードで解けます.${byThm ? "定理名を押すと,その定理の問題が開きます." : ""}</p>
     ${body}`;
   const savePref = () => { S.prefs.list = { dom: LIST.dom, filter: LIST.filter, group: LIST.group }; save(); };
@@ -661,11 +669,29 @@ function renderList() {
     const ids = filteredUnits().filter(u => !grp || GRAM_BY.get(u.id).t === grp).map(u => u.id);
     startSolve(dom, b.dataset.pid, ids, grp ? THM[grp].name : "");
   });
+  // 単語の検索:つづり(前方・部分一致)と意味で探す.当てはまる語のない帯は隠し,ある帯は開く
   const search = $("#wsearch");
-  if (search) search.oninput = () => {
-    const q = search.value.trim().toLowerCase();
-    m.querySelectorAll(".chip").forEach(c => { c.hidden = !!q && !c.querySelector(".cl").textContent.toLowerCase().includes(q); });
-  };
+  if (search) {
+    const run = () => {
+      const q = search.value.trim().toLowerCase();
+      LIST.q = search.value;
+      let hit = 0;
+      m.querySelectorAll(".band").forEach(sec => {
+        let n = 0;
+        sec.querySelectorAll(".chip").forEach(c => {
+          const w = WORD_BY.get(c.dataset.pid);
+          const ok = !q || (w && (w.w.toLowerCase().includes(q) || w.m.includes(q)));
+          c.hidden = !ok; if (ok) n++;
+        });
+        sec.hidden = !!q && n === 0;
+        if (q && n) sec.open = true;
+        hit += n;
+      });
+      $("#wnone").hidden = !q || hit > 0;
+    };
+    search.oninput = run;
+    if (LIST.q) { search.value = LIST.q; run(); }
+  }
   bindGo();
 }
 
@@ -1204,6 +1230,10 @@ function renderRecord() {
     <h2>学習の記録(草)</h2>
     <div class="seg sm" role="group" aria-label="数える対象">${[["ac", "AC した数"], ["all", "解いた数"]].map(([k, v]) => `<button data-hm="${k}" aria-pressed="${hmKey === k}">${v}</button>`).join("")}</div>
     ${heatmapHTML()}
+    <h2>日ごとの記録</h2>
+    ${dailyControlsHTML()}
+    <div class="chart" id="daily"></div>
+    <p class="small muted" id="daily-sum"></p>
     <h2>難易度の推定</h2>
     ${estHTML()}
     <h2>目標の点数</h2>
@@ -1235,6 +1265,11 @@ function renderRecord() {
   $("#exp-btn").onclick = exportData;
   m.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteData(b.dataset.del));
   m.querySelectorAll("[data-hm]").forEach(b => b.onclick = () => { hmKey = b.dataset.hm; renderRecord(); });
+  m.querySelectorAll("[data-dly]").forEach(b => b.onclick = () => {
+    const [k, v] = b.dataset.dly.split(":"); DAILY[k] = k === "span" ? +v : v;
+    b.parentNode.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    drawDaily($("#daily"));
+  });
   m.querySelectorAll(".hm i[data-day]").forEach(c => c.onclick = () => { const el = $("#hm-info"); if (el) el.textContent = c.getAttribute("aria-label"); });
   const est = $("#est-toggle");
   if (est) est.onchange = () => { S.prefs.estD = est.checked; save(); applyEstD(); renderRecord(); toast(est.checked ? "推定した難易度を使います." : "元の難易度に戻しました."); };
@@ -1263,7 +1298,103 @@ function renderRecord() {
   box.dataset.w = box.clientWidth;
   drawChart(box, chartKey);
   if (chartRO) chartRO.observe(box);
+  const dbox = $("#daily");
+  dbox.dataset.w = dbox.clientWidth;
+  drawDaily(dbox);
+  if (chartRO) chartRO.observe(dbox);
 }
+/* 日ごとの記録:日ごとの解いた数・AC 数・新しく AC した数(初めて正解できた問題の数)を棒で並べる.分野で絞れる */
+const DAILY = { span: 30, dom: "all", metric: "n" };
+const DAILY_M = { n: "解いた数", ac: "AC 数", first: "新しく AC" };
+function dailyControlsHTML() {
+  const seg = (k, opts, label) => `<div class="seg sm" role="group" aria-label="${label}">${opts.map(([v, t]) => `<button data-dly="${k}:${v}" aria-pressed="${String(DAILY[k]) === String(v)}">${t}</button>`).join("")}</div>`;
+  return `<div class="dctl">
+    ${seg("metric", Object.entries(DAILY_M), "数える対象")}
+    ${seg("dom", [["all", "すべて"], ...Object.entries(DOMAINS)], "分野")}
+    ${seg("span", [[14, "2週"], [30, "30日"], [90, "90日"]], "期間")}
+  </div>`;
+}
+function dailyData() {
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const keys = [];
+  for (let i = DAILY.span - 1; i >= 0; i--) keys.push(dateKey(today.getTime() - i * DAY));
+  const idx = new Map(keys.map((k, i) => [k, i])), v = keys.map(() => 0), firstAC = new Set();
+  for (const [id, t, ok] of S.att) {
+    const x = Q_BY.get(id); if (!x) continue;
+    const first = ok && !firstAC.has(id); // 初めて AC した解答か(分野で絞る前に,全体の順で判定する)
+    if (ok) firstAC.add(id);
+    if (DAILY.dom !== "all" && x.dom !== DAILY.dom) continue;
+    const i = idx.get(dateKey(t)); if (i == null) continue;
+    if (DAILY.metric === "n" || (DAILY.metric === "ac" && ok) || (DAILY.metric === "first" && first)) v[i]++;
+  }
+  // 「すべて」の解いた数・AC 数は,解答の履歴がない古い記録も含む日ごとの数(days / dayAc)が大きければそちらを使う
+  if (DAILY.dom === "all" && DAILY.metric !== "first") {
+    const src = DAILY.metric === "n" ? S.days : S.dayAc;
+    keys.forEach((k, i) => { v[i] = Math.max(v[i], src[k] || 0); });
+  }
+  return keys.map((k, i) => ({ k, t: new Date(k + "T12:00:00").getTime(), v: v[i] }));
+}
+function drawDaily(box) {
+  if (!box) return;
+  const data = dailyData(), NS = "http://www.w3.org/2000/svg";
+  const el = (tag, at, parent) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (parent) parent.append(e); return e; };
+  box.innerHTML = "";
+  const W = Math.max(280, box.clientWidth), H = 190, M = { l: 30, r: 4, t: 12, b: 22 };
+  const max = Math.max(0, ...data.map(d => d.v));
+  const top = [5, 10, 20, 30, 50, 100, 150, 200, 300, 500, 1000].find(x => x >= max) || Math.ceil(max / 500) * 500;
+  const step = (W - M.l - M.r) / data.length, bw = Math.max(2, step - 2); // 棒どうしに 2px のすき間
+  const y = v => M.t + (1 - v / top) * (H - M.t - M.b), base = y(0);
+  const label = `${DAILY_M[DAILY.metric]}(${DAILY.dom === "all" ? "すべて" : DOMAINS[DAILY.dom]})`;
+  const svg = el("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: "0", "aria-label": `日ごとの${label}.直近${DAILY.span}日` }, box);
+  [0, top / 2, top].forEach(v => {
+    el("line", { x1: M.l, x2: W - M.r, y1: y(v), y2: y(v), stroke: "var(--line)", "stroke-width": 1 }, svg);
+    el("text", { x: M.l - 6, y: y(v) + 4, "text-anchor": "end", class: "ax" }, svg).textContent = v;
+  });
+  // 日付の目盛り:今日から数えて一定の間隔で
+  const every = DAILY.span <= 14 ? 2 : DAILY.span <= 30 ? 7 : 14;
+  data.forEach((d, i) => {
+    if ((data.length - 1 - i) % every) return;
+    el("text", { x: M.l + step * i + step / 2, y: H - 6, "text-anchor": i === data.length - 1 ? "end" : "middle", class: "ax" }, svg).textContent = fmtDate(d.t);
+  });
+  // 棒:上だけ角を丸め(4px),下は基準線にそろえる
+  const bars = data.map((d, i) => {
+    if (!d.v) return null;
+    const x0 = M.l + step * i + (step - bw) / 2, y0 = y(d.v), h = base - y0, r = Math.min(4, bw / 2, h);
+    return el("path", { d: `M${x0},${base}V${y0 + r}Q${x0},${y0} ${x0 + r},${y0}H${x0 + bw - r}Q${x0 + bw},${y0} ${x0 + bw},${y0 + r}V${base}Z`, fill: "var(--accent)", "fill-opacity": i === data.length - 1 ? 1 : 0.85 }, svg);
+  });
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; box.append(tip);
+  let cur = -1;
+  const show = i => {
+    cur = i; const d = data[i];
+    bars.forEach((b, j) => b && b.setAttribute("fill-opacity", j === i ? 1 : 0.55));
+    tip.replaceChildren();
+    const v = document.createElement("div"); v.className = "tv"; v.textContent = d.v;
+    const s1 = document.createElement("div"); s1.className = "small muted"; s1.textContent = `${fmtDate(d.t)}(${"日月火水木金土"[new Date(d.t).getDay()]}) · ${label}`;
+    tip.append(v, s1); tip.hidden = false;
+    const cx = M.l + step * i + step / 2, tw = tip.offsetWidth;
+    tip.style.left = Math.min(Math.max(cx - tw / 2, 0), W - tw) + "px";
+    tip.style.top = Math.max(0, y(d.v) - tip.offsetHeight - 10) + "px";
+  };
+  const hide = () => { cur = -1; bars.forEach((b, j) => b && b.setAttribute("fill-opacity", j === data.length - 1 ? 1 : 0.85)); tip.hidden = true; };
+  // 棒が細くても押しやすいよう,列の幅全体で反応させる
+  const pick = ev => { const r = svg.getBoundingClientRect(); return Math.min(data.length - 1, Math.max(0, Math.floor((ev.clientX - r.left - M.l) / step))); };
+  svg.addEventListener("pointermove", ev => show(pick(ev)));
+  svg.addEventListener("pointerdown", ev => show(pick(ev)));
+  svg.addEventListener("pointerleave", hide);
+  svg.addEventListener("focus", () => show(data.length - 1));
+  svg.addEventListener("blur", hide);
+  svg.addEventListener("keydown", ev => {
+    if (ev.key === "ArrowLeft" && cur > 0) { show(cur - 1); ev.preventDefault(); }
+    if (ev.key === "ArrowRight" && cur < data.length - 1) { show(cur + 1); ev.preventDefault(); }
+  });
+  // 数字でも読めるように(グラフを見なくても分かる要約)
+  const sum = data.reduce((a, d) => a + d.v, 0), active = data.filter(d => d.v).length, best = data.reduce((a, d) => (d.v > a.v ? d : a), data[0]);
+  const unit = DAILY.metric === "first" && DAILY.dom === "word" ? "語" : "問";
+  $("#daily-sum").textContent = sum
+    ? `直近${DAILY.span}日:合計 ${sum} ${unit} · 学習した日 ${active} 日 · 1日平均 ${(sum / DAILY.span).toFixed(1)} ${unit} · 最多 ${best.v} ${unit}(${fmtDate(best.t)}).${DAILY.metric === "first" ? "「新しく AC」は,その日に初めて正解できた問題の数です." : ""}`
+    : `直近${DAILY.span}日の記録はまだありません.`;
+}
+
 /* 草:日ごとの AC 数(または解いた数)を色の濃さで並べる.列が週,行が曜日(日〜土).直近26週 */
 let hmKey = "ac";
 const HM_WEEKS = 26, HM_LV = [1, 5, 10, 20]; // 色の段階の境目(AtCoder Problems の草に近い区切り)
@@ -1482,7 +1613,7 @@ function drawChart(box, key) {
 const chartRO = typeof ResizeObserver === "function" ? new ResizeObserver(entries => {
   for (const e of entries) {
     const w = Math.round(e.contentRect.width);
-    if (e.target.isConnected && w && w !== +e.target.dataset.w) { e.target.dataset.w = w; drawChart(e.target, chartKey); }
+    if (e.target.isConnected && w && w !== +e.target.dataset.w) { e.target.dataset.w = w; e.target.id === "daily" ? drawDaily(e.target) : drawChart(e.target, chartKey); }
   }
 }) : null;
 

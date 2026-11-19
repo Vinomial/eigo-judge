@@ -354,3 +354,9 @@ summary { cursor: pointer; }
 .notebar .mode-note { margin: 0; flex: 1 1 14em; }
 .autonext { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); min-height: 36px; cursor: pointer; }
 .autonext input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* hidden 属性は,display を指定した要素(ボタンなど)にも必ず効かせる */
+[hidden] { display: none !important; }
+/* 日ごとの記録 */
+.dctl { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 4px; }
+.dctl .seg { margin: 0; }
