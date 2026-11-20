@@ -3,22 +3,41 @@
  * js/ のファイルは index.html の順に読み込み,同じ大域の名前を共有する(ビルドなし).
  * 読み込んだ時点で動くのは宣言だけにし,起動の処理は main.js に置く. */
 
-/* ---------------- 記録 ---------------- */
-let chartKey = "all";
+/* ---------------- 記録 ----------------
+ * 項目が多いので,上のタブで分ける(成績・学習・実績・分析・データ).選んだタブは recTab. */
+let chartKey = "all", recTab = "score";
+const REC_TABS = { score: "成績", study: "学習", badge: "実績", est: "分析", data: "データ" };
+// 本番の履歴:1回を1行のカードに(表は幅が足りず読みにくいため)
+function contestListHTML(H) {
+  if (!S.contests.length) return `<p class="muted small">まだありません.まずは1回本番に挑戦して,今の位置を測りましょう.</p>`;
+  return `<div class="clist">${S.contests.slice().reverse().slice(0, 30).map(c => {
+    const k = c.kind || "all", e = H[k].find(x => x.t === c.t), ok = c.items.filter(x => x.ok).length;
+    return `<div class="crow"><div class="cl1"><span class="kindtag">${CONTESTS[k].name}</span><span class="small muted">${new Date(c.t).toLocaleDateString("ja-JP")}</span></div>
+      <div class="cl2"><span><b>${ok}</b><span class="small muted">/${c.items.length} 問</span></span><span class="small muted">パフォーマンス</span>${rateSpan(c.perf[k])}
+      <span class="crate"><span class="small muted">レート</span> ${e ? rateSpan(e.rating) : ""} ${e && e.prev != null ? signed(e.rating - e.prev) : ""}</span></div></div>`;
+  }).join("")}</div>`;
+}
+// 実績:分類ごとに,進み具合(今の数 / 目標)と解除した日を出す
+function badgesHTML() {
+  const c = badgeCtx(), got = b => !!S.badges[b.id] || b.ok(c);
+  const total = BADGES.filter(got).length, pct = Math.round(100 * total / BADGES.length);
+  const fmt = v => (typeof v === "number" && v >= 10000 ? Math.round(v / 1000) + "k" : v);
+  return `<section class="rsec bsum"><div class="bsum-n"><b>${total}</b><span>/ ${BADGES.length}</span></div><div class="bsum-r"><div class="small muted">解除した実績(1つにつきコイン ${COIN.badge} 枚)</div><div class="pbar"><span style="width:${pct}%"></span></div></div></section>
+    ${BADGE_CATS.map(cat => {
+      const bs = BADGES.filter(b => b.cat === cat), done = bs.filter(got).length;
+      return `<section class="rsec"><h2>${cat} <span class="small muted">${done}/${bs.length}</span></h2><div class="badges">${bs.map(b => {
+        const g = got(b), [x, goal] = b.p(c), r = Math.max(0, Math.min(1, x / goal));
+        const when = S.badges[b.id] ? fmtDate(S.badges[b.id]) + " 解除" : "解除";
+        return `<div class="badge${g ? " got" : ""}"><b>${g ? "✓ " : ""}${esc(b.name)}</b><span>${esc(b.desc)}</span>
+          ${g ? `<span class="bwhen">${when}</span>` : goal > 1 ? `<span class="bprog"><span class="pbar"><span style="width:${(100 * r).toFixed(0)}%"></span></span><span class="bnum">${fmt(Math.min(x, goal))}/${fmt(goal)}</span></span>` : `<span class="bwhen muted">未解除</span>`}</div>`;
+      }).join("")}</div></section>`;
+    }).join("")}`;
+}
 function renderRecord() {
   const m = $("#main"), sk = streaks();
   const H = {}; Object.keys(SERIES).forEach(k => H[k] = history(k));
-  const rows = S.contests.slice().reverse().slice(0, 30).map(c => {
-    const k = c.kind || "all", e = H[k].find(x => x.t === c.t);
-    return `<tr><td>${new Date(c.t).toLocaleDateString("ja-JP")}</td><td>${CONTESTS[k].name}</td><td>${c.items.filter(x => x.ok).length}/${c.items.length}</td><td>${rateSpan(c.perf[k])}</td><td>${e ? rateSpan(e.rating) : ""}</td><td>${e && e.prev != null ? signed(e.rating - e.prev) : ""}</td></tr>`;
-  }).join("");
   const scores = (S.scores || []).slice().sort((a, b) => b.t - a.t);
   const scoreRows = scores.map(x => { const e = Rating.toeicEstimate(allPerfs(x.t + DAY)); return `<tr><td>${new Date(x.t).toLocaleDateString("ja-JP")}</td><td><b>${x.score}</b></td><td>${e ? e.score : "-"}</td><td>${e ? signed(x.score - e.score) : ""}</td><td><button class="btn ghost sm danger" data-sdel="${x.t}">削除</button></td></tr>`; }).join("");
-  const c = badgeCtx();
-  const badges = BADGES.map(b => {
-    const got = !!S.badges[b.id] || b.ok(c);
-    return `<div class="badge${got ? " got" : ""}"><b>${esc(b.name)}</b><span>${esc(b.desc)}</span></div>`;
-  }).join("");
   // 苦手な定理:解いた回数が3回以上で,正答率の低い順
   const weak = Object.keys(THM).map(k => {
     let ac = 0, wa = 0;
@@ -27,47 +46,36 @@ function renderRecord() {
   }).filter(x => x.n >= 3 && x.rate < 0.8).sort((a, b) => a.rate - b.rate || b.n - a.n).slice(0, 5);
   const weakHTML = weak.length ? `<div class="weak">${weak.map(x => `<div class="wrow"><span class="wn">${esc(THM[x.k].name)}</span><span class="small muted">正答率 ${Math.round(100 * x.rate)}%(${x.n}回)</span><button class="btn ghost sm" data-go="thm" data-thm="${x.k}">練習</button></div>`).join("")}</div>`
     : `<p class="muted small">文法を解いていくと,正答率の低い定理がここに出ます(3回以上解いた定理が対象).</p>`;
-  m.innerHTML = `
+  const sec = (title, body, note) => `<section class="rsec"><h2>${title}</h2>${note ? `<p class="small muted rnote">${note}</p>` : ""}${body}</section>`;
+  const tabs = `<div class="seg rtabs" role="tablist" aria-label="記録の種類">${Object.entries(REC_TABS).map(([k, v]) => `<button role="tab" data-rtab="${k}" aria-pressed="${recTab === k}" aria-selected="${recTab === k}">${v}</button>`).join("")}</div>`;
+  let body = "";
+  if (recTab === "score") body = `
     ${heroHTML()}
     ${toeicHTML()}
     <div class="ratings">${ratingCells()}</div>
+    ${sec("レートの推移", `<div class="seg sm" role="group" aria-label="系列">${Object.keys(SERIES).map(k => `<button data-k="${k}" aria-pressed="${chartKey === k}">${SERIES[k]}</button>`).join("")}</div><div class="chart" id="chart"></div>`)}
+    ${sec("本番の履歴", contestListHTML(H), S.contests.length > 30 ? "新しい30回を表示しています." : "")}
+    ${sec("目標の点数", `<div class="row sform"><input type="number" id="goal-v" class="search" min="10" max="990" step="5" value="${toeicGoal()}" inputmode="numeric" aria-label="目標の点数"><button class="btn ghost" id="goal-set">変更する</button></div>`)}
+    ${sec("実際の TOEIC の点数", `<div class="row sform"><input type="number" id="sc-score" class="search" min="10" max="990" step="5" placeholder="点数(10〜990)" inputmode="numeric" aria-label="点数"><input type="date" id="sc-date" class="search" value="${dateKey(Date.now())}" aria-label="受けた日"><button class="btn" id="sc-add">記録する</button></div>
+      ${scoreRows ? `<div class="tscroll"><table><thead><tr><th>日付</th><th>実際</th><th>その時の推定</th><th>差</th><th></th></tr></thead><tbody>${scoreRows}</tbody></table></div>` : ""}`, "公式問題集や本番の点数を入れると,その日までの本番の出来と比べて,推定スコアを補正します(新しい記録ほど重く).")}
+    ${S.legacy ? `<p class="small muted">旧方式(Elo)の本番 ${S.legacy.history.length} 回分の記録は,レート計算方式の変更により新しいレートには含めていません.</p>` : ""}`;
+  else if (recTab === "study") body = `
     <div class="streak"><div><b>${sk.cur}</b><span>日連続</span></div><div><b>${sk.max}</b><span>最長連続</span></div><div><b>${sk.total}</b><span>学習日数</span></div></div>
-    <h2>学習の記録(草)</h2>
-    <div class="seg sm" role="group" aria-label="数える対象">${[["ac", "AC した数"], ["all", "解いた数"]].map(([k, v]) => `<button data-hm="${k}" aria-pressed="${hmKey === k}">${v}</button>`).join("")}</div>
-    ${heatmapHTML()}
-    <h2>日ごとの記録</h2>
-    ${dailyControlsHTML()}
-    <div class="chart" id="daily"></div>
-    <p class="small muted" id="daily-sum"></p>
-    <h2>難易度の推定</h2>
-    ${estHTML()}
-    <h2>目標の点数</h2>
-    <div class="row sform"><input type="number" id="goal-v" class="search" min="10" max="990" step="5" value="${toeicGoal()}" inputmode="numeric"><button class="btn ghost" id="goal-set">変更する</button></div>
-    <h2>実際の TOEIC の点数</h2>
-    <p class="small muted">公式問題集や本番の点数を入れると,その日までの本番の出来と比べて,推定スコアを補正します(新しい記録ほど重く).</p>
-    <div class="row sform"><input type="number" id="sc-score" class="search" min="10" max="990" step="5" placeholder="点数(10〜990)" inputmode="numeric"><input type="date" id="sc-date" class="search" value="${dateKey(Date.now())}"><button class="btn" id="sc-add">記録する</button></div>
-    ${scoreRows ? `<div style="overflow-x:auto"><table><thead><tr><th>日付</th><th>実際</th><th>その時の推定</th><th>差</th><th></th></tr></thead><tbody>${scoreRows}</tbody></table></div>` : ""}
-    <h2>苦手な定理</h2>
-    ${weakHTML}
-    <h2>レートの推移</h2>
-    <div class="seg sm" role="group" aria-label="系列">${Object.keys(SERIES).map(k => `<button data-k="${k}" aria-pressed="${chartKey === k}">${SERIES[k]}</button>`).join("")}</div>
-    <div class="chart" id="chart"></div>
-    <h2>本番の履歴</h2>
-    ${rows ? `<div style="overflow-x:auto"><table><thead><tr><th>日付</th><th>種類</th><th>正解</th><th>パフォーマンス</th><th>レート</th><th>変動</th></tr></thead><tbody>${rows}</tbody></table></div>`
-           : `<p class="muted small">まだありません.まずは1回本番に挑戦して,今の位置を測りましょう.</p>`}
-    <h2>実績 <span class="small muted">${BADGES.filter(b => S.badges[b.id] || b.ok(c)).length}/${BADGES.length}</span></h2>
-    <div class="badges">${badges}</div>
-    ${S.legacy ? `<p class="small muted" style="margin-top:16px">旧方式(Elo)の本番 ${S.legacy.history.length} 回分の記録は,レート計算方式の変更により新しいレートには含めていません.</p>` : ""}
-    <h2>端末間の同期</h2>
-    <div id="sync-box">${syncHTML()}</div>
-    <h2>データの引き継ぎ</h2>
-    <p class="small muted">進捗はこの端末のブラウザに保存されます.ログインしない場合は,書き出したファイルを別の端末で読み込むと,その端末の記録と合わせられます.</p>
-    <div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>
-    <h2>データの削除</h2>
-    <p class="small muted">消したデータは元に戻せません.念のため,先に「書き出す」でバックアップを取っておくと安心です.</p>
-    <div class="dels">${Object.entries(DELETE).map(([k, d]) => `<div class="del"><div><b>${d.name}</b><span class="small muted">${d.desc}</span></div><button class="btn ghost sm danger" data-del="${k}">削除</button></div>`).join("")}</div>`;
+    ${sec("草", `<div class="seg sm" role="group" aria-label="数える対象">${[["ac", "AC した数"], ["all", "解いた数"]].map(([k, v]) => `<button data-hm="${k}" aria-pressed="${hmKey === k}">${v}</button>`).join("")}</div>${heatmapHTML()}`)}
+    ${sec("日ごとの記録", `${dailyControlsHTML()}<div class="chart" id="daily"></div><p class="small muted" id="daily-sum"></p>`)}
+    ${sec("進捗(今 AC の問題)", progressHTML())}
+    ${sec("苦手な定理", weakHTML)}`;
+  else if (recTab === "badge") body = badgesHTML();
+  else if (recTab === "est") body = sec("難易度の推定", estHTML());
+  else body = `
+    ${sec("端末間の同期", `<div id="sync-box">${syncHTML()}</div>`)}
+    ${sec("データの引き継ぎ", `<div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>`, "進捗はこの端末のブラウザに保存されます.ログインしない場合は,書き出したファイルを別の端末で読み込むと,その端末の記録と合わせられます.")}
+    ${sec("データの削除", `<div class="dels">${Object.entries(DELETE).map(([k, d]) => `<div class="del"><div><b>${d.name}</b><span class="small muted">${d.desc}</span></div><button class="btn ghost sm danger" data-del="${k}">削除</button></div>`).join("")}</div>`, "消したデータは元に戻せません.念のため,先に「書き出す」でバックアップを取っておくと安心です.")}`;
+  m.innerHTML = tabs + body;
+  m.querySelectorAll("[data-rtab]").forEach(b => b.onclick = () => { recTab = b.dataset.rtab; renderRecord(); toTop(); });
   m.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { chartKey = b.dataset.k; renderRecord(); });
-  $("#exp-btn").onclick = exportData;
+  const on = (sel, f) => { const el = $(sel); if (el) el.onclick = f; };
+  on("#exp-btn", exportData);
   m.querySelectorAll("[data-del]").forEach(b => b.onclick = () => deleteData(b.dataset.del));
   m.querySelectorAll("[data-hm]").forEach(b => b.onclick = () => { hmKey = b.dataset.hm; renderRecord(); });
   m.querySelectorAll("[data-dly]").forEach(b => b.onclick = () => {
@@ -79,34 +87,30 @@ function renderRecord() {
   const est = $("#est-toggle");
   if (est) est.onchange = () => { S.prefs.estD = est.checked; save(); applyEstD(); renderRecord(); toast(est.checked ? "推定した難易度を使います." : "元の難易度に戻しました."); };
   m.querySelectorAll("[data-estq]").forEach(b => b.onclick = () => { const x = Q_BY.get(b.dataset.estq); startSolve(x.dom, x.dom === "reading" ? Q_PASSAGE.get(x.q.id).id : x.q.id, null, "", "record"); });
-  $("#sc-add").onclick = () => {
+  on("#sc-add", () => {
     const v = Math.round(+$("#sc-score").value / 5) * 5, d = $("#sc-date").value;
     if (!(v >= 10 && v <= 990) || !d) { toast("点数(10〜990)と日付を入れてください."); return; }
     S.scores = (S.scores || []).concat({ t: new Date(d + "T12:00:00").getTime(), score: v }); save(); renderRecord();
     toast(`${v} 点を記録しました.`);
-  };
+  });
   m.querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => {
     if (!confirm("この点数の記録を削除しますか?")) return;
     S.scores = S.scores.filter(x => String(x.t) !== b.dataset.sdel);
     S.del = Object.assign({}, S.del, { scores: [...((S.del && S.del.scores) || []), +b.dataset.sdel] }); // 他の端末から復活させない
     save(); renderRecord();
   });
-  $("#imp-file").onchange = e => { const f = e.target.files[0]; if (f) importData(f); };
-  $("#goal-set").onclick = () => {
+  const imp = $("#imp-file"); if (imp) imp.onchange = e => { const f = e.target.files[0]; if (f) importData(f); };
+  on("#goal-set", () => {
     const v = Math.round(+$("#goal-v").value / 5) * 5;
     if (!(v >= 10 && v <= 990)) { toast("10〜990 の点数を入れてください."); return; }
     S.goal = { v, t: Date.now() }; save(); renderRecord(); toast(`目標を ${v} 点にしました.`);
-  };
+  });
   bindSync();
   bindGo();
   const box = $("#chart");
-  box.dataset.w = box.clientWidth;
-  drawChart(box, chartKey);
-  if (chartRO) chartRO.observe(box);
+  if (box) { box.dataset.w = box.clientWidth; drawChart(box, chartKey); if (chartRO) chartRO.observe(box); }
   const dbox = $("#daily");
-  dbox.dataset.w = dbox.clientWidth;
-  drawDaily(dbox);
-  if (chartRO) chartRO.observe(dbox);
+  if (dbox) { dbox.dataset.w = dbox.clientWidth; drawDaily(dbox); if (chartRO) chartRO.observe(dbox); }
 }
 /* 日ごとの記録:日ごとの解いた数・AC 数・新しく AC した数(初めて正解できた問題の数)を棒で並べる.分野で絞れる */
 const DAILY = { span: 30, dom: "all", metric: "n" };

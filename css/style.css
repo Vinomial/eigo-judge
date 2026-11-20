@@ -456,3 +456,41 @@ nav button[aria-current="page"] svg { background: color-mix(in srgb, var(--accen
 .coin svg circle:first-child, .coinbig svg circle:first-child { fill: #F3C64B; stroke: #C9971C; }
 .coin svg circle + circle, .coinbig svg circle + circle { stroke: #C9971C; fill: none; }
 .btn svg circle:first-child { fill: none; }
+
+/* ================= 記録の画面 =================
+   上のタブで項目を分け,項目ごとにカード(.rsec)にまとめる */
+.rtabs { display: flex; width: 100%; position: sticky; top: 0; z-index: 6; margin-bottom: 12px; box-shadow: 0 4px 10px color-mix(in srgb, var(--bg) 80%, transparent); }
+.rtabs button { flex: 1 1 0; padding: 8px 4px; min-width: 0; }
+.rsec { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 4px 14px 14px; margin-bottom: 12px; }
+.rsec > h2 { margin: 12px 0 8px; font-size: 1rem; display: flex; align-items: baseline; gap: 8px; }
+.rnote { margin: -2px 0 10px; }
+.rsec .chart { margin-top: 6px; }
+.rsec .weak .wrow, .rsec .del { box-shadow: none; border: 1px solid var(--line); }
+.rsec .dels { gap: 6px; }
+.rsec .sform { margin-bottom: 4px; }
+/* 本番の履歴 */
+.clist { display: grid; gap: 6px; }
+.crow { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; }
+.cl1 { display: flex; align-items: center; gap: 8px; }
+.cl2 { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.cl2 > span:first-child { margin-right: 6px; }
+.crate { margin-left: auto; white-space: nowrap; }
+.kindtag { font-size: .75rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+/* 実績 */
+.bsum { display: flex; align-items: center; gap: 14px; padding-top: 14px; }
+.bsum-n { display: flex; align-items: baseline; gap: 4px; }
+.bsum-n b { font-size: 2rem; line-height: 1; }
+.bsum-n span { color: var(--muted); }
+.bsum-r { flex: 1; min-width: 0; }
+.bsum-r .pbar { margin-top: 6px; }
+.rsec .badges { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.badge { border-radius: 12px; gap: 2px; padding: 10px; }
+.badge b { font-size: .92rem; line-height: 1.35; }
+.badge span { line-height: 1.4; }
+.badge.got b { color: var(--ac); }
+.bwhen { margin-top: auto; padding-top: 4px; font-size: .72rem; }
+.bprog { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 6px; }
+.bprog .pbar { flex: 1; height: 6px; }
+.bprog .pbar > span { background: var(--accent); }
+.bnum { font-size: .72rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 400px) { .rsec .badges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
