@@ -2041,5 +2041,178 @@ window.READING = [
       { id: "r92q2", q: "Which employee will most likely NOT be able to get a permit?", c: ["One who lives one kilometer away and drives alone", "One who lives ten kilometers away", "One who shares rides with three coworkers", "One who applies on June 10"], a: 0, ev: [2,  3], d: 1600, why: "2キロ以内に住む人は対象外.ただし相乗りなら優先される.1キロで1人で通う人は,どちらの条件でも許可が出ない.条件を組み合わせて考える問題.", x: ["", "2キロより遠いので対象になる.", "2人以上と相乗りすれば,距離にかかわらず優先される.", "締め切りの6月15日より前なので問題ない."] },
       { id: "r92q3", q: "What is indicated about employees who share rides to work?", c: ["They will be given preference for permits.", "They must live within two kilometers.", "They do not need to apply.", "They must park outside the garage."], a: 0, ev: [3], d: 1500, why: "carpool ... will receive priority.priority を preference と言い換えている.", x: ["", "距離の条件はない(regardless of distance).", "申請が不要とは書かれていない.", "駐車場の外に止めるとは書かれていない."] }
     ]
+  },
+
+  // ---- 長文の追加(r93〜r100) ----
+  {
+    id: "r93",
+    kind: "お知らせ",
+    title: "Notice — Parkview Apartments Gym Rules",
+    target: 90,
+    s: [
+      "The residents' gym on the ground floor is open from 6:00 A.M. to 10:00 P.M. every day.",
+      "Please wipe down all machines after use.",
+      "Children under 16 must be accompanied by an adult.",
+      "Guests are welcome, but each resident may bring no more than one guest at a time.",
+      "If a machine is broken, please report it to the front desk rather than trying to fix it yourself."
+    ],
+    ja: "1階の住民用ジムは毎日午前6時から午後10時まで開いている.使った後はすべての器具をふくこと.16歳未満は大人の付き添いが必要.来客も利用できるが,住民1人につき同時に1人まで.器具が壊れていたら,自分で直そうとせず受付に知らせること.",
+    qs: [
+      { id: "r93q1", q: "What are users asked to do after using a machine?", c: ["Turn it off", "Clean it", "Report it to the front desk", "Write their name on a list"], a: 1, ev: [1], d: 300, why: "wipe down all machines after use.ふく = 掃除する(clean).", x: ["電源を切るようには書かれていない.", "", "受付に知らせるのは,器具が壊れていたとき.", "名前を書く話は出てこない."] },
+      { id: "r93q2", q: "Who must come with an adult?", c: ["All guests", "Residents over 16", "Children under 16", "New residents"], a: 2, ev: [2], d: 300, why: "Children under 16 must be accompanied by an adult.", x: ["来客は住民1人につき1人まで.大人の付き添いの話ではない.", "16歳以上は付き添い不要.", "", "新しい住民の話は出てこない."] },
+      { id: "r93q3", q: "What is indicated about guests?", c: ["They must pay a fee.", "They cannot use the gym.", "A resident can bring only one at a time.", "They must arrive before 6:00 A.M."], a: 2, ev: [3], d: 500, why: "no more than one guest at a time(同時に1人まで).", x: ["料金の話は出てこない.", "Guests are welcome(歓迎)とあり,使える.", "", "午前6時は開く時刻で,来客の条件ではない."] }
+    ]
+  },
+  {
+    id: "r94",
+    kind: "チャット",
+    title: "Online chat — Lena Park, Omar Said, Kate Lin",
+    target: 120,
+    s: [
+      "Lena Park [11:02 A.M.]: The printer on our floor is jammed again. Has anyone called maintenance?",
+      "Omar Said [11:04 A.M.]: I did, about an hour ago. They said someone would come after lunch.",
+      "Kate Lin [11:05 A.M.]: I need to print 40 copies of the training handout for 1:00. That won't work.",
+      "Omar Said [11:06 A.M.]: You could use the printer on the fourth floor. It's working fine.",
+      "Kate Lin [11:07 A.M.]: Good idea, but I don't have access to that floor.",
+      "Lena Park [11:08 A.M.]: I do. Send me the file, and I'll print them for you right now."
+    ],
+    ja: "パーク [11:02]:この階のプリンターがまた詰まった.だれか保守に電話した? サイード [11:04]:1時間ほど前にしたよ.昼食の後に来るって. リン [11:05]:1時までに研修の配布資料を40部印刷しないといけないの.それじゃ間に合わない. サイード [11:06]:4階のプリンターを使えば? ちゃんと動いてるよ. リン [11:07]:いい考えだけど,その階に入る権限がないの. パーク [11:08]:私はある.ファイルを送って.今すぐ印刷してあげる.",
+    qs: [
+      { id: "r94q1", q: "What problem do the writers discuss?", c: ["A printer is not working.", "A training session was canceled.", "The fourth floor is closed.", "A file was deleted."], a: 0, ev: [0], d: 300, why: "The printer on our floor is jammed again.プリンターが詰まって使えない.", x: ["", "研修が中止になったとは書かれていない(1時の研修の資料を作っている).", "4階のプリンターは動いており,階が閉鎖されたわけではない.", "ファイルが消えた話は出てこない."] },
+      { id: "r94q2", q: "At 11:05 A.M., what does Ms. Lin mean when she writes, \"That won't work\"?", c: ["The repair will be too expensive.", "The maintenance staff will arrive too late for her.", "The printer cannot print 40 copies.", "She does not know how to use the printer."], a: 1, ev: [1, 2], d: 900, why: "保守の人は昼食の後に来るが,リンさんは1時までに印刷が必要.だから間に合わない,という意味.", x: ["費用の話はしていない.", "", "部数が多すぎるという話ではない(4階のプリンターでなら印刷できる).", "使い方が分からないとは言っていない."] },
+      { id: "r94q3", q: "What will Ms. Park most likely do next?", c: ["Call maintenance again", "Give Ms. Lin a key", "Print the handouts on the fourth floor", "Cancel the training"], a: 2, ev: [3, 5], d: 700, why: "パークさんは4階に入れる.Send me the file, and I'll print them for you.4階のプリンターで印刷する.", x: ["保守にはすでにサイードさんが電話している.", "鍵を渡すとは言っていない.自分で印刷すると言っている.", "", "研修を取り消すとは言っていない."] }
+    ]
+  },
+  {
+    id: "r95",
+    kind: "メール",
+    title: "From: Greenline Bus Company / To: Monthly pass holders / Subject: Fare changes",
+    target: 140,
+    s: [
+      "Dear passengers,",
+      "From April 1, the price of a monthly bus pass will rise from $60 to $66.",
+      "This is the first increase in five years and is necessary to cover higher fuel and maintenance costs.",
+      "Passes purchased before April 1 will remain valid until their expiration dates at the old price.",
+      "Students and riders over 65 will continue to receive a 50 percent discount.",
+      "In addition, we are adding ten new electric buses to the Route 4 line this spring, which will reduce waiting times during rush hour.",
+      "Thank you for riding with Greenline."
+    ],
+    ja: "乗客の皆様.4月1日から,バスの1か月定期券の値段が60ドルから66ドルに上がります.5年ぶりの値上げで,燃料費と整備費の上昇をまかなうために必要です.4月1日より前に買った定期券は,有効期限まで旧価格のまま使えます.学生と65歳以上の方は,引き続き50%引きです.また,この春,4号線に新しい電気バスを10台加え,混雑する時間の待ち時間を短くします.",
+    qs: [
+      { id: "r95q1", q: "Why is the price of the monthly pass increasing?", c: ["To pay for new bus stops", "Because of rising operating costs", "To reduce the number of passengers", "Because of a new tax"], a: 1, ev: [2], d: 600, why: "to cover higher fuel and maintenance costs.燃料費と整備費 = 運行の費用(operating costs)の上昇.", x: ["バス停を作る話は出てこない.", "", "乗客を減らすためではない.", "税金の話は出てこない."] },
+      { id: "r95q2", q: "How much will a student pay for a monthly pass after April 1?", c: ["$30", "$33", "$60", "$66"], a: 1, ev: [1, 4], d: 900, why: "4月1日からの値段は66ドル.学生は50%引きなので 66 ÷ 2 = 33ドル.", x: ["旧価格60ドルの半額.4月1日以降は新価格で計算する.", "", "割引前の旧価格.", "割引前の新価格.学生は50%引きになる."] },
+      { id: "r95q3", q: "What is suggested about Route 4?", c: ["It will be closed in spring.", "It is crowded at certain times.", "Its buses will run less often.", "It is the oldest route."], a: 1, ev: [5], d: 1000, why: "電気バスを加えて「混雑する時間(rush hour)の待ち時間を短くする」とあるので,その時間は混んでいると読み取れる.", x: ["閉鎖ではなく,バスを増やす.", "", "バスを増やすので,本数はむしろ増える.", "いちばん古い路線だとは書かれていない."] }
+    ]
+  },
+  {
+    id: "r96",
+    kind: "表とメール",
+    title: "Sunnyside Catering — Lunch Menu Packages",
+    target: 170,
+    s: [
+      { t: "table", head: ["Package", "Price per person", "Includes", "Minimum order"], rows: [
+        ["Basic", "$12", "Sandwich, drink", "10 people"],
+        ["Standard", "$18", "Sandwich, salad, drink", "10 people"],
+        ["Deluxe", "$25", "Hot meal, salad, dessert, drink", "20 people"]
+      ] },
+      "Vegetarian options are available for every package at no extra cost.",
+      "Orders must be placed at least three business days in advance.",
+      { t: "doc", title: "E-mail — From: Paul Grant / To: Sunnyside Catering / Date: Monday, June 2" },
+      "Hello,",
+      "We are holding a training day for 15 new employees on Friday, June 6, and would like to order lunch.",
+      "We would like to offer our staff a salad with their meal, and three of them do not eat meat.",
+      "Our budget is $20 per person. Please let me know if this is possible."
+    ],
+    ja: "[表:ベーシック 1人12ドル サンドイッチ・飲み物 最少10人,スタンダード 18ドル サンドイッチ・サラダ・飲み物 10人,デラックス 25ドル 温かい料理・サラダ・デザート・飲み物 20人] どのパッケージでも,追加料金なしで菜食の料理を選べる.注文は3営業日前までに.[メール:6月2日(月) グラントさんから] 6月6日(金)に新入社員15人の研修日があり,昼食を注文したい.食事にサラダを付けたい.3人は肉を食べない.予算は1人20ドル.可能か知らせてほしい.",
+    qs: [
+      { id: "r96q1", q: "Which package will Mr. Grant most likely order?", c: ["Basic", "Standard", "Deluxe", "None of them"], a: 1, ev: [6, 7, [0, 1]], d: 900, why: "条件はサラダ付き・1人20ドル以内・15人.Standard(18ドル,サラダ付き,最少10人)がすべて満たす.Deluxe は25ドルで予算を超え,最少20人にも足りない.", x: ["Basic にはサラダが付いていない.", "", "Deluxe は1人25ドルで予算(20ドル)を超え,最少人数20人にも届かない.", "Standard が条件を満たすので,どれも合わないわけではない."] },
+      { id: "r96q2", q: "What is indicated about the employees who do not eat meat?", c: ["They must pay extra.", "They can get a vegetarian meal at no additional charge.", "They need to bring their own lunch.", "They must order the Deluxe package."], a: 1, ev: [1, 6], d: 700, why: "Vegetarian options are available for every package at no extra cost.どのパッケージでも追加料金なしで菜食を選べる.", x: ["追加料金はかからない.", "", "自分で昼食を持ってくる必要はない.", "どのパッケージでも菜食を選べる."] },
+      { id: "r96q3", q: "Can Mr. Grant's order be accepted?", c: ["No, because it is too late to order", "Yes, because it was sent at least three business days early", "No, because the group is too small", "Yes, but only for the Basic package"], a: 1, ev: [2, 3, 5], d: 1200, why: "注文は3営業日前まで.メールは6月2日(月)で,研修は6月6日(金).火・水・木の3営業日があるので間に合う.", x: ["月曜に頼めば金曜には間に合う(3営業日前の条件を満たす).", "", "15人は Standard の最少10人を満たしている.", "Standard も頼める."] }
+    ]
+  },
+  {
+    id: "r97",
+    kind: "記事",
+    title: "Regional Business News — Bookstore Finds New Life as Community Hub",
+    target: 180,
+    s: [
+      "When online sales threatened to close Harbor Books in 2022, owner Rita Gomez decided to change her approach rather than give up.",
+      "She turned half of the shop into a café and began hosting free events, including author talks, children's reading hours, and a monthly book club.",
+      "Within a year, the number of visitors had doubled, and book sales had risen by 30 percent.",
+      "\"People don't just come to buy books anymore,\" Ms. Gomez said. \"They come to meet each other.\"",
+      "The café now accounts for about 40 percent of the store's income.",
+      "Ms. Gomez admits that running a café was harder than she expected, especially finding staff who could make good coffee.",
+      "She is now considering opening a second location in the neighboring town of Westfield, where the only bookstore closed last year."
+    ],
+    ja: "2022年,ネット販売のせいでハーバー書店が閉店しそうになったとき,店主のゴメス氏はあきらめず,やり方を変えることにした.店の半分をカフェにし,著者の講演,子ども向けの読み聞かせ,月1回の読書会などの無料の催しを始めた.1年のうちに来店者は2倍になり,本の売上は30%増えた.「今はもう本を買うためだけに来るのではない.人と会うために来る」とゴメス氏は話す.カフェは今,店の収入の約40%を占める.ゴメス氏は,カフェの運営は思ったより大変で,特においしいコーヒーをいれられる人を見つけるのが難しかったと認める.今は,昨年唯一の書店が閉店した隣町ウェストフィールドに2号店を開くことを考えている.",
+    qs: [
+      { id: "r97q1", q: "Why did Ms. Gomez change her business?", c: ["She wanted to retire.", "Her store was losing customers to online sellers.", "She bought a café.", "The building was sold."], a: 1, ev: [0], d: 700, why: "online sales threatened to close Harbor Books.ネット販売に客を取られ,閉店しそうだった.", x: ["引退したかったとは書かれていない(むしろ続けた).", "", "カフェを買ったのではなく,店の半分をカフェにした.", "建物が売られた話は出てこない."] },
+      { id: "r97q2", q: "What does Ms. Gomez say was difficult?", c: ["Finding authors for events", "Hiring skilled café workers", "Paying the rent", "Selling children's books"], a: 1, ev: [5], d: 900, why: "finding staff who could make good coffee.おいしいコーヒーをいれられる人 = 腕のいいカフェの店員を見つけること.", x: ["著者を探すのが大変だったとは書かれていない.", "", "家賃の話は出てこない.", "子どもの本の売れ行きの話は出てこない."] },
+      { id: "r97q3", q: "Why might Westfield be a good place for a second store?", c: ["It has many cafés.", "Ms. Gomez lives there.", "It currently has no bookstore.", "Rent is cheaper there."], a: 2, ev: [6], d: 1200, why: "where the only bookstore closed last year.唯一の書店が閉店したので,今は書店がない(競合がいない).理由ははっきり書かれていないので,事実から推測する.", x: ["カフェが多いとは書かれていない.", "ゴメス氏がそこに住んでいるとは書かれていない.", "", "家賃の話は出てこない."] }
+    ]
+  },
+  {
+    id: "r98",
+    kind: "グラフつき報告",
+    title: "Lakeside Hotel — Guest Survey Results (Third Quarter)",
+    target: 160,
+    s: [
+      "We asked 500 guests to rate our services on a scale of 1 to 5.",
+      { t: "bar", cap: "Average rating (1–5)", items: [["Room cleanliness", 4.6], ["Front desk", 4.4], ["Breakfast", 3.1], ["Wi-Fi", 2.7], ["Location", 4.8]] },
+      "Guests were very satisfied with the location and the cleanliness of the rooms.",
+      "However, the Wi-Fi received the lowest score, with many guests reporting that the connection was slow in the evenings.",
+      "To address this, a faster Internet service will be installed throughout the hotel in October.",
+      "Breakfast also received mixed reviews; several guests mentioned that the menu offered few choices.",
+      "The kitchen team is currently testing a new menu, which will be introduced next month."
+    ],
+    ja: "500人の宿泊客に,サービスを1〜5で評価してもらった.[グラフ:平均の評価 部屋の清潔さ4.6,受付4.4,朝食3.1,Wi-Fi 2.7,立地4.8] 客は立地と部屋の清潔さにとても満足していた.しかし Wi-Fi は最も低い評価で,夜に接続が遅いという声が多かった.対策として,10月にホテル全体により速いインターネットを入れる.朝食も評価が分かれ,数人の客がメニューの選択肢が少ないと述べた.調理チームは今,新しいメニューを試しており,来月から出す.",
+    qs: [
+      { id: "r98q1", q: "Which service received the highest rating?", c: ["Room cleanliness", "Front desk", "Breakfast", "Location"], a: 3, ev: [[1, 4]], d: 400, why: "グラフで最も長い棒は Location(4.8).", x: ["部屋の清潔さは4.6で2番目.", "受付は4.4.", "朝食は3.1で低い方.", ""] },
+      { id: "r98q2", q: "What did many guests say about the Wi-Fi?", c: ["It was too expensive.", "It was not available in rooms.", "It was slow at certain times.", "It required a password."], a: 2, ev: [3], d: 600, why: "the connection was slow in the evenings.夜(ある時間帯)に遅かった.", x: ["料金の話は出てこない.", "部屋で使えないとは書かれていない.", "", "パスワードの話は出てこない."] },
+      { id: "r98q3", q: "What will the hotel do next month?", c: ["Install faster Internet", "Introduce a new breakfast menu", "Renovate the rooms", "Survey more guests"], a: 1, ev: [6], d: 900, why: "新しいメニューは will be introduced next month(来月から出す).インターネットは10月の予定で,来月とは書かれていない.", x: ["インターネットは「10月に」入れる.来月の予定として書かれているのは朝食のメニュー.", "", "部屋の改装の話は出てこない.", "追加の調査の話は出てこない."] }
+    ]
+  },
+  {
+    id: "r99", part6: true,
+    kind: "Part 6 お知らせ",
+    title: "Notice — Change in Office Supply Ordering",
+    target: 140,
+    s: [
+      "Starting May 1, all orders for office supplies must be [1] through the new online system.",
+      "Paper order forms will no longer be accepted.",
+      "[2]",
+      "Each department has been given a monthly budget, and the system will not allow orders that [3] that amount.",
+      "If you need more supplies than your budget allows, please ask your manager to contact Purchasing.",
+      "Training sessions on the new system will be held next week. Please sign up [4] as space is limited."
+    ],
+    ja: "5月1日から,事務用品の注文はすべて新しいオンラインの仕組みで出さなければならない.紙の注文用紙は受け付けなくなる.[ログインには,いつもの社員番号とパスワードを使う.] 各部署には毎月の予算があり,その額を超える注文はできないようになっている.予算より多くの備品が必要なら,部長から購買部に連絡してもらうこと.新しい仕組みの研修を来週開く.定員があるので早めに申し込むこと.",
+    qs: [
+      { id: "r99q1", q: "(1)", c: ["submit", "submitted", "submitting", "submission"], a: 1, ev: [0], d: 700, why: "注文は「出される」側.must be + 過去分詞 で受動態.", x: ["be の後ろに原形は置けない.", "", "be submitting だと注文が(何かを)出すことになる.", "名詞を置くと「注文は提出である」になり,through 以下とつながらない."] },
+      { id: "r99q2", q: "(2)", c: ["To log in, use your usual employee number and password.", "The old system worked very well.", "Office supplies will be free next month.", "Purchasing is located on the second floor."], a: 0, ev: [0, 1, 2], d: 1000, why: "前の文は新しいオンラインの仕組みの話.その使い方(ログイン方法)を続けるのが自然.", x: ["", "古い仕組みをほめる文は,変更を知らせる流れに合わない.", "無料になる話は,後ろの予算の話と矛盾する.", "購買部の場所は,前後の注文方法の話とつながらない."] },
+      { id: "r99q3", q: "(3)", c: ["exceed", "exceeds", "excess", "exceeding"], a: 0, ev: [3], d: 900, why: "先行詞 orders(複数)を受ける関係代名詞 that の後ろなので,複数に合わせた動詞 exceed.", x: ["", "先行詞 orders は複数なので -s は付けない.", "excess は名詞・形容詞で,動詞の位置に置けない.", "that の後ろには動詞が必要.-ing だけでは動詞にならない."] },
+      { id: "r99q4", q: "(4)", c: ["early", "lately", "earlier than", "soon after"], a: 0, ev: [5], d: 800, why: "定員があるので「早めに」申し込む.early.", x: ["", "lately は「最近」で,勧める内容に合わない.", "earlier than の後ろに比較の相手がない.", "soon after の後ろには基準になる出来事が必要."] }
+    ]
+  },
+  {
+    id: "r100", part6: true,
+    kind: "Part 6 メール",
+    title: "From: Mia Torres / To: Alan Chen / Subject: Conference room booking",
+    target: 140,
+    s: [
+      "Dear Mr. Chen,",
+      "I am writing to confirm your booking of Conference Room B for Thursday, March 14, from 2:00 to 5:00 P.M.",
+      "The room can [1] up to 25 people and is equipped with a projector and a video conferencing system.",
+      "[2], we would like to remind you that food and drinks are not allowed in the room.",
+      "Light refreshments can be served in the lounge next door [3] you request them in advance.",
+      "[4]",
+      "Best regards, Mia Torres, Facilities Coordinator"
+    ],
+    ja: "チェン様.3月14日(木)午後2時から5時までの会議室 B のご予約を確認します.部屋は25人まで入れ,プロジェクターとビデオ会議の設備があります.なお,部屋の中での飲食はできないことをお知らせします.前もってご依頼いただければ,隣のラウンジで軽食をお出しできます.[予約の変更や取り消しは,前日の正午までにご連絡ください.] 施設担当 トーレス.",
+    qs: [
+      { id: "r100q1", q: "(1)", c: ["accommodate", "accommodation", "accommodating", "accommodated"], a: 0, ev: [2], d: 900, why: "can の後ろは動詞の原形.accommodate(収容する).", x: ["", "名詞は can の後ろに置けない.", "can の後ろに -ing は置けない.", "can の後ろに過去分詞は置けない."] },
+      { id: "r100q2", q: "(2)", c: ["Therefore", "However", "As a result", "For example"], a: 1, ev: [2, 3], d: 1000, why: "設備がそろっているという良い情報の後に,飲食できないという制限を伝える.逆の内容をつなぐ However.", x: ["Therefore(したがって)だと,設備があるから飲食禁止という因果になり,意味が通らない.", "", "As a result(その結果)も因果を表し,合わない.", "For example(例えば)は前の文の具体例のとき.飲食禁止は設備の例ではない."] },
+      { id: "r100q3", q: "(3)", c: ["unless", "if", "although", "despite"], a: 1, ev: [4], d: 800, why: "「前もって頼めば出せる」という条件なので if.", x: ["unless(〜しない限り)だと「頼まなければ出せる」になり,意味が逆.", "", "although(〜だけれども)では条件を表せない.", "despite は前置詞で,後ろに節を置けない."] },
+      { id: "r100q4", q: "(4)", c: ["Please let us know by noon the day before if you need to change or cancel your booking.", "The projector was broken last month.", "We hope you enjoyed the meal.", "Conference Room B is no longer available."], a: 0, ev: [5, 6], d: 1000, why: "予約の確認のメールの結び.変更・取り消しの連絡方法を伝える文が自然.", x: ["", "プロジェクターが壊れていた話は,設備がそろっているという前の内容と合わない.", "まだ会議の前なので,食事を楽しんだかを尋ねるのは不自然.", "予約を確認したばかりなので,使えないという内容と矛盾する."] }
+    ]
   }
 ];

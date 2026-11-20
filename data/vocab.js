@@ -771,6 +771,26 @@
     V("token", "n", "しるし・引換券", 1100, "Please accept this gift as a token of our thanks.", "感謝のしるしとしてこの贈り物をお受け取りください.", "as a token of 〜 で「〜のしるしとして」."),
     V("traditional", "a", "伝統的な・従来の", 500, "The restaurant serves traditional dishes.", "そのレストランは伝統的な料理を出す.", "", "tradition"),
 
+    // ---- 長文 r93〜r100 に出てくる語と,語尾の違う紛らわしい形容詞(文法 T68) ----
+    V("anymore", "d", "(否定文で)もう〜ない", 500, "The store does not sell newspapers anymore.", "その店はもう新聞を売っていない.", "not 〜 anymore の形で使う.no longer と同じ意味."),
+    V("jam", "v", "(機械が)詰まる・渋滞", 700, "The copier jams when the paper is wet.", "紙がしめっているとコピー機が詰まる.", "paper jam は「紙詰まり」,traffic jam は「交通渋滞」.", "jammed"),
+    V("lounge", "n", "休憩室・待合室", 600, "Coffee is served in the lounge.", "コーヒーは休憩室で出される.", "airport lounge は「空港の待合室」."),
+    V("vegetarian", "a", "菜食の・菜食主義者", 700, "The restaurant has many vegetarian dishes.", "そのレストランには菜食の料理が多い.", "vegetable(野菜)と同じ語源."),
+    V("considerate", "a", "思いやりのある", 1100, "It was considerate of you to call.", "電話をくれるなんて,思いやりがありますね.", "considerable(かなりの)と語尾が違う.人の性質を表す."),
+    V("reliant", "a", "(on と)頼っている", 1300, "The town is reliant on tourism.", "その町は観光に頼っている.", "be reliant on 〜.reliable(信頼できる)と区別する."),
+    V("successive", "a", "連続する", 1200, "Sales rose for three successive years.", "売上は3年連続で伸びた.", "successful(成功した)と語尾が違う.succeed の「後に続く」の意味から."),
+    V("respectful", "a", "礼儀正しい・敬意を払う", 1000, "Please be respectful to other guests.", "ほかのお客様には礼儀正しくしてください.", "respective(それぞれの)と語尾が違う."),
+    V("industrious", "a", "勤勉な・よく働く", 1300, "The new staff members are industrious.", "新しいスタッフは勤勉だ.", "industrial(産業の)と語尾が違う.人の性質を表す."),
+    V("imaginative", "a", "想像力豊かな", 1100, "She came up with an imaginative design.", "彼女は想像力豊かなデザインを考えた.", "imaginary(想像上の・架空の)と語尾が違う."),
+    V("comprehensible", "a", "理解できる・わかりやすい", 1400, "The manual should be comprehensible to beginners.", "説明書は初心者にもわかるものであるべきだ.", "comprehensive(包括的な)と語尾が違う."),
+    V("dependable", "a", "頼りになる", 1000, "We need a dependable delivery service.", "頼りになる配送業者が必要だ.", "depend(頼る)+ -able.reliable とほぼ同じ意味."),
+    V("invaluable", "a", "非常に貴重な", 1300, "Your advice was invaluable.", "あなたの助言はとても貴重だった.", "in- が付いても「価値がない」ではなく,「値段を付けられないほど貴重な」."),
+    V("favorable", "a", "好意的な・有利な", 1000, "The new product received favorable reviews.", "新製品は好意的な評価を受けた.", "favor(好意)+ -able."),
+    V("historic", "a", "歴史的に重要な", 1100, "The city signed a historic agreement.", "市は歴史的な協定に署名した.", "historical(歴史の・歴史に関する)と語尾が違う."),
+    V("historical", "a", "歴史の・史実の", 1100, "The museum holds historical documents.", "その博物館には歴史の資料がある."),
+    V("exhausted", "a", "疲れ切った・使い果たされた", 900, "After the long flight, I was exhausted.", "長い飛行の後,くたくただった.", "exhaustive(徹底的な)と語尾が違う."),
+    V("exhaustive", "a", "徹底的な・網羅的な", 1400, "The team conducted an exhaustive search.", "チームは徹底的な調査を行った."),
+
     // ---- TOEIC でよく出る語(600〜1100) ----
     V("achieve", "v", "成し遂げる", 600, "We achieved our sales goal this year.", "今年は売上目標を達成した.", "", "achievement"),
     V("agenda", "n", "議題(の一覧)", 700, "The first item on the agenda is the budget.", "議題の最初の項目は予算だ."),
@@ -2062,12 +2082,15 @@
     ratings: "rate", residential: "resident", unlimited: "limited", activities: "activity", texts: "text",
     disruption: "disrupt", entirety: "entire", entireness: "entire", knowledgeable: "knowledge", sustainably: "sustain",
     valuing: "value", waiver: "waive", automate: "automatic", automation: "automatic",
+    expiration: "expire", riders: "ride", rider: "ride",
     accessible: "access", additive: "add", appreciation: "appreciate", conversions: "convert", conversion: "convert", financial: "finance",
     forgot: "forget", organizers: "organize", organizer: "organize", preference: "prefer", shown: "show", suburban: "suburb"
   };
 
   // 取り違えやすい語の組(つづり・意味が似ている).単語問題で,片方の誤答の選択肢にもう片方を出す
   window.CONFUSE = [
+    ["considerable", "considerate"], ["respective", "respectful"], ["imaginary", "imaginative"], ["historic", "historical"],
+    ["exhausted", "exhaustive"], ["comprehensive", "comprehensible"],
     ["affect", "effect"], ["adopt", "adapt", "adept"], ["lend", "borrow"], ["rise", "raise"], ["personal", "personnel"],
     ["advise", "advice"], ["stationery", "stationary"], ["later", "latter"], ["principal", "principle"], ["council", "counsel"],
     ["device", "devise"], ["compliment", "complement"], ["respect", "respective"], ["access", "excess"], ["accept", "except", "expect"],
