@@ -27,8 +27,9 @@ const { tierOf, TIERS } = Rating;
 const LS_KEY = "eigo-judge-v1";
 function freshState() {
   // live: 解答中の本番(再読み込みやタブが閉じられても続きから再開・採点するため)
+  // owned: ショップで買ったテーマ { id: 買った時刻 }(js/theme.js.端末間で共有する)
   // wipe: 削除した時刻 { contests, results, all }.del.scores: 消した点数の時刻.goal: 目標の点数 { v, t }(端末間の同期で使う.js/merge.js)
-  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0, wipe: {}, del: {}, goal: null };
+  return { ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0, wipe: {}, del: {}, goal: null, owned: {} };
 }
 function migrate(o) {
   const s = freshState();
@@ -61,6 +62,8 @@ function save(fromSync) {
 /* ---------------- 共通 ---------------- */
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
+// 本文の枠(#scroller)の先頭に戻る.ページ全体はスクロールしない(index.html の .app を参照)
+function toTop() { const el = document.getElementById("scroller"); if (el) el.scrollTop = 0; }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function fmtSec(s) { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
@@ -325,15 +328,23 @@ const BADGES = [
 function checkBadges() {
   const c = badgeCtx(), fresh = BADGES.filter(b => !S.badges[b.id] && b.ok(c));
   if (!fresh.length) return;
-  fresh.forEach(b => { S.badges[b.id] = Date.now(); toast(`<b>実績解除</b> ${esc(b.name)}<br><span class="small">${esc(b.desc)}</span>`); });
+  fresh.forEach(b => { S.badges[b.id] = Date.now(); });
+  // 同時にいくつも解除したときは1枚の通知にまとめる(重なって画面を覆わないように)
+  toast(fresh.length === 1 ? `<b>実績解除</b> ${esc(fresh[0].name)}<br><span class="small">${esc(fresh[0].desc)}</span>`
+    : `<b>実績を ${fresh.length} 個解除</b><br><span class="small">${fresh.map(b => esc(b.name)).join(" · ")}</span>`);
   save();
 }
+// 通知は同時に2枚まで(古いものから消す).押すとすぐ消える
+const TOAST_MAX = 2;
 function toast(html) {
-  const el = document.createElement("div");
+  const box = $("#toasts"), el = document.createElement("div");
   el.className = "toast"; el.innerHTML = html;
-  $("#toasts").append(el);
-  setTimeout(() => el.classList.add("out"), 3800);
-  setTimeout(() => el.remove(), 4300);
+  const gone = () => { el.classList.add("out"); setTimeout(() => el.remove(), 400); };
+  el.onclick = gone;
+  box.append(el);
+  const live = [...box.children].filter(x => !x.classList.contains("out"));
+  live.slice(0, Math.max(0, live.length - TOAST_MAX)).forEach(x => x.click());
+  setTimeout(gone, 3800);
 }
 
 /* ---------------- 出題 ---------------- */

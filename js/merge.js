@@ -7,7 +7,7 @@
  *   - res(問題ごとの最後の結果)は時刻の新しい方.回数は大きい方と,合わせた att から数えた値の大きい方.
  *   - srs(単語の復習)は最後に解いた時刻 t の新しい方.
  *   - days / dayAc(日ごとの数)は日ごとに大きい方.
- *   - badges は和集合(早い方の時刻),scores は時刻で和集合,goal は新しい方.
+ *   - badges と owned(買ったテーマ)は和集合(早い方の時刻),scores は時刻で和集合,goal は新しい方.
  *   - prefs と live(解答中の本番)はその端末だけのもの(手元を残す.seenLog だけは大きい方).
  * 削除:wipe = { contests, results, all }(削除した時刻)と del.scores(消した点数の時刻)を持つ.
  *   相手の削除を知らない側(wipe が古い側)の記録は,削除の時刻より前のものを捨てる.
@@ -58,6 +58,7 @@
       att, res, srs, days, dayAc, readTimes, contests,
       legacy: knowsC ? s.legacy || null : null,
       badges: knowsA ? obj(s.badges) : {},
+      owned: knowsA ? obj(s.owned) : {},
       scores: knowsA ? arr(s.scores) : [],
       goal: knowsA ? s.goal || null : null,
       del: obj(s.del)
@@ -132,6 +133,11 @@
     const bd = Object.assign({}, b.badges);
     for (const [k, v] of Object.entries(a.badges)) bd[k] = bd[k] ? Math.min(num(bd[k]), num(v)) : v;
     out.badges = bd;
+
+    // 買ったテーマ:和集合(買った時刻は早い方)
+    const ow = Object.assign({}, b.owned);
+    for (const [k, v] of Object.entries(a.owned)) ow[k] = ow[k] ? Math.min(num(ow[k]), num(v)) : v;
+    out.owned = ow;
 
     // 実際の TOEIC の点数:時刻で和集合.消した点数(del.scores)は除く
     const gone = new Set([...arr(a.del.scores), ...arr(b.del.scores)]);

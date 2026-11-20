@@ -20,15 +20,18 @@ function renderHeader() {
   const r = ratingOf("all");
   $("#hdr-rate").innerHTML = r == null ? "" : `<span class="pill" style="${rc(r)}">総合 ${r}</span>`;
 }
-function go(to) { view = to; pendingNav = null; render(); window.scrollTo(0, 0); }
+function go(to) { view = to; pendingNav = null; render(); toTop(); }
 function render() {
   $$("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === view ? "page" : "false"));
+  endPreview();
   renderHeader();
+  renderCoin();
   if (view === "home") $("#main").innerHTML = homeHTML();
   else if (view === "list") renderList();
   else if (view === "contest") renderContest();
   else if (view === "record") renderRecord();
   else if (view === "log") renderLog();
+  else if (view === "shop") renderShop();
   else $("#main").innerHTML = defsHTML();
   bindGo();
 }

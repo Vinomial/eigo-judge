@@ -35,8 +35,9 @@ T.test("幅 375px で横スクロールが出ない", async () => {
   const p = await open({ width: 375 });
   await p.evaluate(() => { WORDS.slice(0, 30).forEach((w, i) => record(w.id, i % 2 === 0)); save(); });
   for (const v of ["home", "list", "contest", "record", "defs", "log"]) {
-    const w = await p.evaluate(v => { go(v); return document.documentElement.scrollWidth; }, v);
-    assert.ok(w <= 375, `${v} の画面の幅が ${w}px`);
+    // 本文の枠は横にはみ出しても隠すだけなので,中身の幅(scrollWidth)が枠の幅を超えていないかを見る
+    const w = await p.evaluate(v => { go(v); const sc = document.getElementById("scroller"); return [sc.scrollWidth, sc.clientWidth, document.documentElement.scrollWidth]; }, v);
+    assert.ok(w[0] <= w[1] && w[2] <= 375, `${v} の画面の幅が ${w[0]}px(枠は ${w[1]}px)`);
   }
   await p.done();
 });
@@ -118,7 +119,7 @@ T.test("長文:長い本文は枠に入り「本文を広げる」が出る.短�
   assert.ok(long, "長い本文で「本文を広げる」が出ない");
   await p.click(".pmore");
   assert.ok(await p.evaluate(() => document.querySelector(".pbox").classList.contains("open")));
-  const short = await p.evaluate(() => { startSolve("reading", READING.find(r => r.s.length <= 4 && !r.s.some(b => typeof b !== "string")).id, null); return document.querySelector(".pmore").hidden; });
+  const short = await p.evaluate(() => { startSolve("reading", READING.filter(r => !r.s.some(b => typeof b !== "string")).sort((a, b) => a.s.join("").length - b.s.join("").length)[0].id, null); return document.querySelector(".pmore").hidden; });
   assert.ok(short, "短い本文なのに「本文を広げる」が出ている");
   await p.evaluate(() => document.querySelectorAll(".rq").forEach(el => el.querySelector(".choice").click()));
   await p.click("#submit-btn");
@@ -195,6 +196,84 @@ T.test("問題一覧:文法の定理別が描け,定理の問題から解き始�
   await p.evaluate(() => document.querySelector(".band").open = true);
   await p.click(".band .chip");
   assert.ok(await p.evaluate(() => pState && pState.dom === "grammar" && pState.queue.length === 10));
+  await p.done();
+});
+
+T.test("長い画面を下までスクロールしても,ページ全体は動かず,タブバーは画面の下に付いたまま(iPhone で途中に取り残された件)", async () => {
+  const p = await open({ width: 375 });
+  const r = await p.evaluate(async () => {
+    const now = Date.now(); for (let i = 0; i < 60; i++) record(ALLQ[i][1].id, i % 2 === 0, now - (i % 20) * DAY);
+    go("record");
+    const sc = document.getElementById("scroller");
+    sc.scrollTop = 1e6; window.scrollTo(0, 1e6);
+    await new Promise(r => setTimeout(r, 100));
+    const nav = document.getElementById("nav").getBoundingClientRect();
+    return { long: sc.scrollHeight > sc.clientHeight * 2, inner: sc.scrollTop, page: document.scrollingElement.scrollTop, navBottom: Math.round(nav.bottom), h: window.innerHeight };
+  });
+  assert.ok(r.long, "テストに使う画面が短い");
+  assert.ok(r.inner > 0, "本文の枠がスクロールしない");
+  assert.strictEqual(r.page, 0, "ページ全体がスクロールした");
+  assert.strictEqual(r.navBottom, r.h, "タブバーが画面の下にない");
+  await p.evaluate(() => go("home"));
+  assert.strictEqual(await p.evaluate(() => document.getElementById("scroller").scrollTop), 0, "画面を移っても先頭に戻らない");
+  await p.done();
+});
+
+T.test("通知:実績をまとめて解除しても1枚にまとまり,同時に出るのは2枚まで", async () => {
+  const p = await open();
+  const r = await p.evaluate(() => {
+    const now = Date.now();
+    for (let d = 0; d < 8; d++) for (let i = 0; i < 8; i++) record(ALLQ[d * 8 + i][1].id, true, now - d * DAY + i);
+    checkBadges();
+    const first = document.querySelectorAll(".toast:not(.out)").length;
+    toast("a"); toast("b"); toast("c");
+    return { first, after: document.querySelectorAll(".toast:not(.out)").length, text: document.querySelector(".toast").textContent };
+  });
+  assert.strictEqual(r.first, 1, "実績の通知が何枚も出た");
+  assert.match(r.text, /実績を \d+ 個解除/);
+  assert.strictEqual(r.after, 2, "通知が2枚より多く出ている");
+  await p.done();
+});
+
+T.test("ショップ:コインは記録から数え,足りなければ買えず,買うとテーマが変わり,再読み込みしても残る.試したテーマは画面を移ると戻る", async () => {
+  const p = await open();
+  assert.strictEqual(await p.evaluate(() => coins()), 0);
+  await p.evaluate(() => go("shop"));
+  assert.ok(await p.isDisabled('[data-buy="floss"]'), "コインがないのに買える");
+  await p.click('[data-try="floss"]');
+  assert.strictEqual(await p.evaluate(() => document.documentElement.dataset.theme), "floss", "試せない");
+  await p.evaluate(() => go("home"));
+  assert.strictEqual(await p.evaluate(() => document.documentElement.dataset.theme), "auto", "試したテーマが戻らない");
+  const earned = await p.evaluate(() => {
+    const now = Date.now();
+    for (let i = 0; i < 130; i++) record(ALLQ[i][1].id, true, now - i);
+    record(ALLQ[0][1].id, true, now + 5); // 同じ問題・同じ日の2回目の AC は数えない
+    save(); return coinsEarned();
+  });
+  assert.strictEqual(earned, 130 + 10, "コインの数え方が違う(AC 130 + 1日20問以上の日 10)");
+  await p.evaluate(() => go("shop"));
+  await p.click('[data-buy="floss"]');
+  const r = await p.evaluate(() => ({ theme: document.documentElement.dataset.theme, owned: !!S.owned.floss, left: coins(), bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() }));
+  assert.deepStrictEqual([r.theme, r.owned, r.left, r.bg.toUpperCase()], ["floss", true, 20, "#FBF3FA"]);
+  await p.reload();
+  assert.strictEqual(await p.evaluate(() => document.documentElement.dataset.theme), "floss", "再読み込みでテーマが戻った");
+  await p.evaluate(() => { go("shop"); });
+  await p.click('[data-use="dark"]');
+  assert.strictEqual(await p.evaluate(() => document.documentElement.dataset.tone), "dark");
+  await p.done();
+});
+
+T.test("全テーマで全画面が描け,横にはみ出さない", async () => {
+  const p = await open({ width: 375 });
+  const bad = await p.evaluate(() => {
+    const out = []; S.owned = Object.fromEntries(THEMES.map(t => [t.id, 1]));
+    for (const t of THEMES) {
+      setTheme(t.id);
+      for (const v of ["home", "list", "contest", "record", "defs", "shop"]) { go(v); const sc = document.getElementById("scroller"); if (sc.scrollWidth > sc.clientWidth) out.push(t.id + ":" + v); }
+    }
+    return out;
+  });
+  assert.deepStrictEqual(bad, []);
   await p.done();
 });
 

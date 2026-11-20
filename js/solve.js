@@ -14,7 +14,7 @@ function startQueue(queue, dom, id, label, from) {
   stopTimer();
   pState = { queue, dom, id, label: label || "", from: from || "list", sess: { n: 0, ac: 0 } };
   setupItem();
-  view = "list"; pendingNav = null; render(); window.scrollTo(0, 0);
+  view = "list"; pendingNav = null; render(); toTop();
 }
 // WA の問題を,古いものから解き直す
 function waQueue() {
@@ -69,7 +69,7 @@ function nextSolve() {
     if (i < 0 || i + 1 >= queue.length) { backToList(true); return; }
     pState.dom = queue[i + 1].dom; pState.id = queue[i + 1].id;
   } else pState.id = autoPick(dom, id);
-  setupItem(); render(); window.scrollTo(0, 0);
+  setupItem(); render(); toTop();
 }
 const queuePos = () => pState.queue.findIndex(x => x.dom === pState.dom && x.id === pState.id);
 // やめるとき(最後まで解いたときも),今回の成績を知らせる

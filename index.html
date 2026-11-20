@@ -17,15 +17,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
+<!-- ページ全体はスクロールさせず,#scroller の中だけをスクロールする.
+     iPhone の Safari では,ページ全体をスクロールすると下に固定したタブバーが画面の途中に取り残されることがあるため -->
+<div class="app">
+<div class="scroller" id="scroller">
 <div class="wrap">
   <header>
     <h1>英語ジャッジ</h1>
-    <span id="hdr-rate"></span>
+    <span class="hdr-r"><button id="hdr-coin" class="coin" data-go="shop" aria-label="ショップ"></button><span id="hdr-rate"></span></span>
   </header>
   <main id="main"></main>
+</div>
 </div>
 <nav id="nav" aria-label="メニュー">
   <button data-v="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>ホーム</button>
@@ -34,24 +39,26 @@
   <button data-v="record"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M5 16l4-5 4 3 6-8"/></svg>記録</button>
   <button data-v="defs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4zM9 8h6M9 12h6"/></svg>定義集</button>
 </nav>
+</div>
 <div id="toasts" aria-live="polite"></div>
-<script src="data/words.js?v=15"></script>
-<script src="data/vocab.js?v=15"></script>
-<script src="data/grammar.js?v=15"></script>
-<script src="data/reading.js?v=15"></script>
-<script src="data/changelog.js?v=15"></script>
-<script src="js/rating.js?v=15"></script>
-<script src="js/merge.js?v=15"></script>
-<script src="js/sync.js?v=15"></script>
-<script src="js/core.js?v=15"></script>
-<script src="js/nav.js?v=15"></script>
-<script src="js/home.js?v=15"></script>
-<script src="js/list.js?v=15"></script>
-<script src="js/solve.js?v=15"></script>
-<script src="js/contest.js?v=15"></script>
-<script src="js/record.js?v=15"></script>
-<script src="js/data.js?v=15"></script>
-<script src="js/defs.js?v=15"></script>
-<script src="js/main.js?v=15"></script>
+<script src="data/words.js?v=16"></script>
+<script src="data/vocab.js?v=16"></script>
+<script src="data/grammar.js?v=16"></script>
+<script src="data/reading.js?v=16"></script>
+<script src="data/changelog.js?v=16"></script>
+<script src="js/rating.js?v=16"></script>
+<script src="js/merge.js?v=16"></script>
+<script src="js/sync.js?v=16"></script>
+<script src="js/core.js?v=16"></script>
+<script src="js/nav.js?v=16"></script>
+<script src="js/home.js?v=16"></script>
+<script src="js/list.js?v=16"></script>
+<script src="js/solve.js?v=16"></script>
+<script src="js/contest.js?v=16"></script>
+<script src="js/record.js?v=16"></script>
+<script src="js/data.js?v=16"></script>
+<script src="js/defs.js?v=16"></script>
+<script src="js/theme.js?v=16"></script>
+<script src="js/main.js?v=16"></script>
 </body>
 </html>

@@ -134,15 +134,15 @@ function renderContest() {
   $("#prev-btn").onclick = () => moveTo(i - 1);
   if (i < n - 1) $("#next-btn").onclick = () => moveTo(i + 1);
   $("#submit-btn").onclick = () => {
-    if (unanswered() && !cState.confirming) { cState.confirming = true; renderContest(); window.scrollTo(0, 0); return; }
-    finishContest(); renderContest(); window.scrollTo(0, 0);
+    if (unanswered() && !cState.confirming) { cState.confirming = true; renderContest(); toTop(); return; }
+    finishContest(); renderContest(); toTop();
   };
   if (pendingNav) {
     $("#leave-yes").onclick = () => { const to = pendingNav; finishContest(); go(to); };
     $("#leave-no").onclick = () => { pendingNav = null; render(); };
   }
   if (cState.confirming && !pendingNav) {
-    $("#conf-yes").onclick = () => { finishContest(); renderContest(); window.scrollTo(0, 0); };
+    $("#conf-yes").onclick = () => { finishContest(); renderContest(); toTop(); };
     $("#conf-no").onclick = () => { cState.confirming = false; renderContest(); };
   }
 }

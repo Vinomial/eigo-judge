@@ -152,4 +152,14 @@ test("ランダムな記録で,和集合・冪等・対称を確かめる", () =
   }
 });
 
+test("買ったテーマは両方の端末のものが残り(早い時刻),「すべて」の削除を知らない側のものは捨てる", () => {
+  const a = S({ owned: { floss: T0 + 5000, mint: T0 } }), b = S({ owned: { floss: T0, ocean: T0 + 9 } });
+  const m = merge(a, b);
+  assert.deepStrictEqual(m.owned, { floss: T0, mint: T0, ocean: T0 + 9 });
+  same(merge(m, b), m); same(core(merge(b, a)), core(m));
+  const wiped = S({ wipe: { all: T0 + DAY } });
+  assert.deepStrictEqual(merge(wiped, a).owned, {}, "削除を知らない側の購入が戻ってきた");
+  assert.deepStrictEqual(merge(S(), S({})).owned, {}, "owned がない古いデータでも動く");
+});
+
 console.log(`\n${n} 件のテストに合格しました`);

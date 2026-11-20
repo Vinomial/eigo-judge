@@ -16,16 +16,20 @@
   }
 }
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; height: 100%; overflow: hidden; }
 body {
-  margin: 0; background: var(--bg); color: var(--ink);
+  margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none;
+  background: var(--bg); color: var(--ink);
   font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
   font-size: 16px; line-height: 1.7;
-  padding-top: env(safe-area-inset-top, 0px);
   -webkit-tap-highlight-color: transparent;
 }
+/* 画面の骨組み:上から 本文の枠(ここだけスクロール)→ タブバー.
+   ページ全体はスクロールしないので,iPhone の Safari でもタブバーが取り残されず,本文がステータスバーの下に潜らない */
+.app { height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); background: var(--bg-deco, var(--bg)); }
+.scroller { flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 .en { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; line-height: 1.75; }
-.wrap { max-width: 720px; margin: 0 auto; padding: 12px 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom, 0px)); }
+.wrap { max-width: 720px; margin: 0 auto; padding: 12px 16px 28px; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 32px; }
 h1 { font-size: 1.15rem; margin: 0; font-weight: 700; letter-spacing: .02em; }
 h2 { font-size: 1.05rem; margin: 28px 0 10px; }
@@ -35,7 +39,7 @@ button { font: inherit; color: inherit; }
 
 /* 下のタブバー */
 nav {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  position: relative; flex: none; z-index: 10;
   display: flex; justify-content: center;
   background: var(--surface); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -197,7 +201,7 @@ summary { cursor: pointer; }
 
 /* 解いた後の操作(解説を読んでいる間も下に残す) */
 .actions { margin-top: 16px; }
-.actions.stick { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); z-index: 4; background: var(--surface); padding: 10px 0; margin-bottom: -10px; border-top: 1px solid var(--line); }
+.actions.stick { position: sticky; bottom: 0; z-index: 4; background: var(--surface); padding: 10px 0; margin-bottom: -10px; border-top: 1px solid var(--line); }
 .btn.grow { flex: 1; }
 .qprog { height: 4px; background: var(--sunk); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
 .qprog > span { display: block; height: 100%; background: var(--accent); transition: width .3s; }
@@ -360,3 +364,95 @@ summary { cursor: pointer; }
 /* 日ごとの記録 */
 .dctl { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 4px; }
 .dctl .seg { margin: 0; }
+
+/* ================= テーマ(js/theme.js) =================
+   色は js/theme.js が <html> に直接設定する.ここではライト系・ダーク系で変える物(レートの色,フォームの色)だけを決める.
+   「自動」のときは data-tone がなく,上の :root と @media の既定が効く. */
+:root[data-tone="light"] {
+  color-scheme: light;
+  --r-gray: #7A7A7A; --r-brown: #7B3F00; --r-green: #0E7A0E; --r-cyan: #008C8C; --r-blue: #1F3FD6; --r-yellow: #8E8A00; --r-orange: #C25E00; --r-red: #CC1F1F;
+  --shadow: 0 1px 2px rgba(20, 30, 40, .05), 0 6px 18px rgba(20, 30, 40, .06);
+}
+:root[data-tone="dark"] {
+  color-scheme: dark;
+  --r-gray: #A3A3A3; --r-brown: #C07A3E; --r-green: #4CB65E; --r-cyan: #3CCACA; --r-blue: #7D96FF; --r-yellow: #D6C944; --r-orange: #FF9A3C; --r-red: #FF6B6B;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25);
+}
+:root { --shadow: 0 1px 2px rgba(20, 30, 40, .05), 0 6px 18px rgba(20, 30, 40, .06); --radius: 14px; }
+@media (prefers-color-scheme: dark) { :root:not([data-tone]) { --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25); } }
+
+/* ================= 全体の見た目の調整 ================= */
+header { margin-bottom: 10px; }
+h1 { font-size: 1.1rem; }
+.hdr-r { display: inline-flex; align-items: center; gap: 8px; }
+.coin { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 2px 10px 2px 6px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 700; font-size: .88rem; font-variant-numeric: tabular-nums; cursor: pointer; }
+.coin svg, .coinbig svg, .btn svg { width: 18px; height: 18px; fill: none; stroke: #C9971C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.btn svg { stroke: currentColor; margin-right: 4px; }
+
+/* カード類は角を丸く,薄い影で浮かせる */
+.card, .toeic, .tile, .kind, .news, .hero0, .streak > div, .wrow, .del, .theme { border-radius: var(--radius); box-shadow: var(--shadow); }
+.card { border-color: transparent; }
+.tile, .kind { border-color: transparent; transition: transform .12s, box-shadow .12s; }
+.tile.main { box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent); }
+.tile.warn { border-color: var(--wa); }
+.btn, .tile, .kind, .choice, .chip, .qdot, nav button, .theme .btn { transition: transform .1s, background-color .15s, border-color .15s; }
+.btn:active:not(:disabled), .tile:active, .kind:active, .choice:active:not(:disabled), .chip:active { transform: scale(.98); }
+.chip { border-radius: 10px; }
+.choice { border-radius: 12px; background: var(--surface); }
+.choice[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.choice.idk { background: transparent; }
+.seg { border-radius: 12px; }
+.seg button[aria-pressed="true"] { box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+
+/* ホームの総合レートをカードに */
+.hero { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px 12px; margin-bottom: 12px; border-left: 6px solid var(--rc, var(--line)); }
+.ratings { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 0; overflow: hidden; }
+.rt { border-left-width: 4px; }
+
+/* タブバー:選んでいるタブは,アイコンの後ろに色の付いた丸を出す */
+nav { background: color-mix(in srgb, var(--surface) 92%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px); }
+nav button { position: relative; }
+nav button svg { padding: 3px 12px; width: 48px; height: 30px; border-radius: 999px; transition: background-color .15s; }
+nav button[aria-current="page"] svg { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+/* 通知は上に出す(下のタブバーや解答のボタンと重ならないように).押すと消える */
+#toasts { top: calc(env(safe-area-inset-top, 0px) + 8px); bottom: auto; }
+.toast { pointer-events: auto; cursor: pointer; padding: 9px 14px; font-size: .92rem; line-height: 1.5; border-radius: 12px; }
+
+/* 本番:問題の番号の丸を少し小さくし,1行に収まりやすく */
+.qdot { width: 30px; height: 30px; font-size: .78rem; }
+.dots { gap: 5px; }
+
+/* ================= ショップ ================= */
+.shophead { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 16px; margin-bottom: 12px; }
+.shophead .lab { font-size: .82rem; color: var(--muted); }
+.coinbig { display: flex; align-items: center; gap: 6px; }
+.coinbig svg { width: 28px; height: 28px; }
+.coinbig b { font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.themes { display: grid; gap: 10px; }
+.theme { display: grid; grid-template-columns: 92px 1fr; grid-template-areas: "sw info" "sw act"; gap: 4px 12px; align-items: center; padding: 10px; background: var(--surface); border: 2px solid transparent; }
+.theme.sel { border-color: var(--accent); }
+.theme .sw { grid-area: sw; }
+.theme .tinfo { grid-area: info; display: flex; flex-direction: column; min-width: 0; line-height: 1.45; }
+.theme .tinfo span { font-size: .8rem; color: var(--muted); }
+.theme .tact { grid-area: act; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.tag.on { background: var(--ac-bg); color: var(--ac); }
+.sw { position: relative; display: block; width: 92px; height: 72px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.sw-half { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.sw-card { width: 70%; height: 66%; border: 1px solid; border-radius: 6px; padding: 5px; display: flex; flex-direction: column; gap: 3px; }
+.sw-card i { display: block; height: 4px; border-radius: 2px; width: 85%; }
+.sw-btn { display: block; height: 8px; width: 50%; border-radius: 3px; margin-top: auto; }
+.sw-dots { display: flex; gap: 3px; position: absolute; right: 18%; bottom: 22%; }
+.sw-dots b { width: 7px; height: 7px; border-radius: 50%; }
+.coint td:last-child { text-align: right; }
+@media (min-width: 560px) { .themes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* 判定後の色は,選んだときの色より後に書いて必ず勝たせる */
+.choice.right { border-color: var(--ac); background: var(--ac-bg); }
+.choice.wrong { border-color: var(--wa); background: var(--wa-bg); }
+/* 練習の説明と「AC なら自動で次へ」は縦に並べる(横に並べると説明が細く折り返すため) */
+.notebar { flex-direction: column; align-items: flex-start; gap: 2px; }
+.notebar .mode-note { flex: none; }
+.coin svg circle:first-child, .coinbig svg circle:first-child { fill: #F3C64B; stroke: #C9971C; }
+.coin svg circle + circle, .coinbig svg circle + circle { stroke: #C9971C; fill: none; }
+.btn svg circle:first-child { fill: none; }
