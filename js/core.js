@@ -8,10 +8,10 @@ const DOMAINS = { word: "単語", grammar: "文法", reading: "長文" };
 const SERIES = { all: "総合", word: "単語", grammar: "文法", reading: "長文" };
 // 本番の種類.all は総合(全分野).分野別の本番はその分野のレートだけが動く
 const CONTESTS = {
-  all: { name: "総合", word: 4, grammar: 4, reading: 1, sec: 720, desc: "単語4問・文法4問・長文1題(3〜4問).12分" },
+  all: { name: "総合", word: 4, grammar: 4, reading: 1, sec: 720, desc: "単語4問・文法4問・長文1題(3〜5問).12分" },
   word: { name: "単語", word: 12, sec: 300, desc: "単語12問.5分" },
   grammar: { name: "文法", grammar: 10, sec: 480, desc: "文法10問.8分" },
-  reading: { name: "長文", reading: 2, sec: 900, desc: "長文2題(6〜8問).15分" },
+  reading: { name: "長文", reading: 2, sec: 900, desc: "長文2題(6〜10問).15分" },
   // ミニ模試:TOEIC のリーディング(Part 5 が30問・Part 6 が16問・Part 7 が54問・75分)の半分の配分
   mock: { name: "ミニ模試", p5: 15, p6: 2, p7: 27, sec: 2280, desc: "TOEIC と同じ配分の半分.Part 5 が15問・Part 6 が2題(8問)・Part 7 が27問.38分" }
 };

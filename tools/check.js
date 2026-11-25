@@ -103,7 +103,7 @@ for (const r of READING) {
     const blanks = r.s.filter(b => typeof b === "string").join(" ").match(/\[\d\]/g) || [];
     if (r.qs.length !== 4) err(r.id, "Part 6 の設問は4問にする");
     if (blanks.join("") !== r.qs.map((_, k) => `[${k + 1}]`).join("")) err(r.id, `Part 6 の空所 [1]〜[${r.qs.length}] が本文に順に1つずつない (${blanks.join("")})`);
-  } else if (r.qs.length !== 3) err(r.id, "設問は3問にする");
+  } else if (r.qs.length !== 3 && !(r.qs.length === 5 && r.s.filter(b => b && b.t === "doc").length >= 2)) err(r.id, "設問は3問にする(3つの文書を読み比べる長文だけ5問まで)");
   r.qs.forEach((q, k) => {
     uniqueId(q.id, new RegExp(`^${r.id}q${k + 1}$`));
     dRange(q.id, q.d);

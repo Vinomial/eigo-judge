@@ -791,6 +791,18 @@
     V("exhausted", "a", "疲れ切った・使い果たされた", 900, "After the long flight, I was exhausted.", "長い飛行の後,くたくただった.", "exhaustive(徹底的な)と語尾が違う."),
     V("exhaustive", "a", "徹底的な・網羅的な", 1400, "The team conducted an exhaustive search.", "チームは徹底的な調査を行った."),
 
+    // ---- 長文 r101〜r106 に出てくる語 ----
+    V("acre", "n", "エーカー(面積の単位.約4047平方メートル)", 900, "The farm covers 12 acres.", "その農場の広さは12エーカーだ."),
+    V("crack", "v", "ひびが入る・割れ目", 700, "My phone screen cracked when I dropped it.", "落としたら電話の画面にひびが入った."),
+    V("disagree", "v", "意見が合わない・反対する", 600, "Some members disagree with the plan.", "その計画に反対する会員もいる.", "dis(否定)+ agree(同意する)."),
+    V("enthusiastic", "a", "熱心な・乗り気の", 1000, "The staff were enthusiastic about the new project.", "スタッフは新しい事業に乗り気だった.", "", "enthusiasm"),
+    V("genuine", "a", "本物の・正規の", 1000, "We only use genuine parts for repairs.", "修理には正規の部品だけを使う."),
+    V("halfway", "d", "途中で・中間に", 700, "The bus stopped halfway to the station.", "バスは駅に行く途中で止まった.", "half(半分)+ way(道)."),
+    V("kit", "n", "(道具・部品の)一式", 600, "The repair kit includes a battery and tools.", "修理キットには電池と道具が入っている."),
+    V("loud", "a", "(音が)大きい・うるさい", 400, "The machine makes a loud noise.", "その機械は大きな音を立てる.", "", "loudly"),
+    V("upcoming", "a", "近く行われる・今度の", 800, "Please register for the upcoming workshop.", "今度の講習会に申し込んでください.", "up(近づいて)+ coming(来る)."),
+    V("weaken", "v", "弱まる・弱める", 900, "The battery weakens after two years.", "電池は2年たつと弱ってくる.", "weak(弱い)+ -en(〜にする)."),
+
     // ---- TOEIC でよく出る語(600〜1100) ----
     V("achieve", "v", "成し遂げる", 600, "We achieved our sales goal this year.", "今年は売上目標を達成した.", "", "achievement"),
     V("agenda", "n", "議題(の一覧)", 700, "The first item on the agenda is the budget.", "議題の最初の項目は予算だ."),
@@ -2082,7 +2094,7 @@
     ratings: "rate", residential: "resident", unlimited: "limited", activities: "activity", texts: "text",
     disruption: "disrupt", entirety: "entire", entireness: "entire", knowledgeable: "knowledge", sustainably: "sustain",
     valuing: "value", waiver: "waive", automate: "automatic", automation: "automatic",
-    expiration: "expire", riders: "ride", rider: "ride",
+    expiration: "expire", riders: "ride", rider: "ride", predictable: "predict", unpredictable: "predict", subscription: "subscribe", subscriptions: "subscribe", disagrees: "disagree",
     accessible: "access", additive: "add", appreciation: "appreciate", conversions: "convert", conversion: "convert", financial: "finance",
     forgot: "forget", organizers: "organize", organizer: "organize", preference: "prefer", shown: "show", suburban: "suburb"
   };
