@@ -127,7 +127,7 @@ T.test("長文:長い本文は枠に入り「本文を広げる」が出る.短�
   await p.done();
 });
 
-T.test("本番:4種類とも採点でき,レートが付く", async () => {
+T.test("本番:5種類(ミニ模試を含む)とも採点でき,レートが付く", async () => {
   const p = await open();
   const r = await p.evaluate(() => {
     const out = {};
@@ -138,8 +138,8 @@ T.test("本番:4種類とも採点でき,レートが付く", async () => {
     }
     return { out, n: S.contests.length, all: ratingOf("all"), word: ratingOf("word") };
   });
-  assert.deepStrictEqual(Object.values(r.out), [true, true, true, true]);
-  assert.strictEqual(r.n, 4);
+  assert.deepStrictEqual(Object.values(r.out), [true, true, true, true, true]);
+  assert.strictEqual(r.n, 5);
   assert.ok(r.all != null && r.word != null, "レートが付かない");
   await p.done();
 });
@@ -248,6 +248,73 @@ T.test("実績:すべて進み具合を返し,id が重ならず,条件を満た
   await p.done();
 });
 
+T.test("ミニ模試:Part 5→6→7 の順に約50問,38分.終わると Part ごとの結果が出て,文法と長文のレートが付く(総合レートは動かない)", async () => {
+  const p = await open();
+  const r = await p.evaluate(() => {
+    go("contest"); startContest("mock");
+    const parts = cState.items.map(partOf), sorted = parts.every((x, i) => !i || parts[i - 1] <= x);
+    const n = { 5: parts.filter(x => x === 5).length, 6: parts.filter(x => x === 6).length, 7: parts.filter(x => x === 7).length };
+    const sec = Math.round((cState.end - Date.now()) / 1000);
+    cState.sts.forEach(s => { s.sel = 0; }); finishContest(); renderContest();
+    return { sorted, n, sec, sum: !!document.querySelector(".mocksum"), all: ratingOf("all"), g: ratingOf("grammar"), rd: ratingOf("reading"), perf: S.contests[0].perf.mock };
+  });
+  assert.ok(r.sorted, "Part の順に並んでいない");
+  assert.deepStrictEqual([r.n[5], r.n[6]], [15, 8]);
+  assert.ok(r.n[7] >= 27 && r.n[7] <= 29, `Part 7 の設問数が ${r.n[7]}`);
+  assert.ok(r.sec > 2270 && r.sec <= 2280, "制限時間が38分でない");
+  assert.ok(r.sum, "Part ごとの結果が出ない");
+  assert.strictEqual(r.all, null, "総合レートが動いた");
+  assert.ok(r.g != null && r.rd != null && r.perf != null);
+  await p.done();
+});
+
+T.test("解き直し・未挑戦:間違えた問題を総合・分野別に,未挑戦は解いた問題を除いて出す.文法も復習の時期が来ると出る", async () => {
+  const p = await open();
+  const r = await p.evaluate(() => {
+    const now = Date.now();
+    record(WORDS[0].id, false, now - 3000); record(GRAM[0].id, false, now - 2000); READING[0].qs.forEach((q, i) => record(q.id, i > 0, now - 1000));
+    updateSrs(GRAM[1].id, false); S.srs[GRAM[1].id].due = now - 1; save();
+    go("drill");
+    const btn = d => document.querySelector(`[data-drill="${d}"]`);
+    const counts = { all: waQueue("all").length, word: waQueue("word").length, grammar: waQueue("grammar").length, reading: waQueue("reading").length, gdue: dueQueue("grammar").length };
+    const unseen = unseenQueue("all").slice(0, 30), seenIn = unseen.some(x => x.id === WORDS[0].id || x.id === GRAM[0].id || x.id === READING[0].id);
+    const doms = new Set(unseen.map(x => x.dom));
+    btn("wa:grammar").click();
+    const q = pState.queue.map(x => x.dom);
+    return { counts, seenIn, doms: [...doms].sort(), q, disabled: btn ? null : 0, auto: autoPick("grammar") };
+  });
+  assert.deepStrictEqual([r.counts.all, r.counts.word, r.counts.grammar, r.counts.reading], [3, 1, 1, 1]);
+  assert.strictEqual(r.counts.gdue, 1, "文法の復習の時期が出ない");
+  assert.ok(!r.seenIn, "未挑戦に解いた問題が入っている");
+  assert.deepStrictEqual(r.doms, ["grammar", "reading", "word"], "未挑戦(総合)が全分野を混ぜていない");
+  assert.deepStrictEqual(r.q, ["grammar"], "文法の解き直しに別の分野が入っている");
+  assert.strictEqual(r.auto, await p.evaluate(() => GRAM[1].id), "おまかせの文法で復習の時期の問題が先に出ない");
+  await p.done();
+});
+
+T.test("ショップ:フォント・アイコン・演出を買って使え,ほかの端末用に S.owned に入る", async () => {
+  const p = await open();
+  const r = await p.evaluate(async () => {
+    const now = Date.now(); for (let i = 0; i < 600; i++) record(ALLQ[i][1].id, true, now - i); save();
+    shopTab = "icon"; go("shop");
+    document.querySelector('[data-buy="icon:emoji"]').click();
+    shopTab = "font"; renderShop(); document.querySelector('[data-buy="font:maru"]').click();
+    shopTab = "fx"; renderShop(); document.querySelector('[data-buy="fx:stars"]').click();
+    go("home");
+    return { emo: document.querySelectorAll("#nav .emo").length, font: getComputedStyle(document.documentElement).getPropertyValue("--font-ja").trim(), fx: currentItem("fx"), owned: Object.keys(S.owned).sort(), spent: coinsSpent() };
+  });
+  assert.strictEqual(r.emo, 5, "タブのアイコンが絵文字にならない");
+  assert.match(r.font, /Zen Maru Gothic/);
+  assert.strictEqual(r.fx, "fx:stars");
+  assert.deepStrictEqual(r.owned, ["font:maru", "fx:stars", "icon:emoji"]);
+  assert.strictEqual(r.spent, 80 + 100 + 100);
+  await p.evaluate(() => { useItem("icon", "icon:pixel"); });
+  assert.strictEqual(await p.evaluate(() => document.querySelectorAll("#nav .emo").length), 5, "持っていないアイコンに変わった");
+  await p.evaluate(() => { useItem("icon", "icon:line"); });
+  assert.strictEqual(await p.evaluate(() => document.querySelectorAll("#nav svg:not(.pix)").length), 5, "標準のアイコンに戻らない");
+  await p.done();
+});
+
 T.test("通知:実績をまとめて解除しても1枚にまとまり,同時に出るのは2枚まで", async () => {
   const p = await open();
   const r = await p.evaluate(() => {
@@ -282,8 +349,8 @@ T.test("ショップ:コインは記録から数え,足りなければ買えず,
   assert.strictEqual(earned, 130 + 10, "コインの数え方が違う(AC 130 + 1日20問以上の日 10)");
   await p.evaluate(() => go("shop"));
   await p.click('[data-buy="floss"]');
-  const r = await p.evaluate(() => ({ theme: document.documentElement.dataset.theme, owned: !!S.owned.floss, left: coins(), bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() }));
-  assert.deepStrictEqual([r.theme, r.owned, r.left, r.bg.toUpperCase()], ["floss", true, 20, "#FBF3FA"]);
+  const r = await p.evaluate(() => ({ theme: document.documentElement.dataset.theme, owned: !!S.owned.floss, left: coins() - (coinsEarned() - 120), bg: getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() }));
+  assert.deepStrictEqual([r.theme, r.owned, r.left, r.bg.toUpperCase()], ["floss", true, 0, "#FBF3FA"]);
   await p.reload();
   assert.strictEqual(await p.evaluate(() => document.documentElement.dataset.theme), "floss", "再読み込みでテーマが戻った");
   await p.evaluate(() => { go("shop"); });

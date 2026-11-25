@@ -16,20 +16,6 @@ function startQueue(queue, dom, id, label, from) {
   setupItem();
   view = "list"; pendingNav = null; render(); toTop();
 }
-// WA の問題を,古いものから解き直す
-function waQueue() {
-  const t = id => (S.res[id] && S.res[id].t) || 0;
-  return [
-    ...WORDS.filter(w => statusOf(w.id) === "WA").map(w => ({ dom: "word", id: w.id, t: t(w.id) })),
-    ...GRAM.filter(q => statusOf(q.id) === "WA").map(q => ({ dom: "grammar", id: q.id, t: t(q.id) })),
-    ...READING.filter(p => passageStatus(p) === "WA").map(p => ({ dom: "reading", id: p.id, t: Math.max(...p.qs.map(q => t(q.id))) }))
-  ].sort((a, b) => a.t - b.t);
-}
-function startWaReview() {
-  const q = waQueue().slice(0, 20);
-  if (!q.length) { toast("WA の問題はありません."); return; }
-  startQueue(q, q[0].dom, q[0].id, "WA の解き直し", "home");
-}
 // 苦手な単語:最後が WA か,WA の回数が AC 以上(2回以上)の単語.WA の多い順
 function weakWords() {
   return WORDS.filter(w => { const r = S.res[w.id]; return r && (r.last === "WA" || (r.wa >= 2 && r.wa >= r.ac)); })
@@ -41,7 +27,7 @@ function startWeakWords() {
   const add = w => { if (!seen.has(w.id) && q.length < 20) { seen.add(w.id); q.push({ dom: "word", id: w.id }); } };
   weakWords().slice(0, 15).forEach(w => { add(w); confusables(w).forEach(add); });
   if (!q.length) { toast("苦手な単語はありません."); return; }
-  startQueue(q, "word", q[0].id, "苦手な単語", "home");
+  startQueue(q, "word", q[0].id, "苦手な単語", view === "drill" ? "drill" : "home");
 }
 // 1つの定理の問題を続けて解く(未 AC を先に,易しい順)
 function startTheorem(k, from) {
@@ -128,6 +114,7 @@ function renderSolveSingle() {
     const bar = $(".qprog > span");
     if (bar && pState.queue) bar.style.width = (100 * (queuePos() + 1) / pState.queue.length).toFixed(1) + "%";
     if (fresh) $("#verdict").scrollIntoView({ block: "nearest", behavior: "smooth" });
+    if (fresh && ok) playFx(); // ショップで買った正解の演出(js/shop.js)
     if (fresh && ok && S.prefs.autoNext) {
       const me = pState;
       clearTimeout(autoT);
@@ -140,7 +127,7 @@ function renderSolveSingle() {
     const ok = isCorrect(item, st);
     pState.sess.n++; if (ok) pState.sess.ac++;
     record(item.q.id, ok);
-    if (item.dom === "word") updateSrs(item.q.id, ok);
+    if (item.dom !== "reading") updateSrs(item.q.id, ok); // 単語と文法は間隔反復
     save(); show(true); checkBadges();
     const se = $("#sess"); if (se) se.innerHTML = sessText();
   });

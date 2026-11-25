@@ -2,7 +2,7 @@
 /* 英語ジャッジ:テーマとショップ
  * テーマは色の組(CSS 変数)を切り替える.「自動」は端末のライト/ダークに合わせ(style.css の既定),それ以外は <html> に直接設定する.
  * コインは保存せず,記録から毎回数える(端末間で食い違わないように).保存するのは買ったテーマ S.owned { id: 買った時刻 } だけ.
- * 使っているテーマは S.prefs.theme(端末ごと).
+ * 使っているテーマは S.prefs.theme(端末ごと).フォント・アイコン・演出と,ショップの画面は js/shop.js.
  * js/ のファイルは index.html の順に読み込み,同じ大域の名前を共有する(ビルドなし).
  * 読み込んだ時点で動くのは宣言だけにし,起動の処理は main.js に置く. */
 
@@ -39,7 +39,22 @@ const THEMES = [
   { id: "midnight", name: "深夜", desc: "濃い紺に金色", price: 200, tone: "dark",
     c: { bg: "#0E1424", surface: "#161E33", sunk: "#1D2740", ink: "#E8ECF6", muted: "#97A2BD", line: "#28334F", accent: "#E5C068", on: "#1B1608", ac: "#5CC68F", wa: "#F09A4A", acBg: "#183428", waBg: "#3E2B17", hl: "#463A17" } },
   { id: "terminal", name: "ターミナル", desc: "黒い画面に緑の文字", price: 250, tone: "dark",
-    c: { bg: "#0B0F0B", surface: "#111811", sunk: "#172117", ink: "#C8F7C5", muted: "#7FAE7B", line: "#22331F", accent: "#39D353", on: "#04140A", ac: "#39D353", wa: "#F0B429", acBg: "#123018", waBg: "#33280C", hl: "#2E3A12" } }
+    c: { bg: "#0B0F0B", surface: "#111811", sunk: "#172117", ink: "#C8F7C5", muted: "#7FAE7B", line: "#22331F", accent: "#39D353", on: "#04140A", ac: "#39D353", wa: "#F0B429", acBg: "#123018", waBg: "#33280C", hl: "#2E3A12" } },
+  { id: "lemon", name: "レモン", desc: "明るい黄色で元気に", price: 90, tone: "light",
+    c: { bg: "#FFFBE8", surface: "#FFFFFF", sunk: "#FBF2C8", ink: "#2F2A12", muted: "#7A7253", line: "#EFE3AE", accent: "#B08400", on: "#FFFFFF", ac: "#2E8045", wa: "#C2591A", acBg: "#DDF1DD", waBg: "#FBE2D0", hl: "#FFE9A0" } },
+  { id: "lavender", name: "ラベンダー", desc: "やさしい薄紫", price: 110, tone: "light",
+    c: { bg: "#F5F2FB", surface: "#FFFFFF", sunk: "#EAE4F6", ink: "#2C2540", muted: "#6E6787", line: "#DCD4EE", accent: "#6B4FBB", on: "#FFFFFF", ac: "#2D8268", wa: "#BF6420", acBg: "#DBF0E9", waBg: "#F8E4D3", hl: "#FFF0BF",
+      deco: "linear-gradient(170deg, #EFE8FB 0%, #F8F5FD 60%, #FDF4F8 100%)" } },
+  { id: "snow", name: "雪", desc: "白と氷の青", price: 120, tone: "light",
+    c: { bg: "#F4F8FB", surface: "#FFFFFF", sunk: "#E6EEF4", ink: "#1C2A36", muted: "#62717E", line: "#D5E1EA", accent: "#3B7DB5", on: "#FFFFFF", ac: "#26805D", wa: "#B8641C", acBg: "#DAF0E6", waBg: "#F5E5D3", hl: "#FFF3C2",
+      deco: "radial-gradient(140% 70% at 50% 0%, #E3F0FA 0%, #F4F8FB 70%)" } },
+  { id: "chocomint", name: "チョコミント", desc: "チョコ色にミントの差し色", price: 160, tone: "dark",
+    c: { bg: "#2A1D17", surface: "#352620", sunk: "#41302A", ink: "#F3EAE4", muted: "#BFA99E", line: "#4D3A31", accent: "#7EE0C3", on: "#10261F", ac: "#7EE0C3", wa: "#F2A65A", acBg: "#1F3B33", waBg: "#4A3220", hl: "#4D4024" } },
+  { id: "space", name: "宇宙", desc: "星の見える紫の夜空", price: 220, tone: "dark",
+    c: { bg: "#0F0B1E", surface: "#181330", sunk: "#211A3D", ink: "#ECE8FA", muted: "#A39CC4", line: "#2D2552", accent: "#A98BFF", on: "#160F2E", ac: "#5ED6A0", wa: "#FFAA5C", acBg: "#173A30", waBg: "#45301E", hl: "#3E3420",
+      deco: "radial-gradient(1px 1px at 20% 30%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 70% 15%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 85% 60%, #fff7 50%, transparent 51%), radial-gradient(1px 1px at 40% 80%, #fff5 50%, transparent 51%), radial-gradient(120% 80% at 70% 0%, #2B1E55 0%, #0F0B1E 65%)" } },
+  { id: "highcontrast", name: "くっきり", desc: "白黒をはっきりさせた見やすい画面", price: 50, tone: "light",
+    c: { bg: "#FFFFFF", surface: "#FFFFFF", sunk: "#EDEDED", ink: "#000000", muted: "#3A3A3A", line: "#8A8A8A", accent: "#0033CC", on: "#FFFFFF", ac: "#006B2E", wa: "#A34400", acBg: "#D4F5DF", waBg: "#FFE1CC", hl: "#FFEB70" } }
 ];
 const THEME_BY = new Map(THEMES.map(t => [t.id, t]));
 const VARS = { bg: "--bg", surface: "--surface", sunk: "--sunk", ink: "--ink", muted: "--muted", line: "--line", accent: "--accent", on: "--on-accent", ac: "--ac", wa: "--wa", acBg: "--ac-bg", waBg: "--wa-bg", hl: "--hl", deco: "--bg-deco" };
@@ -79,21 +94,10 @@ function coinParts() {
   ];
 }
 const coinsEarned = () => coinParts().reduce((a, x) => a + x.n * x.each, 0);
-const coinsSpent = () => Object.keys(S.owned || {}).reduce((a, id) => a + ((THEME_BY.get(id) || {}).price || 0), 0);
+const coinsSpent = () => Object.keys(S.owned || {}).reduce((a, id) => a + ((ITEM_BY.get(id) || {}).price || 0), 0); // ITEM_BY は js/shop.js
 const coins = () => coinsEarned() - coinsSpent();
 const COIN_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/></svg>`;
 function renderCoin() { const b = $("#hdr-coin"); if (b) b.innerHTML = `${COIN_SVG}<span>${Math.max(0, coins())}</span>`; }
-
-function buyTheme(id) {
-  const t = THEME_BY.get(id);
-  if (!t || ownsTheme(id)) return;
-  if (coins() < t.price) { toast(`コインが ${t.price - Math.max(0, coins())} 枚足りません.`); return; }
-  if (!confirm(`「${t.name}」を ${t.price} コインで買いますか?`)) return;
-  S.owned = Object.assign({}, S.owned, { [id]: Date.now() });
-  setTheme(id);
-  toast(`<b>「${esc(t.name)}」を買いました</b><br><span class="small">テーマを切り替えました.</span>`);
-  render();
-}
 
 /* ---------------- ショップの画面 ---------------- */
 function swatchHTML(t) {
@@ -101,32 +105,6 @@ function swatchHTML(t) {
   // 自動は左右でライトとダークを見せる
   const half = (c, clip) => `<span class="sw-half" style="background:${c.deco || c.bg};${clip}"><span class="sw-card" style="background:${c.surface};border-color:${c.line}"><i style="background:${c.ink}"></i><i style="background:${c.muted};width:60%"></i><span class="sw-btn" style="background:${c.accent}"></span><span class="sw-dots"><b style="background:${c.ac}"></b><b style="background:${c.wa}"></b></span></span></span>`;
   return `<span class="sw">${t.c ? half(c, "") : half(THEME_BY.get("light").c, "clip-path:inset(0 50% 0 0)") + half(d, "clip-path:inset(0 0 0 50%)")}</span>`;
-}
-function renderShop() {
-  const m = $("#main"), have = Math.max(0, coins()), cur = currentTheme(), shown = previewTheme || cur;
-  m.innerHTML = `
-    <div class="shophead">
-      <div><div class="lab">持っているコイン</div><div class="coinbig">${COIN_SVG}<b>${have}</b></div></div>
-      <button class="btn ghost sm" data-go="home">← ホーム</button>
-    </div>
-    ${previewTheme ? `<div class="banner">「${esc(THEME_BY.get(previewTheme).name)}」を試しています.ほかの画面に移ると元に戻ります.</div>` : ""}
-    <h2>テーマ</h2>
-    <div class="themes">${THEMES.map(t => {
-      const own = ownsTheme(t.id), using = t.id === cur;
-      const act = using ? `<span class="tag on">使用中</span>`
-        : own ? `<button class="btn sm" data-use="${t.id}">使う</button>`
-        : `<button class="btn ghost sm" data-try="${t.id}">試す</button><button class="btn sm" data-buy="${t.id}" ${have < t.price ? "disabled" : ""}>${COIN_SVG}${t.price}</button>`;
-      return `<div class="theme${t.id === shown ? " sel" : ""}">${swatchHTML(t)}
-        <div class="tinfo"><b>${esc(t.name)}</b><span>${esc(t.desc)}</span><span class="small muted">${t.price ? (own ? "購入済み" : `${t.price} コイン`) : "無料"}</span></div>
-        <div class="tact">${act}</div></div>`;
-    }).join("")}</div>
-    <h2>コインのため方</h2>
-    <table class="coint"><tbody>${coinParts().map(x => `<tr><td>${x.name}</td><td>${x.each} 枚 × ${x.n}</td><td><b>${x.each * x.n}</b></td></tr>`).join("")}
-      <tr><td>テーマに使った分</td><td></td><td><b>−${coinsSpent()}</b></td></tr></tbody></table>
-    <p class="small muted">コインは記録から数えます.同じ問題で何度 AC しても,もらえるのは1日1枚までです.「問題の結果」を削除すると,その分のコインも減ります(買ったテーマはそのまま使えます).買ったテーマはログインした端末どうしで共有され,どのテーマを使うかは端末ごとに選べます.</p>`;
-  m.querySelectorAll("[data-use]").forEach(b => b.onclick = () => { setTheme(b.dataset.use); render(); });
-  m.querySelectorAll("[data-try]").forEach(b => b.onclick = () => { previewTheme = b.dataset.try; applyTheme(previewTheme); renderShop(); });
-  m.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => buyTheme(b.dataset.buy));
 }
 // ほかの画面に移ったら,試していたテーマを元に戻す(nav.js の render から呼ぶ)
 function endPreview() { if (previewTheme && view !== "shop") { previewTheme = null; applyTheme(currentTheme()); } }

@@ -11,8 +11,12 @@ const CONTESTS = {
   all: { name: "総合", word: 4, grammar: 4, reading: 1, sec: 720, desc: "単語4問・文法4問・長文1題(3〜4問).12分" },
   word: { name: "単語", word: 12, sec: 300, desc: "単語12問.5分" },
   grammar: { name: "文法", grammar: 10, sec: 480, desc: "文法10問.8分" },
-  reading: { name: "長文", reading: 2, sec: 900, desc: "長文2題(6〜8問).15分" }
+  reading: { name: "長文", reading: 2, sec: 900, desc: "長文2題(6〜8問).15分" },
+  // ミニ模試:TOEIC のリーディング(Part 5 が30問・Part 6 が16問・Part 7 が54問・75分)の半分の配分
+  mock: { name: "ミニ模試", p5: 15, p6: 2, p7: 27, sec: 2280, desc: "TOEIC と同じ配分の半分.Part 5 が15問・Part 6 が2題(8問)・Part 7 が27問.38分" }
 };
+// ミニ模試の中で,その問題がどの Part か(文法 = Part 5,長文の穴埋め = Part 6,それ以外の長文 = Part 7)
+const partOf = it => (it.dom === "grammar" ? 5 : it.dom === "reading" ? (it.p.part6 ? 6 : 7) : 0);
 const DAY = 86400000;
 const GOAL = 20;        // 1日の目安の問題数
 const TOEIC_GOAL_DEFAULT = 550; // 目標の TOEIC スコア(「記録」画面で変えられる.S.goal)
@@ -404,8 +408,9 @@ const BADGES = [
   mkBadge("fig", "長文", "図表を読む", "表やグラフのある長文を3題,全問 AC にする", badgeN("figDone", 3)),
   mkBadge("rall", "長文", "長文全 AC", "長文の全設問を AC の状態にする", badgeYes("readAll")),
 
-  mkBadge("shop1", "その他", "おしゃれ", "ショップでテーマを1つ買う", badgeN("owned", 1)),
-  mkBadge("shop5", "その他", "コレクター", "ショップでテーマを5つ買う", badgeN("owned", 5)),
+  mkBadge("shop1", "その他", "おしゃれ", "ショップで品物を1つ買う(テーマ・フォント・アイコン・演出)", badgeN("owned", 1)),
+  mkBadge("shop5", "その他", "コレクター", "ショップで品物を5つ買う", badgeN("owned", 5)),
+  mkBadge("shop10", "その他", "大コレクター", "ショップで品物を10個買う", badgeN("owned", 10)),
   mkBadge("coin500", "その他", "コイン長者", "コインを合計500枚ためる(使った分も数える)", badgeN("earned", 500)),
   mkBadge("score1", "その他", "答え合わせ", "実際の TOEIC の点数を記録する", badgeN("scores", 1)),
   mkBadge("night", "その他", "夜ふかし", "夜中(0時〜4時)に問題を解く", badgeYes("night")),
@@ -457,6 +462,8 @@ function autoPick(dom, avoid) {
     return shuffle(WORDS.filter(w => w.id !== avoid))[0].id;
   }
   if (dom === "grammar") {
+    const due = GRAM.filter(q => S.srs[q.id] && S.srs[q.id].due <= Date.now() && q.id !== avoid).sort((a, b) => S.srs[a.id].due - S.srs[b.id].due);
+    if (due.length) return due[0].id;
     const notAC = GRAM.filter(q => statusOf(q.id) !== "AC" && q.id !== avoid);
     return pickNear(notAC.length ? notAC : GRAM.filter(q => q.id !== avoid), estimate("grammar"), 1)[0].id;
   }

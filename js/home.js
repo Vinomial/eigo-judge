@@ -53,7 +53,7 @@ function toeicHTML() {
   </div>`;
 }
 function homeHTML() {
-  const due = dueWords().length, sk = streaks(), wa = waQueue().length, weak = weakWords().length;
+  const due = dueWords().length, sk = streaks(), wa = waQueue().length, gdue = dueQueue("grammar").length;
   const unseen = WORDS.filter(w => !S.srs[w.id]).length;
   const gLeft = GRAM.filter(q => statusOf(q.id) !== "AC").length, rLeft = READING.filter(p => passageStatus(p) !== "AC").length;
   const tile = (attrs, title, sub, cls = "") => `<button class="tile ${cls}" ${attrs}><b>${title}</b><span>${sub}</span></button>`;
@@ -71,8 +71,8 @@ function homeHTML() {
     ${tile('data-go="auto" data-dom="word"', "単語", due ? `復習 ${due} 語がたまっています` : unseen ? `新しい単語(残り ${unseen} 語)` : "おまかせで復習")}
     ${tile('data-go="auto" data-dom="grammar"', "文法", gLeft ? `おまかせ(未 AC ${gLeft} 問)` : "全問 AC.おまかせで復習")}
     ${tile('data-go="auto" data-dom="reading"', "長文", rLeft ? `おまかせ(未 AC ${rLeft} 題)` : "全題 AC.おまかせで復習")}
-    ${wa ? tile('data-go="wa"', "WA を解き直す", `${wa} 問(古いものから${wa > 20 ? " 20 問" : ""})`, "warn") : ""}
-    ${weak ? tile('data-go="weak"', "苦手な単語", `${weak} 語.取り違えやすい語と一緒に`, "warn") : ""}
+    ${tile('data-go="drill"', "解き直し・未挑戦", [wa ? `間違えた問題 ${wa}` : "", gdue ? `文法の復習 ${gdue}` : "", `未挑戦 ${unseenCount("all")}`].filter(Boolean).join(" · "), wa ? "warn" : "")}
+    ${tile('data-go="mock"', "ミニ模試", "TOEIC と同じ配分で50問・38分", "")}
   </div>
   <p class="small muted">練習ではレートは動きません.本番を解くとレートと推定スコアが変動します.</p>
   <h2>進捗(今 AC の問題)</h2>

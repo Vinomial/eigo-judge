@@ -24,7 +24,7 @@ document.addEventListener("keydown", e => {
 
 // ブラウザに保存データを消されにくくする(対応している環境のみ)
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* noop */ }
-applyTheme(currentTheme());
+applyLook(); // テーマ・フォント・タブのアイコン(js/shop.js)
 applyEstD();
 restoreContest();
 render();

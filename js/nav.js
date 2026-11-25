@@ -32,6 +32,7 @@ function render() {
   else if (view === "record") renderRecord();
   else if (view === "log") renderLog();
   else if (view === "shop") renderShop();
+  else if (view === "drill") { $("#main").innerHTML = drillHTML(); bindDrill(); }
   else $("#main").innerHTML = defsHTML();
   bindGo();
 }
@@ -41,7 +42,8 @@ function bindGo() {
   $$("[data-go]").forEach(b => b.onclick = () => {
     const to = b.dataset.go;
     if (to === "auto") startSolve(b.dataset.dom || LIST.dom, null, null, "", from);
-    else if (to === "wa") startWaReview();
+    else if (to === "wa") go("drill");
+    else if (to === "mock") go("contest"); // 種類の選択から(ミニ模試は目立つ位置に出る)
     else if (to === "weak") startWeakWords();
     else if (to === "thm") startTheorem(b.dataset.thm, from);
     else go(to);

@@ -20,7 +20,7 @@ html { -webkit-text-size-adjust: 100%; height: 100%; overflow: hidden; }
 body {
   margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none;
   background: var(--bg); color: var(--ink);
-  font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-family: var(--font-ja, "Zen Kaku Gothic New"), "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
   font-size: 16px; line-height: 1.7;
   -webkit-tap-highlight-color: transparent;
 }
@@ -494,3 +494,44 @@ nav button[aria-current="page"] svg { background: color-mix(in srgb, var(--accen
 .bprog .pbar > span { background: var(--accent); }
 .bnum { font-size: .72rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 @media (max-width: 400px) { .rsec .badges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ================= ショップの品物 ================= */
+/* タブのアイコン(nav[data-icons]) */
+nav[data-icons="bold"] svg { stroke-width: 2.6; }
+nav[data-icons="duo"] svg { fill: color-mix(in srgb, currentColor 22%, transparent); }
+nav .emo { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 30px; border-radius: 999px; font-size: 1.25rem; line-height: 1; filter: grayscale(.55); opacity: .8; }
+nav button[aria-current="page"] .emo { filter: none; opacity: 1; background: color-mix(in srgb, var(--accent) 16%, transparent); }
+nav svg.pix, .iconsw svg.pix { fill: currentColor; stroke: none; shape-rendering: crispEdges; padding: 5px 14px; }
+/* 見本 */
+.fontsw { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); font-size: .8rem; line-height: 1.3; color: var(--ink); }
+.fontsw b { font-size: .95rem; }
+.iconsw { display: grid; grid-template-columns: repeat(3, 1fr); place-items: center; padding: 6px 4px; background: var(--bg); color: var(--ink); }
+.iconsw svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.iconsw[data-icons="bold"] svg { stroke-width: 2.6; }
+.iconsw[data-icons="duo"] svg { fill: color-mix(in srgb, currentColor 22%, transparent); }
+.iconsw svg.pix { width: 22px; height: 22px; padding: 0; }
+.iconsw .emo { font-size: 1.1rem; }
+.fxsw { display: flex; align-items: center; justify-content: center; background: var(--bg); font-size: 2rem; color: var(--accent); }
+/* 正解の演出(画面の真ん中に出して消える.押しても邪魔しない) */
+.fx { position: fixed; left: 50%; top: 42%; z-index: 30; pointer-events: none; }
+.fx i { position: absolute; left: 0; top: 0; width: 9px; height: 14px; background: var(--c); border-radius: 2px; transform: translate(-50%, -50%); animation: fxburst 1.1s cubic-bezier(.2, .7, .3, 1) forwards; }
+.fx-stars i { width: auto; height: auto; background: none; color: var(--c); font-size: 1.4rem; font-style: normal; }
+.fx-confetti i { animation-duration: 1.3s; }
+@keyframes fxburst { 0% { transform: translate(-50%, -50%) scale(.4); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y) + 80px)) rotate(var(--r)) scale(1); opacity: 0; } }
+.fx-maru svg { width: 180px; height: 180px; transform: translate(-50%, -50%); animation: fxmaru 1.2s ease-out forwards; overflow: visible; }
+.fx-maru circle { fill: none; stroke: #E5484D; stroke-width: 6; }
+.fx-maru .petal { fill: none; stroke: #E5484D; stroke-width: 3; }
+@keyframes fxmaru { 0% { transform: translate(-50%, -50%) scale(.3) rotate(-30deg); opacity: 0; } 30% { transform: translate(-50%, -50%) scale(1.05) rotate(0); opacity: 1; } 75% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+/* 解き直し・未挑戦 */
+.dtitle { font-size: 1.15rem; }
+.dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.dbtn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; min-height: 60px; background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; text-align: left; }
+.dbtn span { font-size: .8rem; color: var(--muted); }
+.dbtn:disabled { opacity: .45; cursor: default; }
+@media (hover: hover) { .dbtn:hover:not(:disabled) { border-color: var(--accent); } }
+/* ミニ模試 */
+.kind.mock { border: 1.5px solid var(--wa); }
+.parttag { color: var(--accent); }
+.mocksum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 10px; }
+.mocksum > div { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 8px 10px; display: flex; flex-direction: column; }
+.mocksum b { font-size: 1.4rem; line-height: 1.2; }

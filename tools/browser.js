@@ -30,7 +30,7 @@ function chromePath() {
   try { const p = chromium.executablePath(); if (p && fs.existsSync(p)) return p; } catch (e) { /* 次へ */ }
   const cache = path.join(os.homedir(), ".cache", "ms-playwright");
   const dirs = fs.existsSync(cache) ? fs.readdirSync(cache).filter(d => /^chromium-\d+$/.test(d)).sort((a, b) => +b.split("-")[1] - +a.split("-")[1]) : [];
-  for (const d of dirs) for (const sub of ["chrome-linux64/chrome", "chrome-linux/chrome", "chrome-mac/Chromium.app/Contents/MacOS/Chromium", "chrome-win/chrome.exe"]) {
+  for (const d of dirs) for (const sub of ["chrome-linux64/chrome", "chrome-linux/chrome", "chrome-linux-arm64/chrome", "chrome-mac/Chromium.app/Contents/MacOS/Chromium", "chrome-win/chrome.exe"]) {
     const p = path.join(cache, d, sub);
     if (fs.existsSync(p)) return p;
   }

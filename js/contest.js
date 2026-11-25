@@ -11,12 +11,32 @@ function startContest(kind = "all") {
   const pen = id => (recent.has(id) ? 400 : 0) + (statusOf(id) === "AC" ? 150 : 0);
   const passages = READING.map(p => ({ id: p.id, d: passageD(p) }));
   const pps = K.reading ? pickNear(passages, estimate("reading"), K.reading, u => (p => (p.qs.some(q => recent.has(q.id)) ? 400 : 0) + (passageStatus(p) === "AC" ? 150 : 0))(PASS_BY.get(u.id))) : [];
+  if (kind === "mock") { startMock(K, recent, pen); return; }
   const items = [
     ...(K.word ? pickNear(WORDS, estimate("word"), K.word, q => pen(q.id)).map(q => ({ dom: "word", q })) : []),
     ...(K.grammar ? pickNear(GRAM, estimate("grammar"), K.grammar, q => pen(q.id)).map(q => ({ dom: "grammar", q })) : []),
     ...pps.flatMap(u => { const p = PASS_BY.get(u.id); return p.qs.map(q => ({ dom: "reading", q, p })); })
   ];
   cState = { kind, items, sts: items.map(it => newSt(it, true)), i: 0, end: Date.now() + K.sec * 1000, done: false, confirming: false };
+  stopTimer(); timerId = setInterval(contestTick, 1000);
+  persistContest();
+  renderContest();
+}
+// ミニ模試:Part 5(文法)→ Part 6(長文の穴埋め)→ Part 7(長文)の順に並べる.Part 7 は設問の数が p7 に届くまで長文を足す
+function startMock(K, recent, pen) {
+  const pPen = p => (p.qs.some(q => recent.has(q.id)) ? 400 : 0) + (passageStatus(p) === "AC" ? 150 : 0);
+  const near = (list, k) => pickNear(list.map(p => ({ id: p.id, d: passageD(p) })), estimate("reading"), k, u => pPen(PASS_BY.get(u.id))).map(u => PASS_BY.get(u.id));
+  const p6 = near(READING.filter(p => p.part6), K.p6);
+  const p7 = [];
+  for (const p of near(READING.filter(p => !p.part6), READING.length)) {
+    if (p7.reduce((a, x) => a + x.qs.length, 0) >= K.p7) break;
+    p7.push(p);
+  }
+  const items = [
+    ...pickNear(GRAM, estimate("grammar"), K.p5, q => pen(q.id)).map(q => ({ dom: "grammar", q })),
+    ...[...p6, ...p7].flatMap(p => p.qs.map(q => ({ dom: "reading", q, p })))
+  ];
+  cState = { kind: "mock", items, sts: items.map(it => newSt(it, true)), i: 0, end: Date.now() + K.sec * 1000, done: false, confirming: false };
   stopTimer(); timerId = setInterval(contestTick, 1000);
   persistContest();
   renderContest();
@@ -65,7 +85,8 @@ function finishContest() {
   // 総合の本番だけが総合レートを動かす.分野別の本番はその分野のパフォーマンスだけを持つ
   const perf = { all: cState.kind === "all" ? Rating.performance(items) : null };
   Object.keys(DOMAINS).forEach(k => perf[k] = Rating.performance(items.filter(x => x.dom === k)));
-  items.forEach(x => { record(x.id, !!x.ok, t); if (x.dom === "word") updateSrs(x.id, !!x.ok); });
+  if (cState.kind === "mock") perf.mock = Rating.performance(items); // ミニ模試全体の出来(総合レートは動かさない)
+  items.forEach(x => { record(x.id, !!x.ok, t); if (x.dom !== "reading") updateSrs(x.id, !!x.ok); });
   S.contests.push({ t, kind: cState.kind, items, perf });
   const after = {};
   Object.keys(SERIES).forEach(k => after[k] = ratingOf(k));
@@ -84,10 +105,11 @@ function renderContest() {
     m.innerHTML = `
       <p style="margin-top:0"><b>本番モード</b>:今の実力に近い難易度から出題します.種類を選んでください.</p>
       <div class="kinds">${Object.entries(CONTESTS).map(([k, K]) => {
-        const r = ratingOf(k);
-        return `<button class="kind${k === "all" ? " main" : ""}" data-kind="${k}"><b>${K.name}</b><span>${K.desc}</span><span class="small">${SERIES[k]}レート ${r == null ? "-" : r}</span></button>`;
+        const r = SERIES[k] ? ratingOf(k) : null;
+        const sub = SERIES[k] ? `${SERIES[k]}レート ${r == null ? "-" : r}` : "文法と長文のレートが動く";
+        return `<button class="kind${k === "all" || k === "mock" ? " main" : ""}${k === "mock" ? " mock" : ""}" data-kind="${k}"><b>${K.name}</b><span>${K.desc}</span><span class="small">${sub}</span></button>`;
       }).join("")}</div>
-      <p class="small muted">総合の本番は総合レートと各分野のレート,分野別の本番はその分野のレートだけが動きます.推定 TOEIC スコアは総合の本番から計算します.</p>
+      <p class="small muted">総合の本番は総合レートと各分野のレート,分野別の本番とミニ模試はその分野のレートだけが動きます.推定 TOEIC スコアは総合の本番から計算します.ミニ模試は時間配分の練習にどうぞ(1問あたり約45秒).</p>
       <p class="small muted">解答中は正誤を表示しません.「わからない」を選ぶと WA になりますが,当てずっぽうより正確に実力を測れます.時間切れになるとその時点で採点します.</p>`;
     m.querySelectorAll("[data-kind]").forEach(b => b.onclick = () => startContest(b.dataset.kind));
     return;
@@ -111,7 +133,7 @@ function renderContest() {
   }
   m.innerHTML = `${banner}
     <div class="ctop">
-      <span><span class="small muted">${CONTESTS[cState.kind || "all"].name} · </span>${i + 1} / ${n}問目 <span class="small muted" id="left-count">(未解答 ${left})</span></span>
+      <span><span class="small muted">${CONTESTS[cState.kind || "all"].name}${cState.kind === "mock" ? ` · <b class="parttag">Part ${partOf(item)}</b>` : ""} · </span>${i + 1} / ${n}問目 <span class="small muted" id="left-count">(未解答 ${left})</span></span>
       <span class="timer" id="timer"></span>
     </div>
     <div class="dots">${cState.items.map((_, k) => `<button class="qdot${k === i ? " cur" : ""}${cState.sts[k].sel != null ? " done" : ""}" data-j="${k}" aria-label="${k + 1}問目">${k + 1}</button>`).join("")}</div>
@@ -180,8 +202,16 @@ function contestResultHTML() {
   return `${promoHTML}
     <p style="margin-top:0"><b>結果:${score} / ${c.items.length} 問正解</b></p>
     <div style="overflow-x:auto"><table class="rtable"><thead><tr><th></th><th>パフォーマンス</th><th>レート</th><th>変動</th></tr></thead><tbody>${rows}</tbody></table></div>
-    ${perf.all != null ? `<p class="small">今回のパフォーマンス ${perf.all} は,TOEIC に換算すると <b>約 ${Math.max(10, Math.min(990, Rating.toeic(perf.all) + toeicOffset()))} 点</b>の出来です(目安).</p>` : `<p class="small muted">分野別の本番なので,${SERIES[c.kind]}レートだけが変動しました.</p>`}
+    ${perf.mock != null ? mockSummaryHTML(c, perf.mock) : ""}
+    ${perf.all != null ? `<p class="small">今回のパフォーマンス ${perf.all} は,TOEIC に換算すると <b>約 ${Math.max(10, Math.min(990, Rating.toeic(perf.all) + toeicOffset()))} 点</b>の出来です(目安).</p>` : c.kind === "mock" ? "" : `<p class="small muted">分野別の本番なので,${SERIES[c.kind]}レートだけが変動しました.</p>`}
     <p class="small muted">パフォーマンスは「今回の出来をレートに換算した値」です.レートはパフォーマンスの平均に近づいていきます(参加回数が少ないうちは低めに出ます).</p>
     <h2>各問題の解説</h2>${det}
     <div class="row" style="margin-top:20px"><button class="btn" id="again-btn">同じ種類でもう一度</button><button class="btn ghost" id="kinds-btn">種類を選ぶ</button><button class="btn ghost" data-go="record">記録を見る</button></div>`;
+}
+
+// ミニ模試の結果:Part ごとの正解数と,全体の出来の換算
+function mockSummaryHTML(c, perf) {
+  const parts = [5, 6, 7].map(n => { const ix = c.items.map((it, i) => (partOf(it) === n ? i : -1)).filter(i => i >= 0); return { n, all: ix.length, ok: ix.filter(i => c.res[i]).length }; });
+  return `<div class="mocksum">${parts.map(x => `<div><span class="small muted">Part ${x.n}</span><b>${x.ok}<span class="small muted">/${x.all}</span></b><span class="small muted">${x.all ? Math.round(100 * x.ok / x.all) : 0}%</span></div>`).join("")}</div>
+    <p class="small">ミニ模試全体のパフォーマンスは ${rateSpan(perf)}.TOEIC(合計点)に換算すると <b>約 ${Math.max(10, Math.min(990, Rating.toeic(perf) + toeicOffset()))} 点</b>の出来です(目安.リスニングは含まず,リーディングの出来から推定).</p>`;
 }

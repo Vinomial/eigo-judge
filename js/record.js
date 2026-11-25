@@ -11,7 +11,7 @@ const REC_TABS = { score: "成績", study: "学習", badge: "実績", est: "分�
 function contestListHTML(H) {
   if (!S.contests.length) return `<p class="muted small">まだありません.まずは1回本番に挑戦して,今の位置を測りましょう.</p>`;
   return `<div class="clist">${S.contests.slice().reverse().slice(0, 30).map(c => {
-    const k = c.kind || "all", e = H[k].find(x => x.t === c.t), ok = c.items.filter(x => x.ok).length;
+    const k = c.kind || "all", e = H[k] && H[k].find(x => x.t === c.t), ok = c.items.filter(x => x.ok).length;
     return `<div class="crow"><div class="cl1"><span class="kindtag">${CONTESTS[k].name}</span><span class="small muted">${new Date(c.t).toLocaleDateString("ja-JP")}</span></div>
       <div class="cl2"><span><b>${ok}</b><span class="small muted">/${c.items.length} 問</span></span><span class="small muted">パフォーマンス</span>${rateSpan(c.perf[k])}
       <span class="crate"><span class="small muted">レート</span> ${e ? rateSpan(e.rating) : ""} ${e && e.prev != null ? signed(e.rating - e.prev) : ""}</span></div></div>`;
