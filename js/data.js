@@ -7,6 +7,10 @@
 // js/sync.js から呼ばれる.同期の結果を反映するときも,もう一度手元と合わせる(通信中に解いた記録を消さないため)
 window.App = {
   getState: () => S,
+  // みんなの解答(js/sync.js の stats):送る中身,送ってよいか,届いたときの処理
+  statsPayload: () => statsPayload(),
+  shareStats: () => S.prefs.share !== false,
+  onPool: () => onPoolChange(),
   applyState(m) {
     const next = Merge.merge(S, m);
     const txt = x => JSON.stringify(Merge.shareable(x));

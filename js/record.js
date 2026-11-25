@@ -85,6 +85,8 @@ function renderRecord() {
   });
   m.querySelectorAll(".hm i[data-day]").forEach(c => c.onclick = () => { const el = $("#hm-info"); if (el) el.textContent = c.getAttribute("aria-label"); });
   const est = $("#est-toggle");
+  const sh = $("#share-toggle");
+  if (sh) sh.onchange = () => { S.prefs.share = sh.checked; save(); if (window.Sync) Sync.stats(true); toast(sh.checked ? "最初の解答をみんなの推定に使ってもらいます." : "最初の解答を送るのをやめ,送った分も消しました."); };
   if (est) est.onchange = () => { S.prefs.estD = est.checked; save(); applyEstD(); renderRecord(); toast(est.checked ? "推定した難易度を使います." : "元の難易度に戻しました."); };
   m.querySelectorAll("[data-estq]").forEach(b => b.onclick = () => { const x = Q_BY.get(b.dataset.estq); startSolve(x.dom, x.dom === "reading" ? Q_PASSAGE.get(x.q.id).id : x.q.id, null, "", "record"); });
   on("#sc-add", () => {
@@ -233,8 +235,10 @@ function estHTML() {
   const E = estimateD(), rows = [];
   for (const dom of Object.keys(DOMAINS)) {
     const x = E.dom[dom];
-    if (!x.ok) { rows.push(`<p class="small muted">${DOMAINS[dom]}:最初の解答 ${x.n} 件(${MIN_ATT} 件たまると推定します).</p>`); continue; }
-    rows.push(`<h3 class="esth">${DOMAINS[dom]} <span class="small muted">最初の解答 ${x.n} 件</span></h3>
+    const cnt = `自分の最初の解答 ${x.n} 件${x.pool ? ` · みんなの解答 ${x.pool} 件` : ""}`;
+    if (!x.ok) { rows.push(`<p class="small muted">${DOMAINS[dom]}:${cnt}(合わせて ${MIN_ATT} 件たまると推定します).</p>`); continue; }
+    if (!x.bands.length) { rows.push(`<h3 class="esth">${DOMAINS[dom]} <span class="small muted">${cnt}</span></h3><p class="small muted">みんなの解答から推定しています(色帯ごとの比較は,自分の最初の解答が ${MIN_ATT} 件たまると出ます).</p>`); continue; }
+    rows.push(`<h3 class="esth">${DOMAINS[dom]} <span class="small muted">${cnt}</span></h3>
       <div style="overflow-x:auto"><table class="estt"><thead><tr><th>色帯</th><th>問題</th><th>予想の正答率</th><th>実際</th><th></th></tr></thead><tbody>${x.bands.map(b => {
         const diff = b.act - b.exp, note = b.n < 10 ? `<span class="muted">少ない</span>` : diff <= -0.15 ? `<span class="down">見積もりより難しい</span>` : diff >= 0.15 ? `<span class="up">見積もりより易しい</span>` : "おおむね妥当";
         return `<tr><td><span class="dot" style="--rc:var(${b.t.color})"></span>${b.t.name}</td><td>${b.n}</td><td>${Math.round(100 * b.exp)}%</td><td>${Math.round(100 * b.act)}%</td><td class="small">${note}</td></tr>`;
@@ -244,10 +248,12 @@ function estHTML() {
   const thmList = G.length ? `<h3 class="esth">見積もりがずれている定理</h3><div class="weak">${G.map(g => `<div class="wrow"><span class="wn">${esc(THM[g.k].name)}</span><span class="small ${g.shift > 0 ? "down" : "up"}">${g.shift > 0 ? "+" : ""}${g.shift}(${g.shift > 0 ? "難しい" : "易しい"})</span><button class="btn ghost sm" data-go="thm" data-thm="${g.k}">練習</button></div>`).join("")}</div>` : "";
   const big = [...E.items].filter(([, e]) => E.dom[e.dom].ok && Math.abs(e.est - e.d0) >= 100).sort((a, b) => Math.abs(b[1].est - b[1].d0) - Math.abs(a[1].est - a[1].d0)).slice(0, 15);
   const name = id => { const { dom, q } = Q_BY.get(id); return dom === "word" ? `<span class="en">${esc(q.w)}</span>` : dom === "grammar" ? `G${id.slice(1)} ${esc(THM[q.t].name)}` : `${id.toUpperCase().replace("Q", " 問")}`; };
-  const list = big.length ? `<h3 class="esth">見積もりと大きく違う問題</h3><div class="estlist">${big.map(([id, e]) => `<button class="chip" data-estq="${id}"><span class="dot" style="${rc(e.est)}"></span><span class="cl">${name(id)}</span><span class="cd">${e.d0} → <b>${e.est}</b> ${e.ok ? "AC" : "WA"}</span></button>`).join("")}</div>` : "";
-  return `<p class="small muted">各問題の最初の解答と,その時点の実力から,問題の難易度を推定し直します(AtCoder Problems の difficulty と同じ考え方).1人分の解答なので,1問ごとの推定は d0 から少ししか動きません.色帯ごとの正答率の比較の方があてになります.</p>
+  const list = big.length ? `<h3 class="esth">見積もりと大きく違う問題</h3><div class="estlist">${big.map(([id, e]) => `<button class="chip" data-estq="${id}"><span class="dot" style="${rc(e.est)}"></span><span class="cl">${name(id)}</span><span class="cd">${e.d0} → <b>${e.est}</b> ${e.n > 1 ? `${e.n}件` : e.ok ? "AC" : "WA"}</span></button>`).join("")}</div>` : "";
+  const share = window.Sync && Sync.state().user ? `<label class="estsw"><input type="checkbox" id="share-toggle" ${S.prefs.share !== false ? "checked" : ""}> 自分の最初の解答をみんなの推定に使ってもらう <span class="small muted">(名前やメールアドレスは送りません.送るのは問題ごとの最初の正誤と,そのときの実力の推定値だけです)</span></label>` : `<p class="small muted">ログインすると,ログインしている人どうしで最初の解答を持ち寄り,人数が増えるほど細かく正確に難易度を推定します(名前やメールアドレスは送りません).</p>`;
+  return `<p class="small muted">各問題の最初の解答と,その時点の実力から,問題の難易度を推定し直します(AtCoder Problems の difficulty と同じ考え方).自分の分に,ログインしている人たちの分(${E.users} 人)を足して推定します.人数が少ないうちは,1問ごとの推定は元の値から少ししか動きません.</p>
     ${rows.join("")}${thmList}${list}
-    <label class="estsw"><input type="checkbox" id="est-toggle" ${S.prefs.estD ? "checked" : ""}> 推定した難易度を使う <span class="small muted">(問題一覧の色・おまかせ・本番の出題とパフォーマンスに反映.いつでも戻せます)</span></label>`;
+    <label class="estsw"><input type="checkbox" id="est-toggle" ${useEstD() ? "checked" : ""}> 推定した難易度を使う <span class="small muted">(問題一覧の色・おまかせ・本番の出題とパフォーマンスに反映.いつでも戻せます.設定していなければ,みんなの解答が2人分以上集まったときに自動で使います)</span></label>
+    ${share}`;
 }
 /* レートの推移グラフ(1系列.背景は色の帯,点はその時点の色) */
 function drawChart(box, key) {

@@ -241,6 +241,9 @@ function itemHTML(item, st) {
   return metaHTML("reading", q.d) + passageHTML(item.p, null, { cur: k + 1, box: true }) + `<p class="qtext en"><b>${qLabel(item.p, k)}</b></p>` + choicesHTML(q.c, st, true);
 }
 function editorialHTML(item) {
+  return editorialBody(item).replace(/<\/div>$/, commHTML(item.q.id) + "</div>");
+}
+function editorialBody(item) {
   const q = item.q;
   if (item.dom === "word") {
     const root = rootOf(q);

@@ -36,6 +36,17 @@ const { doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebas
   await t("users 以外の場所には書けない", assertFails(setDoc(doc(alice, "other/x"), ok)));
   await t("users の下の別の場所には書けない", assertFails(setDoc(doc(alice, "users/alice/sub/x"), ok)));
   await t("本人は自分の文書を消せる", assertSucceeds(deleteDoc(doc(alice, "users/alice"))));
+  // みんなの解答(stats)
+  const st = { a: "w1:1:812,g1:0:640", n: 2, updatedAt: Date.now(), v: 1 };
+  await t("stats:本人は自分の分を書ける", assertSucceeds(setDoc(doc(alice, "stats/alice"), st)));
+  await t("stats:ログインしている人は他人の分も読める", assertSucceeds(getDoc(doc(bob, "stats/alice"))));
+  await t("stats:ログインしている人は一覧を読める", assertSucceeds(getDocs(collection(bob, "stats"))));
+  await t("stats:ログインしていない人は読めない", assertFails(getDocs(collection(anon, "stats"))));
+  await t("stats:他人の分は書けない", assertFails(setDoc(doc(bob, "stats/alice"), st)));
+  await t("stats:他人の分は消せない", assertFails(deleteDoc(doc(bob, "stats/alice"))));
+  await t("stats:決まった項目以外は書けない(メールアドレスなど)", assertFails(setDoc(doc(alice, "stats/alice"), { ...st, email: "a@example.com" })));
+  await t("stats:大きすぎれば書けない", assertFails(setDoc(doc(alice, "stats/alice"), { ...st, a: "x".repeat(200001) })));
+  await t("stats:本人は自分の分を消せる", assertSucceeds(deleteDoc(doc(alice, "stats/alice"))));
   await env.cleanup();
   console.log(`\n${n} 件のテストに合格しました`);
   process.exit(0);

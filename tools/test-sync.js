@@ -81,6 +81,24 @@ T.test("ログアウトしても端末の記録は残り,間違ったパスワ�
   assert.match(await A.evaluate(() => Sync.state().msg), /パスワードが違います/);
 });
 
+T.test("みんなの解答:別の人の最初の解答が届いて推定に使われ,「送らない」にすると消える", async () => {
+  const C = await device();
+  const g40 = p => p.evaluate(() => { const t0 = Date.now(); GRAM.slice(0, 40).forEach((q, i) => record(q.id, i % 3 > 0, t0 + i)); save(); });
+  await g40(B); await g40(C);
+  const t = Date.now();
+  await C.evaluate(e => Sync.signUp(e, "secret123"), "other" + EMAIL);
+  await synced(C, t);
+  await B.evaluate(() => Sync.stats(true)); await C.evaluate(() => Sync.stats(true));
+  const r = await C.evaluate(() => { const E = estimateD(), e = E.items.get(GRAM[1].id); return { users: E.users, n: e && e.n, uid: Sync.state().user.uid }; });
+  assert.strictEqual(r.users, 1, "ほかの人の解答が届かない");
+  assert.strictEqual(r.n, 2, "自分とほかの人の解答が合わさっていない");
+  await C.evaluate(() => { S.prefs.share = false; save(); return Sync.stats(true); });
+  const left = await B.evaluate(async () => { await Sync.stats(true); return Object.keys(JSON.parse(localStorage.getItem("eigo-judge-pool")).users); });
+  assert.ok(!left.includes(r.uid), "「送らない」にしても消えていない");
+  assert.deepStrictEqual(C.errs, []);
+  await C.context().close();
+});
+
 T.test("どちらの端末でもページのエラーが出ていない", async () => {
   assert.deepStrictEqual(A.errs, []); assert.deepStrictEqual(B.errs, []);
 });

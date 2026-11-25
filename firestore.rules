@@ -2,6 +2,7 @@ rules_version = '2';
 // 英語ジャッジのアクセス規則.Firebase の管理画面(Firestore → ルール)にこのまま貼り付けて公開する.
 // - users/{uid} は本人(その uid でログインしている人)だけが読み書き・削除できる.
 // - 中身は { data: 進捗の JSON 文字列, updatedAt: 数, ver: 数 } だけ.data は 900KB まで(いたずらで大きくされないように).
+// - stats/{uid} はみんなの解答(難易度の推定用).ログインしている人は読める.書けるのは本人だけ.
 // - それ以外の場所は誰も読み書きできない(何も書かなければ拒否になる).
 // 変えたら tools/rules-test に従って,エミュレーターで確かめてから公開する.
 service cloud.firestore {
@@ -19,6 +20,22 @@ service cloud.firestore {
       }
       allow get, delete: if isOwner();
       allow create, update: if isOwner() && validDoc();
+    }
+    // みんなの解答(難易度の推定に使う).ログインしている人は全員分を読める(一覧も).書けるのは自分の文書だけ.
+    // 中身は { a: "問題id:正誤:実力,..." の文字列, n, updatedAt, v } だけ.名前やメールアドレスは入れない.a は 200KB まで.
+    match /stats/{uid} {
+      function isOwnerS() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validStats() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['a', 'n', 'updatedAt', 'v'])
+          && d.a is string && d.a.size() <= 200000
+          && d.n is int && d.updatedAt is int && d.v is int;
+      }
+      allow read: if request.auth != null;
+      allow delete: if isOwnerS();
+      allow create, update: if isOwnerS() && validStats();
     }
   }
 }

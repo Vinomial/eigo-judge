@@ -18,6 +18,9 @@
   const KEY = "eigo-judge-sync";
   const MAX_LEN = 900000; // 文書の上限(1MB)より少し小さく
   const DEBOUNCE = 15000; // 解答してから送るまでの待ち時間(まとめて送る)
+  const POOL_KEY = "eigo-judge-pool";      // みんなの最初の解答(js/core.js の poolObs が読む)
+  const POOL_EVERY = 6 * 3600 * 1000;      // みんなの解答を取ってくる間隔(読み取りの回数を抑える)
+  const STATS_MAX = 200000;                // stats の文字列の上限(firestore.rules と同じ)
 
   const st = { fb: null, user: null, busy: false, last: 0, msg: "", err: false, timer: null, again: false, listeners: [] };
   const mem = () => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } };
@@ -101,13 +104,41 @@
       st.timer = setTimeout(() => syncNow("save"), DEBOUNCE);
     },
     syncNow,
-    // サーバーの自分のデータを消す(この端末の記録は残る)
+    // サーバーの自分のデータを消す(この端末の記録は残る).みんなの推定に送った分も消す
     async deleteRemote() {
       if (!st.user) return;
       const { db, F } = st.fb;
       await F.deleteDoc(F.doc(db, "users", st.user.uid));
-    }
+      await F.deleteDoc(F.doc(db, "stats", st.user.uid)).catch(() => {});
+    },
+    stats
   };
+
+  /* みんなの解答:Firestore の stats/{uid} に { a: "id:正誤:実力,...", n, updatedAt, v } を置き,全員分を読んで難易度の推定に使う.
+   * 送るのは問題ごとの最初の正誤と,そのときの実力の推定値だけ(名前・メールアドレス・時刻は送らない).
+   * 「送らない」を選んだら(S.prefs.share === false)自分の文書を消す.取ってくるのは POOL_EVERY ごと(force で今すぐ). */
+  async function stats(force) {
+    if (!st.fb || !st.user || !App.statsPayload) return;
+    const { db, F } = st.fb, uid = st.user.uid, ref = F.doc(db, "stats", uid);
+    try {
+      if (App.shareStats()) {
+        const a = App.statsPayload();
+        if (a && a.length <= STATS_MAX && (force || a !== mem().statsSent)) {
+          await F.setDoc(ref, { a, n: a.split(",").length, updatedAt: Date.now(), v: 1 });
+          remember({ statsSent: a });
+        }
+      } else if (mem().statsSent != null) {
+        await F.deleteDoc(ref); remember({ statsSent: null });
+      }
+      let pool = null; try { pool = JSON.parse(localStorage.getItem(POOL_KEY) || "null"); } catch (e) { pool = null; }
+      if (!force && pool && pool.mine === uid && Date.now() - pool.t < POOL_EVERY) return;
+      const snap = await F.getDocs(F.collection(db, "stats"));
+      const users = {};
+      snap.forEach(d => { const x = d.data(); if (x && typeof x.a === "string") users[d.id] = x.a; });
+      localStorage.setItem(POOL_KEY, JSON.stringify({ t: Date.now(), mine: uid, users }));
+      App.onPool();
+    } catch (e) { /* みんなの解答は無くても動く(規則がまだ公開されていないときなど) */ }
+  }
 
   // 取ってきて → 合わせて → 送る(トランザクションなので,他の端末と同時でも取りこぼさない)
   async function syncNow(reason) {
@@ -130,6 +161,7 @@
       });
       App.applyState(merged, reason);
       st.last = Date.now(); remember({ last: st.last });
+      stats(false); // みんなの解答(失敗しても同期には影響しない)
       if (st.err) setMsg("");
       return true;
     } catch (e) {
