@@ -65,6 +65,7 @@ function homeHTML() {
     <div class="trow"><span><b>今日 ${sk.today}</b> / ${GOAL} 問</span><span class="small muted">${sk.cur} 日連続 · 学習 ${sk.total} 日</span></div>
     <div class="pbar"><span style="width:${Math.min(100, 100 * sk.today / GOAL).toFixed(0)}%"></span></div>
   </div>
+  ${petCardHTML()}
   <h2>今日のメニュー</h2>
   <div class="tiles">
     ${tile('data-go="contest"', "本番に挑戦する", "総合または分野別.レートが動く", "main")}

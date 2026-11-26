@@ -154,7 +154,11 @@ function renderSolveSingle() {
     const bar = $(".qprog > span");
     if (bar && pState.queue) bar.style.width = (100 * (queuePos() + 1) / pState.queue.length).toFixed(1) + "%";
     if (fresh) $("#verdict").scrollIntoView({ block: "nearest", behavior: "smooth" });
-    if (fresh && ok) playFx(); // ショップで買った正解の演出(js/shop.js)
+    if (fresh && ok) { // ショップで買った正解の演出・スタンプ(js/shop.js)と,マスコット(js/pet.js)
+      playFx();
+      $("#verdict").insertAdjacentHTML("beforeend", stampHTML());
+      petPop();
+    }
     if (fresh) afterJudgeEst(st);
     if (fresh && ok && S.prefs.autoNext) {
       const me = pState;

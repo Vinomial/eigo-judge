@@ -54,8 +54,35 @@ const THEMES = [
     c: { bg: "#0F0B1E", surface: "#181330", sunk: "#211A3D", ink: "#ECE8FA", muted: "#A39CC4", line: "#2D2552", accent: "#A98BFF", on: "#160F2E", ac: "#5ED6A0", wa: "#FFAA5C", acBg: "#173A30", waBg: "#45301E", hl: "#3E3420",
       deco: "radial-gradient(1px 1px at 20% 30%, #fff8 50%, transparent 51%), radial-gradient(1px 1px at 70% 15%, #fff6 50%, transparent 51%), radial-gradient(1.5px 1.5px at 85% 60%, #fff7 50%, transparent 51%), radial-gradient(1px 1px at 40% 80%, #fff5 50%, transparent 51%), radial-gradient(120% 80% at 70% 0%, #2B1E55 0%, #0F0B1E 65%)" } },
   { id: "highcontrast", name: "くっきり", desc: "白黒をはっきりさせた見やすい画面", price: 50, tone: "light",
-    c: { bg: "#FFFFFF", surface: "#FFFFFF", sunk: "#EDEDED", ink: "#000000", muted: "#3A3A3A", line: "#8A8A8A", accent: "#0033CC", on: "#FFFFFF", ac: "#006B2E", wa: "#A34400", acBg: "#D4F5DF", waBg: "#FFE1CC", hl: "#FFEB70" } }
+    c: { bg: "#FFFFFF", surface: "#FFFFFF", sunk: "#EDEDED", ink: "#000000", muted: "#3A3A3A", line: "#8A8A8A", accent: "#0033CC", on: "#FFFFFF", ac: "#006B2E", wa: "#A34400", acBg: "#D4F5DF", waBg: "#FFE1CC", hl: "#FFEB70" } },
+  // 季節の限定品(season.その季節だけ買える.買ったものはいつでも使える)
+  { id: "halloween", name: "ハロウィン", desc: "かぼちゃ色と夜の紫", price: 200, tone: "dark", season: "halloween",
+    c: { bg: "#1A1222", surface: "#241A2E", sunk: "#2E2239", ink: "#F4ECDF", muted: "#B9A9C2", line: "#3B2D48", accent: "#FF8A2A", on: "#1A0F05", ac: "#7BD88F", wa: "#FFB347", acBg: "#1F3A28", waBg: "#47301A", hl: "#4A3A1C",
+      deco: "radial-gradient(90% 50% at 85% 0%, #3D2350 0%, #1A1222 65%)" } },
+  { id: "xmas", name: "クリスマス", desc: "白い雪に赤と緑", price: 200, tone: "light", season: "winter",
+    c: { bg: "#FBF7F2", surface: "#FFFFFF", sunk: "#F1E9E0", ink: "#2A2220", muted: "#75685F", line: "#E6DACD", accent: "#B8262F", on: "#FFFFFF", ac: "#1F7A45", wa: "#B8561A", acBg: "#DAEFE0", waBg: "#F7E2D3", hl: "#FFF0B8",
+      deco: "linear-gradient(180deg, #F7EDE6 0%, #FBF7F2 50%, #EEF5EE 100%)" } },
+  { id: "hatsuhi", name: "初日の出", desc: "新年の朝焼けと金色", price: 200, tone: "light", season: "newyear",
+    c: { bg: "#FFF8EE", surface: "#FFFFFF", sunk: "#F8EBD8", ink: "#2B1D14", muted: "#7D6A5A", line: "#EEDCC4", accent: "#C0392B", on: "#FFFFFF", ac: "#2C7A4B", wa: "#B5561E", acBg: "#DCEFE2", waBg: "#F8DFCF", hl: "#FFE7A0",
+      deco: "linear-gradient(180deg, #FFE1C2 0%, #FFF4E4 40%, #FFF8EE 100%)" } }
 ];
+/* 季節の限定品:その期間だけショップに並び,買える(MM-DD.年をまたいでもよい).買ったものはいつでも使える */
+const SEASONS = {
+  newyear: { name: "お正月", from: "12-26", to: "01-15" },
+  spring: { name: "春", from: "03-01", to: "04-30" },
+  summer: { name: "夏", from: "07-01", to: "08-31" },
+  halloween: { name: "ハロウィン", from: "10-01", to: "10-31" },
+  winter: { name: "冬", from: "11-15", to: "12-25" }
+};
+let SHOP_NOW = 0; // テスト用に日付を固定する(0 なら今)
+const shopNow = () => SHOP_NOW || Date.now();
+const mmdd = t => { const d = new Date(t); return String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+function inSeason(key, t = shopNow()) {
+  const s = SEASONS[key]; if (!s) return false;
+  const md = mmdd(t);
+  return s.from <= s.to ? md >= s.from && md <= s.to : md >= s.from || md <= s.to;
+}
+const seasonLabel = key => { const s = SEASONS[key], [m, d] = s.to.split("-").map(Number); return `${s.name}の限定品 · ${m}/${d} まで`; };
 const THEME_BY = new Map(THEMES.map(t => [t.id, t]));
 const VARS = { bg: "--bg", surface: "--surface", sunk: "--sunk", ink: "--ink", muted: "--muted", line: "--line", accent: "--accent", on: "--on-accent", ac: "--ac", wa: "--wa", acBg: "--ac-bg", waBg: "--wa-bg", hl: "--hl", deco: "--bg-deco" };
 let previewTheme = null; // ショップで「試す」中のテーマ(画面を離れると元に戻す)

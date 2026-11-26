@@ -65,7 +65,7 @@ function renderRecord() {
     ${sec("日ごとの記録", `${dailyControlsHTML()}<div class="chart" id="daily"></div><p class="small muted" id="daily-sum"></p>`)}
     ${sec("進捗(今 AC の問題)", progressHTML())}
     ${sec("苦手な定理", weakHTML)}`;
-  else if (recTab === "badge") body = badgesHTML();
+  else if (recTab === "badge") body = stickerBookHTML() + badgesHTML();
   else if (recTab === "est") body = sec("難易度の推定", estHTML()) + sec("難易度の変化の履歴", dlogHTML());
   else body = `
     ${sec("端末間の同期", `<div id="sync-box">${syncHTML()}</div>`)}
