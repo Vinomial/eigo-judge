@@ -10,7 +10,8 @@
     "test:sync": "firebase emulators:exec --only firestore,auth --project eigo-judge \"node tools/test-sync.js\"",
     "release": "node tools/release.js",
     "new": "node tools/new.js",
-    "browser": "playwright-core install chromium"
+    "browser": "playwright-core install chromium",
+    "deploy:rules": "npm run test:rules && firebase deploy --only firestore:rules --project eigo-judge"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",

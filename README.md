@@ -37,4 +37,7 @@ TOEIC 550点を目指す,競技プログラミング風の英語学習アプリ.
 
 ## 公開(GitHub Pages)
 
-リポジトリの Settings → Pages で,Source を「Deploy from a branch」,Branch を `main` / `(root)` にします.
+main に push すると,GitHub Actions(`.github/workflows/test.yml`)がテストを回し,すべて通ったときだけ GitHub Pages に公開します.
+リポジトリの Settings → Pages で,Source を「GitHub Actions」にしておきます.テストが落ちたときは公開されず,前の版のままになります.
+
+Firestore の規則(`firestore.rules`)を変えたときは,`npx firebase login`(初回だけ)のあと `npm run deploy:rules` で公開します.

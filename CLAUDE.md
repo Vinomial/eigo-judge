@@ -82,13 +82,13 @@ TOEIC 550点を1年以内に取るための,競技プログラミング(AtCoder)
 - `js/schema.js` 進捗(`S`)の項目の一覧(`window.Schema`.node でも `require` できる).既定の値,同期するか,どの削除で消すかを1か所に書く.**保存する項目を足すときはここに1行足す**(`freshState`・削除・同期で送るものはここから決まる)
 - `js/merge.js` 2つの進捗を合わせる純粋な関数(`window.Merge`.node でも `require` できる).同期と「読み込む」で使う
 - `js/sync.js` 端末間の同期(Firebase の Authentication と Firestore).ログインした端末だけが SDK を CDN から読み込む
-- `firestore.rules` Firestore のアクセス規則(本人の `users/{uid}` だけ読み書きできる).変えたら `tools/test-rules.js` をエミュレーターで通してから,管理画面に貼って公開する
+- `firestore.rules` Firestore のアクセス規則(本人の `users/{uid}` だけ読み書きできる).変えたら `npx firebase login`(初回だけ)→ `npm run deploy:rules` で公開する(エミュレーターで `tools/test-rules.js` を通してから送る).管理画面に貼ってもよい
 - `tools/test-merge.js` `js/merge.js` のテスト(`node tools/test-merge.js`).同期や保存形式を変えたら必ず通す
 - `tools/test-ui.js` 画面のテスト(ヘッドレスの Chromium で実際に操作する).テストは `tools/ui/` に画面ごとに置く(ファイルを足せば自動で読み込む.共通の道具は `tools/ui/helpers.js`).`node tools/test-ui.js 単語 本番` のように語を付けると,名前にその語を含むテストだけを動かす.`tools/browser.js` はテスト用の小さなサーバーとブラウザの起動
 - `tools/test-sync.js` 2台の端末の同期のテスト(Firebase のエミュレーター相手.本番には通信しない)
 - `package.json` はテストの道具だけ(アプリはビルド不要のまま).`firebase.json` はエミュレーターの設定
 - `eslint.config.js` lint の設定.index.html の順に各ファイルの一番外側の宣言を集め,ほかのファイルから見える名前として渡す(どこにも宣言のない名前=打ち間違いを `no-undef` で見つける).ブラウザの大域の名前(`history` など)と同じ名前は付けない
-- `.github/workflows/test.yml` push のたびに GitHub Actions で全部のテスト(lint・検査・画面・同期・規則)を回す.失敗すると GitHub に × が付く
+- `.github/workflows/test.yml` push のたびに GitHub Actions で全部のテスト(lint・検査・画面・同期・規則)を回す.**main への push はテストにすべて通ったときだけ GitHub Pages に公開する**(Pages の Source は「GitHub Actions」.落ちたら公開されず,前の版のまま).公開するのはアプリのファイル(index.html,manifest,css/,js/,data/,icons/)だけ.アプリにファイルの種類を足したら,ここの cp にも足す
 - `tools/release.js`(`npm run release`) 公開の準備:`?v=` を公開中より1つ上げ,更新履歴に新しい1件があるかを確かめ,`npm test` を通す
 - `tools/new.js`(`npm run new -- 種類`) 問題を足すときのひな形(次の id,正解の位置の偏りをならす).`grammar T12` / `reading [part6|multi]` / `word 語 …` / `thm`
 - `data/words.js` 語根から導く単語(`AFFIX`,`ROOT`,`WORDS`)
@@ -102,10 +102,10 @@ TOEIC 550点を1年以内に取るための,競技プログラミング(AtCoder)
 - `tools/find-words.js` 単語を足す前に,候補が収録済みか・派生形か・基本語かを調べる
 - **公開するたびに `data/changelog.js` に1件足す**(id は連番.利用者から見て変わったことを書く).
 - `index.html` の `?v=番号` は古いファイルが残らないようにするための番号.JS・CSS・データを変えて公開するときに上げる(`npm run release` が上げる.番号がそろっているか,js/ と data/ のファイルをすべて読み込んでいるかは `tools/check.js` が調べる)
-- **公開の手順**:更新履歴に1件足す → `npm run release` → コミット → `git push origin main`(GitHub Pages に反映される)
+- **公開の手順**:更新履歴に1件足す → `npm run release` → コミット → `git push origin main` → GitHub Actions のテストに通ると GitHub Pages に反映される(4分ほど.`gh run watch` で見られる)
 
 ビルド不要.`index.html` をブラウザで直接開いても動く(データは `fetch` ではなく `<script>` で読み込むため).
-GitHub Pages(https://vinomial.github.io/eigo-judge/)で公開する.
+GitHub Pages(https://vinomial.github.io/eigo-judge/)で公開する(GitHub Actions から.テストに通ったときだけ).
 
 ## テスト
 

@@ -1,5 +1,6 @@
 # push と pull request のたびに検査とテストを回す(失敗すると GitHub に×が付き,メールで知らせが来る).
-# アプリの公開(GitHub Pages)はこれとは別に main から行われる.
+# main への push でテストにすべて通ったときだけ,アプリを GitHub Pages に公開する(deploy).
+# 公開するのはアプリのファイルだけ(index.html,manifest,css/,js/,data/,icons/).テストの道具や CLAUDE.md は含めない.
 name: test
 on:
   push:
@@ -26,3 +27,31 @@ jobs:
           java-version: 21
       - name: 同期とアクセス規則のテスト(Firebase のエミュレーター.本番には通信しない)
         run: npm run test:sync && npm run test:rules
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: 公開するファイルを集める
+        run: |
+          mkdir _site
+          cp -r index.html manifest.webmanifest css js data icons _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

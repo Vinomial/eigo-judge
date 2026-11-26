@@ -47,5 +47,5 @@ if (!process.argv.includes("--no-test")) {
   }
   console.log("✓ 検査とテストに合格");
 }
-console.log("\n公開の準備ができました.git commit して git push origin main すると GitHub Pages に反映されます.");
+console.log("\n公開の準備ができました.git commit して git push origin main すると,GitHub Actions のテストに通ったあと GitHub Pages に反映されます(4分ほど.gh run watch で見られます).");
 console.log("同期・保存形式・規則を変えたときは npm run test:sync と npm run test:rules も通してください.");
