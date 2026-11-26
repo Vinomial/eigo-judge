@@ -57,9 +57,14 @@ function migrate(o) {
 }
 let S = freshState();
 try { const raw = localStorage.getItem(LS_KEY); if (raw) S = migrate(JSON.parse(raw)); } catch (e) { /* 保存領域が使えない環境では毎回初期状態 */ }
+let saveWarned = false;
 function save(fromSync) {
   S.updatedAt = Date.now();
-  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* noop */ }
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+  catch (e) {
+    // 端末の保存領域がいっぱいなど.黙って失敗すると記録が消えるので,1回だけ知らせる
+    if (!saveWarned && typeof toast === "function") { saveWarned = true; setTimeout(() => toast("<b>この端末に記録を保存できませんでした</b><br><span class=\"small\">保存領域がいっぱいかもしれません.ログインして同期するか,「記録」→「データ」で書き出してください.</span>"), 0); }
+  }
   if (!fromSync && window.Sync) Sync.dirty();
 }
 

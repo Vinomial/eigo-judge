@@ -30,6 +30,7 @@ function syncHTML() {
   if (z.user) return `
     <p class="small" style="margin:0">ログイン中:<b>${esc(z.email || "(メールアドレスなし)")}</b></p>
     <p class="small muted" style="margin:2px 0 8px">${z.busy ? "同期しています…" : z.last ? `最後の同期:${new Date(z.last).toLocaleString("ja-JP")}` : "まだ同期していません."}</p>
+    ${(() => { const sz = Sync.size(); if (!sz.packed) return ""; const pct = Math.round(100 * sz.packed / sz.max); return `<p class="small ${pct >= 80 ? "down" : "muted"}" style="margin:0 0 8px">サーバーの記録の大きさ:${Math.round(sz.packed / 1000)} KB / ${Math.round(sz.max / 1000)} KB(${pct}%.圧縮前は ${Math.round(sz.raw / 1000)} KB)${pct >= 80 ? ".上限に近づいています.作者に知らせてください." : ""}</p>`; })()}
     ${msg}
     <div class="row"><button class="btn" id="sync-now"${z.busy ? " disabled" : ""}>今すぐ同期</button><button class="btn ghost" id="sync-out">ログアウト</button></div>
     <details class="small" style="margin-top:10px"><summary>サーバーの記録を削除する</summary>

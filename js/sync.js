@@ -16,7 +16,42 @@
   };
   const SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
   const KEY = "eigo-judge-sync";
-  const MAX_LEN = 900000; // 文書の上限(1MB)より少し小さく
+  const MAX_LEN = 900000; // 文書の上限(1MB)より少し小さく(圧縮した後の長さで比べる)
+  /* 送るときは圧縮する(gzip → base64 の前に "z1:" を付ける).記録はおよそ 5〜7 倍小さくなる.
+   * 圧縮のない古い文書(JSON そのまま)も読める.古い版のアプリが圧縮された文書を読むと JSON.parse で失敗して同期をやめるので,記録は消えない.
+   * CompressionStream が使えない環境では,今まで通り JSON のまま送る. */
+  const ZIP = "z1:";
+  const canZip = () => typeof CompressionStream === "function" && typeof DecompressionStream === "function";
+  async function pipe(bytes, stream) { return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()); }
+  function toB64(u8) { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+  function fromB64(b) { const s = atob(b), u8 = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i); return u8; }
+  /* 解答の履歴 att は,圧縮する前に「問題の番号の表」と「前の解答との時刻の差」に置き換える(時刻の数字が毎回違うと gzip が縮めにくいため).
+   * att: { z: 1, ids: [問題 id], c: "番号*2+正誤(36進),...", d: "前との差ミリ秒(36進),..." }.ミリ秒まで元に戻る(同期の重複判定に使うため). */
+  function attPack(att) {
+    const ids = [], ix = new Map(); let prev = 0; const c = [], d = [];
+    for (const [id, t, ok] of att) {
+      if (!ix.has(id)) { ix.set(id, ids.length); ids.push(id); }
+      c.push((ix.get(id) * 2 + (ok ? 1 : 0)).toString(36)); d.push((t - prev).toString(36)); prev = t;
+    }
+    return { z: 1, ids, c: c.join(","), d: d.join(",") };
+  }
+  function attUnpack(p) {
+    if (!p.c) return [];
+    const c = p.c.split(","), d = p.d.split(","); let t = 0;
+    return c.map((x, i) => { const k = parseInt(x, 36); t += parseInt(d[i], 36); return [p.ids[k >> 1], t, k & 1]; });
+  }
+  async function pack(json) {
+    if (!canZip()) return json;
+    const o = JSON.parse(json);
+    if (Array.isArray(o.att)) o.att = attPack(o.att); // キーの順番は変えない(取ってきた側で同じ JSON に戻すため)
+    return ZIP + toB64(await pipe(new TextEncoder().encode(JSON.stringify(o)), new CompressionStream("gzip")));
+  }
+  async function unpack(text) {
+    if (!text.startsWith(ZIP)) return text;
+    const o = JSON.parse(new TextDecoder().decode(await pipe(fromB64(text.slice(ZIP.length)), new DecompressionStream("gzip"))));
+    if (o.att && o.att.z === 1) o.att = attUnpack(o.att);
+    return JSON.stringify(o);
+  }
   const DEBOUNCE = 15000; // 解答してから送るまでの待ち時間(まとめて送る)
   const POOL_KEY = "eigo-judge-pool";      // みんなの最初の解答(js/core.js の poolObs が読む)
   const POOL_EVERY = 6 * 3600 * 1000;      // みんなの解答を取ってくる間隔(読み取りの回数を抑える)
@@ -104,6 +139,9 @@
       st.timer = setTimeout(() => syncNow("save"), DEBOUNCE);
     },
     syncNow,
+    // 送っている記録の大きさ(圧縮後・圧縮前の文字数).テストと画面の表示に使う
+    size: () => ({ packed: st.size || 0, raw: st.raw || 0, max: MAX_LEN }),
+    _pack: pack, _unpack: unpack,
     // サーバーの自分のデータを消す(この端末の記録は残る).みんなの推定に送った分も消す
     async deleteRemote() {
       if (!st.user) return;
@@ -153,11 +191,17 @@
       await F.runTransaction(db, async tx => {
         const snap = await tx.get(ref);
         const remoteText = snap.exists() ? snap.data().data : null;
-        const remote = remoteText ? JSON.parse(remoteText) : null;
+        const remoteJson = remoteText ? await unpack(remoteText) : null;
+        const remote = remoteJson ? JSON.parse(remoteJson) : null;
         merged = remote ? Merge.merge(App.getState(), remote) : App.getState();
         const text = JSON.stringify(Merge.shareable(merged));
-        if (text.length > MAX_LEN) throw Object.assign(new Error("too-large"), { code: "too-large" });
-        if (text !== remoteText) tx.set(ref, { data: text, updatedAt: Date.now(), ver: 2 });
+        // 中身が変わったときだけ,圧縮して送る(比べるのは圧縮する前の JSON)
+        if (text !== remoteJson) {
+          const packed = await pack(text);
+          if (packed.length > MAX_LEN) throw Object.assign(new Error("too-large"), { code: "too-large" });
+          tx.set(ref, { data: packed, updatedAt: Date.now(), ver: 2 });
+          st.size = packed.length; st.raw = text.length;
+        }
       });
       App.applyState(merged, reason);
       st.last = Date.now(); remember({ last: st.last });

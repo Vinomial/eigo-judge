@@ -99,6 +99,27 @@ T.test("みんなの解答:別の人の最初の解答が届いて推定に使�
   await C.context().close();
 });
 
+T.test("容量:サーバーには圧縮して送り,圧縮していない古い形の記録も読める.大量の解答でも上限に収まる", async () => {
+  // 大量の解答(2万件)を作って同期し,圧縮後の大きさを確かめる.
+  // 時刻は前のテストの「問題の結果」の削除より後にする(削除より前の解答は,同期で正しく捨てられるため)
+  await A.evaluate(e => Sync.signIn(e, "secret123"), EMAIL); await synced(A, 0);
+  await A.evaluate(() => { const t0 = Date.now() + 1000; for (let i = 0; i < 20000; i++) record(ALLQ[i % ALLQ.length][1].id, i % 3 > 0, t0 + i * 997); save(); });
+  await syncNow(A);
+  const sz = await A.evaluate(() => Sync.size());
+  assert.ok(sz.packed > 0 && sz.packed < sz.max, `圧縮後 ${sz.packed} 文字(上限 ${sz.max})`);
+  assert.ok(sz.raw / sz.packed > 5, `圧縮が効いていない(${sz.raw} → ${sz.packed})`);
+  console.log(`       (2万件の解答:圧縮前 ${Math.round(sz.raw / 1000)} KB → 送る大きさ ${Math.round(sz.packed / 1000)} KB)`);
+  // 古い形(JSON のまま)の文書を置いても,もう片方の端末で読めて合わせられる
+  const n = await A.evaluate(async () => {
+    const plain = JSON.stringify({ ver: 2, res: { g5: { ac: 1, wa: 0, last: "AC", t: Date.now() } }, att: [["g5", Date.now(), 1], ["w1", Date.now() + 5, 0], ["g5", Date.now() + 9, 0]], z: 1 });
+    const all = JSON.stringify(Merge.shareable(S));
+    return [await Sync._unpack(await Sync._pack(plain)) === plain, await Sync._unpack(await Sync._pack(all)) === all, await Sync._unpack(plain) === plain];
+  });
+  assert.deepStrictEqual(n, [true, true, true], "圧縮して戻すと元に戻らない(または古い形が読めない)");
+  await syncNow(B);
+  assert.ok(await B.evaluate(() => S.att.length >= 20000), "圧縮した記録をもう片方の端末で読めない");
+});
+
 T.test("どちらの端末でもページのエラーが出ていない", async () => {
   assert.deepStrictEqual(A.errs, []); assert.deepStrictEqual(B.errs, []);
 });
