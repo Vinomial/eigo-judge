@@ -11,7 +11,7 @@ vm.createContext(ctx);
 for (const f of ["words.js", "vocab.js", "grammar.js", "reading.js"]) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "data", f), "utf8"), ctx, { filename: f });
 }
-const { AFFIX, ROOT, WORDS, THM, GRAM, READING, IRREG } = ctx.window;
+const { AFFIX, ROOT, WORDS, THM, GRAM, READING, IRREG, CONFUSE } = ctx.window;
 
 const errors = [];
 const err = (id, msg) => errors.push(`${id}: ${msg}`);
@@ -67,6 +67,9 @@ const used = { r: new Set(), a: new Set() };
 WORDS.forEach(w => w.p.forEach(p => used[p[1]] && used[p[1]].add(p[2] || p[0])));
 Object.keys(ROOT).forEach(k => { if (!used.r.has(k)) err(`ROOT.${k}`, "どの単語にも使われていない"); });
 Object.keys(AFFIX).forEach(k => { if (!used.a.has(k)) err(`AFFIX.${k}`, "どの単語にも使われていない"); });
+// 取り違えやすい語の組:どの語も単語データにあること(ないと選択肢に並ばない)
+const spelled = new Set(WORDS.map(w => w.w));
+(CONFUSE || []).forEach(g => g.forEach(w => { if (!spelled.has(w)) err(`CONFUSE.${w}`, "単語データにない"); }));
 
 // 文法
 const stems = new Map();

@@ -3,6 +3,14 @@
 // 公開するたびに1件足す.items は利用者から見て何が変わったかを短く書く.
 window.CHANGELOG = [
   {
+    id: 14, date: "2026-11-26", title: "身の回りの物・乗り物の単語と熟語を追加・反対の意味の語が選択肢に並ぶように",
+    items: [
+      "文房具・家具・服・台所用品など身の回りの物(stapler,cupboard,apron,kettle など)と,乗り物・交通の語(boarding pass,crosswalk,steering wheel など)を追加しました.TOEIC の写真描写の問題によく出る語です.",
+      "基本の動詞を使った熟語(get on,try on,throw away,pull over など)を追加しました.",
+      "反対の意味の語(buy / sell,arrive / depart,superior / inferior など 63 組)を,取り違えやすい語として選択肢に並べるようにしました.反対の語も新しく追加しています.全 3190 語."
+    ]
+  },
+  {
     id: 13, date: "2026-11-26", title: "ごく基本の単語を約400語追加",
     items: [
       "中学で習うような基本の動詞(go,take,buy など)・形容詞(big,cheap,busy など)・副詞・名詞(office,ticket,weather など)・数(one〜million)・カタカナ語(camera,laptop など)を約400語追加しました.全 3015 語.",
