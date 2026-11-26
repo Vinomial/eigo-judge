@@ -8,12 +8,15 @@
  *   - srs(単語の復習)は最後に解いた時刻 t の新しい方.
  *   - days / dayAc(日ごとの数)は日ごとに大きい方.
  *   - badges と owned(買ったテーマ)は和集合(早い方の時刻),scores は時刻で和集合,goal は新しい方.
+ *   - daily(今日の問題)は日ごとに AC の多い方(同じなら早い方),speed(早解き)は時刻で和集合.
  *   - prefs と live(解答中の本番)はその端末だけのもの(手元を残す.seenLog だけは大きい方).
  * 削除:wipe = { contests, results, all }(削除した時刻)と del.scores(消した点数の時刻)を持つ.
  *   相手の削除を知らない側(wipe が古い側)の記録は,削除の時刻より前のものを捨てる.
  *   時刻を持たない項目(日ごとの数,所要時間,実績)は,その側の att から作り直すか捨てる.
  * 性質:merge(a, b) は何度くり返しても同じ結果になる(冪等).a と b を入れ替えても,手元だけの項目以外は同じ. */
 (function (root) {
+  // 項目の一覧(js/schema.js).ブラウザでは先に読み込んだ window.Schema,node では require
+  const Schema = typeof module !== "undefined" && module.exports ? require("./schema.js") : root.Schema;
   const dateKey = t => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const obj = x => (x && typeof x === "object" && !Array.isArray(x) ? x : {});
   const arr = x => (Array.isArray(x) ? x : []);
@@ -48,6 +51,8 @@
       }
       srs = Object.fromEntries(Object.entries(srs).filter(([, v]) => v && num(v.t) >= cut.results));
     }
+    const daily = Object.fromEntries(Object.entries(obj(s.daily)).filter(([, v]) => v && num(v.t) >= cut.results));
+    const speed = arr(s.speed).filter(x => x && num(x.t) >= cut.results);
     if (!knowsA && knowsR) {
       // 「すべて」の削除を知らない側:日ごとの数は att から作り直す(結果の削除は知っているので res は使える)
       days = {}; dayAc = {};
@@ -55,7 +60,7 @@
     }
     const contests = arr(s.contests).filter(c => c && num(c.t) >= cut.contests);
     return {
-      att, res, srs, days, dayAc, readTimes, contests,
+      att, res, srs, days, dayAc, readTimes, contests, daily, speed,
       legacy: knowsC ? s.legacy || null : null,
       badges: knowsA ? obj(s.badges) : {},
       owned: knowsA ? obj(s.owned) : {},
@@ -150,20 +155,34 @@
     out.goal = !a.goal ? b.goal : !b.goal ? a.goal : num(b.goal.t) > num(a.goal.t) ? b.goal : a.goal;
     if (!out.goal) out.goal = null;
 
+    // 今日の問題:日ごとに AC の多い方(同じなら先に解き終えた方)
+    const dl = Object.assign({}, b.daily);
+    for (const [k, v] of Object.entries(a.daily)) {
+      const w = dl[k];
+      if (!w || num(v.ac) > num(w.ac) || (num(v.ac) === num(w.ac) && num(v.t) < num(w.t))) dl[k] = v;
+    }
+    out.daily = dl;
+
+    // 早解き:時刻で和集合
+    const sp = new Map();
+    for (const x of [...a.speed, ...b.speed]) if (!sp.has(x.t)) sp.set(x.t, x);
+    out.speed = [...sp.values()].sort((p, q) => p.t - q.t);
+
     out.updatedAt = Math.max(num(local.updatedAt), num(remote.updatedAt));
     return out;
   }
+  // 合わせ方を書いた項目(js/schema.js の sync が true の項目と一致させる.tools/test-merge.js で確かめる)
+  const HANDLED = ["ver", "res", "srs", "contests", "readTimes", "days", "dayAc", "att", "badges", "scores", "goal", "owned", "daily", "speed", "legacy", "wipe", "del"];
 
   // 同期で送らない項目(その端末だけのもの)を除いたもの
+  // updatedAt は保存のたびに変わるので送らない(中身が同じなら書き込まないため)
   function shareable(s) {
     const o = Object.assign({}, s);
-    delete o.live;
-    delete o.prefs;
-    delete o.updatedAt; // 保存のたびに変わるので送らない(中身が同じなら書き込まないため)
+    Schema.LOCAL.forEach(k => { delete o[k]; });
     return o;
   }
 
-  const api = { merge, shareable, dateKey };
+  const api = { merge, shareable, dateKey, HANDLED };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.Merge = api;
 })(typeof window !== "undefined" ? window : this);

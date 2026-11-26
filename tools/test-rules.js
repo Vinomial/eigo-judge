@@ -4,7 +4,6 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const assert = require("assert");
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require("@firebase/rules-unit-testing");
 const { doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebase/firestore");
 

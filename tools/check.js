@@ -177,5 +177,16 @@ console.log(`誤答の説明つき: 文法 ${GRAM.filter(g => g.x).length} 問 /
 console.log(`文法・長文の正解位置: A ${pos[0]} / B ${pos[1]} / C ${pos[2]} / D ${pos[3]}`);
 console.log(`長文に出てくるが単語データにない語: ${missing.size} 語${missing.size && !process.argv.includes("--vocab") ? "(--vocab で一覧)" : ""}`);
 if (process.argv.includes("--vocab")) console.log([...missing].sort().map(([w, s]) => `${w}(${[...s].join(",")})`).join(" "));
+// index.html:js/ と data/ のファイルをすべて読み込んでいるか,?v= の番号がそろっているか
+{
+  const root = path.join(__dirname, ".."), html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const srcs = [...html.matchAll(/(?:src|href)="((?:js|data|css)\/[^"?]+)(?:\?v=(\d+))?"/g)];
+  for (const dir of ["js", "data"]) for (const f of fs.readdirSync(path.join(root, dir)).filter(f => f.endsWith(".js"))) {
+    if (!srcs.some(m => m[1] === `${dir}/${f}`)) err("index.html", `${dir}/${f} を読み込んでいない`);
+  }
+  const vs = new Set(srcs.map(m => m[2]));
+  if (vs.size !== 1 || vs.has(undefined)) err("index.html", `?v= の番号がそろっていない(${[...vs].join(", ")})`);
+}
+
 if (errors.length) { console.log(`\nエラー ${errors.length} 件`); errors.forEach(e => console.log("  " + e)); process.exit(1); }
 console.log("エラーなし");

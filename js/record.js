@@ -35,7 +35,7 @@ function badgesHTML() {
 }
 function renderRecord() {
   const m = $("#main"), sk = streaks();
-  const H = {}; Object.keys(SERIES).forEach(k => H[k] = history(k));
+  const H = {}; Object.keys(SERIES).forEach(k => H[k] = rateHistory(k));
   const scores = (S.scores || []).slice().sort((a, b) => b.t - a.t);
   const scoreRows = scores.map(x => { const e = Rating.toeicEstimate(allPerfs(x.t + DAY)); return `<tr><td>${new Date(x.t).toLocaleDateString("ja-JP")}</td><td><b>${x.score}</b></td><td>${e ? e.score : "-"}</td><td>${e ? signed(x.score - e.score) : ""}</td><td><button class="btn ghost sm danger" data-sdel="${x.t}">削除</button></td></tr>`; }).join("");
   // 苦手な定理:解いた回数が3回以上で,正答率の低い順
@@ -257,7 +257,7 @@ function estHTML() {
 }
 /* レートの推移グラフ(1系列.背景は色の帯,点はその時点の色) */
 function drawChart(box, key) {
-  const h = history(key);
+  const h = rateHistory(key);
   box.innerHTML = "";
   if (!h.length) { box.innerHTML = `<p class="muted small">本番を1回解くと,ここに日付ごとのレートが表示されます.</p>`; return; }
   const NS = "http://www.w3.org/2000/svg";

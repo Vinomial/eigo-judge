@@ -1,0 +1,28 @@
+# push と pull request のたびに検査とテストを回す(失敗すると GitHub に×が付き,メールで知らせが来る).
+# アプリの公開(GitHub Pages)はこれとは別に main から行われる.
+name: test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Chromium(画面のテスト用)
+        run: npx playwright-core install --with-deps chromium
+      - name: lint・データの検査・合わせ方・画面のテスト
+        run: npm test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: 同期とアクセス規則のテスト(Firebase のエミュレーター.本番には通信しない)
+        run: npm run test:sync && npm run test:rules

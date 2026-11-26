@@ -80,12 +80,14 @@ function exportData() {
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
-/* データの削除.レートは本番の記録から計算するので,本番の記録を消すとレートと推定スコアも消える */
+/* データの削除.レートは本番の記録から計算するので,本番の記録を消すとレートと推定スコアも消える.
+ * 消す項目は js/schema.js の clear で決める(項目を足したら,そちらに書く).after は消したあとの片付け */
+const clearFields = kind => Schema.clearedBy(kind).forEach(k => { S[k] = Schema.FIELDS[k].def(); });
 const DELETE = {
   contests: { name: "本番の記録", desc: "本番の履歴を消します.レート・推定 TOEIC スコア・グラフも消えます.問題ごとの AC / WA と,実際の TOEIC の点数は残ります.",
-    run: () => { S.contests = []; S.live = null; S.legacy = null; cState = null; S.wipe = Object.assign({}, S.wipe, { contests: Date.now() }); } },
-  results: { name: "問題の結果", desc: "問題ごとの AC / WA,解答の履歴(草と難易度の推定に使う),単語の復習の予定,長文の所要時間を消します.すべて未挑戦に戻ります.レートと買ったテーマは残ります(コインはその分減ります).",
-    run: () => { S.res = {}; S.srs = {}; S.readTimes = {}; S.att = []; S.dayAc = {}; D_EST = null; applyEstD(); S.wipe = Object.assign({}, S.wipe, { results: Date.now() }); } },
+    run: () => { clearFields("contests"); cState = null; S.wipe = Object.assign({}, S.wipe, { contests: Date.now() }); } },
+  results: { name: "問題の結果", desc: "問題ごとの AC / WA,解答の履歴(草と難易度の推定に使う),復習の予定,長文の所要時間,今日の問題と早解きの記録を消します.すべて未挑戦に戻ります.レートと買ったテーマは残ります(コインはその分減ります).",
+    run: () => { clearFields("results"); D_EST = null; applyEstD(); S.wipe = Object.assign({}, S.wipe, { results: Date.now() }); } },
   all: { name: "すべてのデータ", desc: "本番の記録,問題の結果,学習日数,実績,買ったテーマ,設定をすべて消して,最初の状態に戻します.",
     run: () => { S = freshState(); S.wipe = { all: Date.now() }; cState = null; D_EST = null; applyEstD(); } }
 };

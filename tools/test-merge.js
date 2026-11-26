@@ -1,10 +1,11 @@
 // 端末間の同期(js/merge.js)のテスト.使い方: node tools/test-merge.js
 "use strict";
 const assert = require("assert");
-const { merge, shareable } = require("../js/merge.js");
+const { merge, shareable, HANDLED } = require("../js/merge.js");
+const Schema = require("../js/schema.js");
 
 const DAY = 86400000, T0 = Date.UTC(2026, 10, 1, 3); // 2026-11-01 12:00 JST
-const S = o => Object.assign({ ver: 2, res: {}, srs: {}, contests: [], readTimes: {}, days: {}, badges: {}, prefs: {}, scores: [], att: [], dayAc: {}, live: null, legacy: null, updatedAt: 0, wipe: {}, del: {}, goal: null }, o);
+const S = o => Object.assign(Schema.fresh(), o);
 // 解答を記録した状態を作る(js/core.js の record と同じ数え方)
 function play(s, list) {
   s = JSON.parse(JSON.stringify(s));
@@ -160,6 +161,61 @@ test("買ったテーマは両方の端末のものが残り(早い時刻),「�
   const wiped = S({ wipe: { all: T0 + DAY } });
   assert.deepStrictEqual(merge(wiped, a).owned, {}, "削除を知らない側の購入が戻ってきた");
   assert.deepStrictEqual(merge(S(), S({})).owned, {}, "owned がない古いデータでも動く");
+});
+
+/* ---- 項目の一覧(js/schema.js)との突き合わせ ----
+ * 項目を足したら,ここの SAMPLE にも例を足す(足さないとこのテストが落ちる).
+ * 例の時刻は t(削除より前の時刻)を使う. */
+const SAMPLE = {
+  ver: () => 2,
+  res: t => ({ w1: { ac: 1, wa: 0, last: "AC", t } }),
+  srs: t => ({ w1: { box: 1, due: t + DAY, t } }),
+  contests: t => [{ t, kind: "word", items: [], perf: { word: 700 } }],
+  readTimes: () => ({ r1: [120] }),
+  days: t => ({ [require("../js/merge.js").dateKey(t)]: 3 }),
+  dayAc: t => ({ [require("../js/merge.js").dateKey(t)]: 2 }),
+  att: t => [["w1", t, 1]],
+  badges: t => ({ c1: t }),
+  scores: t => [{ t, score: 500 }],
+  goal: t => ({ v: 600, t }),
+  owned: t => ({ floss: t }),
+  daily: t => ({ [require("../js/merge.js").dateKey(t)]: { t, n: 5, ac: 4 } }),
+  speed: t => [{ t, dom: "word", sec: 60, ac: 12, wa: 1 }],
+  legacy: () => ({ ratings: { all: 900 }, history: [1] }),
+  wipe: t => ({ contests: t }),
+  del: t => ({ scores: [t] }),
+  prefs: () => ({ wdir: "je" }),
+  live: t => ({ t }),
+  updatedAt: t => t
+};
+test("項目の一覧:同期する項目はすべて merge に合わせ方があり,同期しない項目はサーバーに送らない", () => {
+  const sync = Object.keys(Schema.FIELDS).filter(k => Schema.FIELDS[k].sync).sort();
+  assert.deepStrictEqual([...HANDLED].sort(), sync, "js/schema.js の sync と js/merge.js の HANDLED が食い違っている");
+  assert.deepStrictEqual(Object.keys(SAMPLE).sort(), Object.keys(Schema.FIELDS).sort(), "SAMPLE に例がない(または余分な)項目がある");
+  const full = Object.fromEntries(Object.keys(SAMPLE).map(k => [k, SAMPLE[k](T0)]));
+  const sh = shareable(full);
+  Schema.LOCAL.forEach(k => assert.ok(!(k in sh), `${k} は送らない項目なのに送っている`));
+  sync.forEach(k => assert.ok(k in sh, `${k} を送っていない`));
+});
+test("項目の一覧:同期する項目は,片方の端末にしかなくても合わせた結果に残る", () => {
+  for (const k of Object.keys(Schema.FIELDS).filter(k => Schema.FIELDS[k].sync && !["ver", "wipe"].includes(k))) {
+    const has = S({ [k]: SAMPLE[k](T0) }), none = S();
+    for (const m of [merge(has, none), merge(none, has)]) {
+      assert.notDeepStrictEqual(JSON.parse(JSON.stringify(m[k])), JSON.parse(JSON.stringify(Schema.FIELDS[k].def())), `${k} が合わせると消えた`);
+    }
+  }
+});
+test("項目の一覧:削除(clear)に書いた項目は,削除を知らない端末から戻ってこない", () => {
+  for (const kind of ["contests", "results", "all"]) {
+    const keys = kind === "all" ? Object.keys(Schema.FIELDS).filter(k => Schema.FIELDS[k].sync && !["ver", "wipe", "del", "days"].includes(k)) : Schema.clearedBy(kind).filter(k => Schema.FIELDS[k].sync);
+    for (const k of keys) {
+      const wiped = S({ wipe: { [kind]: T0 + DAY } }), old = S({ [k]: SAMPLE[k](T0) });
+      if (k === "res") old.att = SAMPLE.att(T0); // res は att から作り直すので,att も削除前のもの
+      for (const m of [merge(wiped, old), merge(old, wiped)]) {
+        assert.deepStrictEqual(JSON.parse(JSON.stringify(m[k])), JSON.parse(JSON.stringify(Schema.FIELDS[k].def())), `「${kind}」の削除のあと ${k} が戻ってきた`);
+      }
+    }
+  }
 });
 
 console.log(`\n${n} 件のテストに合格しました`);
