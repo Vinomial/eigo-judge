@@ -222,13 +222,14 @@ function heatmapHTML() {
       total += n; if (n) active++; best = Math.max(best, n);
       const lv = HM_LV.filter(x => n >= x).length;
       const label = `${fmtDate(t)}(${"日月火水木金土"[d]}):${hmKey === "ac" ? "AC" : "解いた数"} ${n}${hmKey === "ac" ? "" : ` · AC ${S.dayAc[k] || 0}`}`;
-      cells.push(`<i class="l${lv}" data-day="${k}" aria-label="${label}" title="${label}"></i>`);
+      const dl = (S.daily || {})[k] ? " dly" : ""; // 今日の問題を解き終えた日には印を付ける
+      cells.push(`<i class="l${lv}${dl}" data-day="${k}" aria-label="${label}${dl ? " · 今日の問題 済み" : ""}" title="${label}${dl ? " · 今日の問題 済み" : ""}"></i>`);
       if (d === 0 && new Date(t).getDate() <= 7) months.push(`<span style="grid-column:${w + 1}">${new Date(t).getMonth() + 1}月</span>`);
     }
   }
   return `<div class="hmwrap"><div class="hmm" style="grid-template-columns:repeat(${HM_WEEKS},1fr)">${months.join("")}</div>
     <div class="hm" style="grid-template-columns:repeat(${HM_WEEKS},1fr)">${cells.join("")}</div>
-    <div class="hmleg"><span class="small muted" id="hm-info">マスを押すと,その日の数が出ます.</span><span class="small muted">少 <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> 多</span></div></div>
+    <div class="hmleg"><span class="small muted" id="hm-info">マスを押すと,その日の数が出ます.</span><span class="small muted"><i class="l0 dly"></i> 今日の問題 · 少 <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> 多</span></div></div>
     <p class="small muted">直近${HM_WEEKS}週で ${total} ${hmKey === "ac" ? "AC" : "問"} · ${active} 日 · 1日の最高 ${best}.${hmKey === "ac" ? "色の濃さは 1 / 5 / 10 / 20 問以上." : ""}</p>`;
 }
 function estHTML() {

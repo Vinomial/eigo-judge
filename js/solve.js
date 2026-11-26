@@ -37,7 +37,9 @@ function startTheorem(k, from) {
 function setupItem() {
   const { dom, id } = pState;
   S.prefs.notes = (S.prefs.notes || 0) + 1;
-  pState.prev = unitStatus(dom, id); // 開いた時点の結果(解いた後も「前回」として表示する)
+  pState.prev = dom === "spell" ? statusOf(SPELL(id)) : unitStatus(dom, id); // 開いた時点の結果(解いた後も「前回」として表示する)
+  if (dom === "root") { const q = ROOTQ_BY.get(id); pState.item = { dom, q }; pState.st = rootSt(q); pState.done = false; return; }
+  if (dom === "spell") { pState.item = { dom, q: WORD_BY.get(id) }; pState.st = { sel: null, ans: "", idk: false, done: false }; pState.done = false; return; }
   if (dom === "reading") {
     const p = PASS_BY.get(id);
     Object.assign(pState, { passage: p, sts: p.qs.map(q => newSt({ dom, q })), start: Date.now(), done: false, st: null, item: { dom, p } });
@@ -97,13 +99,26 @@ function renderSolve() {
   $("#back-btn").onclick = backToList;
   if (pState.dom === "reading") renderSolveReading(); else renderSolveSingle();
 }
+// 1問を判定して記録する(単語・文法・語根・つづり).単語・文法・語根・つづりは間隔反復も進める
+function judgeSingle(item, st) {
+  st.done = true;
+  const ok = isCorrect(item, st), id = itemId(item);
+  pState.sess.n++; if (ok) pState.sess.ac++;
+  record(id, ok);
+  updateSrs(id, ok);
+  dailyTick(id, ok);
+  save(); checkBadges();
+  const se = $("#sess"); if (se) se.innerHTML = sessText();
+  return ok;
+}
 function renderSolveSingle() {
   const item = pState.item, st = pState.st, card = $("#qcard");
   card.innerHTML = itemHTML(item, st) + `<div id="result"></div><div class="row actions" id="actions"></div>`;
   const show = fresh => {
     const ok = isCorrect(item, st);
-    $("#result").innerHTML = `<p style="margin-top:16px" id="verdict"><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span>${st.sel === IDK ? ` <span class="small muted">「わからない」を選びました.解説で確認しましょう.</span>` : ""}</p>` + editorialHTML(item);
-    markChoices(card, item, st);
+    const idk = st.sel === IDK || st.idk;
+    $("#result").innerHTML = `<p style="margin-top:16px" id="verdict"><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span>${idk ? ` <span class="small muted">「わからない」を選びました.解説で確認しましょう.</span>` : ""}</p>` + editorialHTML(item, st);
+    if (item.dom === "spell") markSpell(card, item, st); else markChoices(card, item, st);
     // 次へ進むボタンは,解説を読んでいる間も画面の下に残す
     const a = $("#actions");
     a.classList.add("stick");
@@ -122,15 +137,24 @@ function renderSolveSingle() {
     }
   };
   if (st.done) { show(false); return; }
-  bindChoices(card, st, () => {
-    st.done = true;
-    const ok = isCorrect(item, st);
-    pState.sess.n++; if (ok) pState.sess.ac++;
-    record(item.q.id, ok);
-    if (item.dom !== "reading") updateSrs(item.q.id, ok); // 単語と文法は間隔反復
-    save(); show(true); checkBadges();
-    const se = $("#sess"); if (se) se.innerHTML = sessText();
-  });
+  if (item.dom === "spell") { bindSpell(card, st, () => { judgeSingle(item, st); show(true); }); return; }
+  bindChoices(card, st, () => { judgeSingle(item, st); show(true); });
+}
+// つづり入力:Enter か「答える」で判定.空のままでは答えられない
+function bindSpell(card, st, onDone) {
+  const inp = card.querySelector("#sp-in");
+  inp.focus({ preventScroll: true });
+  card.querySelector("#sp-form").onsubmit = e => {
+    e.preventDefault();
+    if (!normSpell(inp.value)) { inp.focus(); return; }
+    st.ans = inp.value; onDone();
+  };
+  card.querySelector("#sp-idk").onclick = () => { st.idk = true; st.ans = inp.value; onDone(); };
+}
+function markSpell(card, item, st) {
+  card.querySelectorAll("input, button").forEach(b => { if (!b.closest("#result")) b.disabled = true; });
+  const inp = card.querySelector("#sp-in"), ok = isCorrect(item, st);
+  if (inp) inp.classList.add(ok ? "right" : "wrong");
 }
 function renderSolveReading() {
   const p = pState.passage, sts = pState.sts, card = $("#qcard");
@@ -175,7 +199,7 @@ function renderSolveReading() {
     stopTimer();
     pState.elapsed = (Date.now() - pState.start) / 1000;
     pState.done = true;
-    p.qs.forEach((q, k) => { const ok = isCorrect({ dom: "reading", q }, sts[k]); pState.sess.n++; if (ok) pState.sess.ac++; record(q.id, ok); });
+    p.qs.forEach((q, k) => { const ok = isCorrect({ dom: "reading", q }, sts[k]); pState.sess.n++; if (ok) pState.sess.ac++; record(q.id, ok); dailyTick(q.id, ok); });
     (S.readTimes[p.id] = S.readTimes[p.id] || []).push(Math.round(pState.elapsed));
     save(); renderSolve(); checkBadges();
     const sum = $("#rsum"); if (sum) sum.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -226,6 +250,8 @@ const SPEAK = typeof window.speechSynthesis !== "undefined";
 const speakBtn = text => (SPEAK ? `<button class="speak" data-say="${esc(text)}" aria-label="発音を聞く"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button>` : "");
 function itemHTML(item, st) {
   const q = item.q;
+  if (item.dom === "root") return rootItemHTML(item, st);
+  if (item.dom === "spell") return spellItemHTML(item, st);
   if (item.dom === "word") {
     const ex = esc(q.ex).replace(new RegExp("\\b(" + q.w.slice(0, -1) + "\\w*)", "i"), "<b>$1</b>");
     if (st.rev) { // 意味 → 英単語.例文の単語は空所にする
@@ -240,7 +266,12 @@ function itemHTML(item, st) {
   const k = item.p.qs.indexOf(q);
   return metaHTML("reading", q.d) + passageHTML(item.p, null, { cur: k + 1, box: true }) + `<p class="qtext en"><b>${qLabel(item.p, k)}</b></p>` + choicesHTML(q.c, st, true);
 }
-function editorialHTML(item) {
+function editorialHTML(item, st) {
+  if (item.dom === "root") return rootEditorialHTML(item);
+  if (item.dom === "spell") {
+    const q = item.q, mine = st && normSpell(st.ans) && !spellRight(item, st) ? `<p class="small">あなたの解答:<span class="en down">${esc(st.ans)}</span></p>` : "";
+    return `<div class="editorial"><h3>正しいつづり</h3><p class="word en">${esc(q.w)}${speakBtn(q.w)}</p>${mine}</div>` + editorialBody({ dom: "word", q });
+  }
   return editorialBody(item).replace(/<\/div>$/, commHTML(item.q.id) + "</div>");
 }
 function editorialBody(item) {
@@ -283,7 +314,7 @@ function markChoices(root, item, st) {
   root.querySelectorAll(".choice").forEach(b => {
     const i = +b.dataset.i;
     b.disabled = true;
-    const right = i >= 0 && (item.dom === "word" ? wordRight(item, st, i) : i === item.q.a);
+    const right = i >= 0 && (item.dom === "word" ? wordRight(item, st, i) : item.dom === "root" ? rootRight(item, st, i) : i === item.q.a);
     if (right) b.classList.add("right"); else if (i === st.sel) b.classList.add("wrong");
     // 単語:判定後,各選択肢がどの単語か(逆向きならその意味)を示す.誤答の選択肢もついでに覚えられる
     const w = item.dom === "word" && i >= 0 && (st.rev ? WORD_BY.get(st.choices[i]) : WORD_BY_M.get(st.choices[i]));

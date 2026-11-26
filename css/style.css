@@ -535,3 +535,25 @@ nav svg.pix, .iconsw svg.pix { fill: currentColor; stroke: none; shape-rendering
 .mocksum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 10px; }
 .mocksum > div { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 8px 10px; display: flex; flex-direction: column; }
 .mocksum b { font-size: 1.4rem; line-height: 1.2; }
+
+/* ---- いろいろな練習(js/modes.js) ---- */
+.tile.daily { grid-column: 1 / -1; border-color: var(--accent); }
+.tile.daily.done { border-color: var(--ac); }
+.tile.daily.done b { color: var(--ac); }
+/* 草:今日の問題を解き終えた日の印 */
+.hm i.dly, .hmleg i.dly { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.dlyweek { display: flex; gap: 6px; margin: 4px 0 10px; }
+.dlyweek span { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; color: var(--muted); background: var(--sunk); }
+.dlyweek span.on { background: var(--ac); color: var(--on-accent); font-weight: 700; }
+/* 早解き */
+.sptop { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.sptime { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.spres { text-align: center; }
+.spscore { font-size: 3rem; font-weight: 700; line-height: 1.1; color: var(--accent); }
+.spscore span { font-size: 1rem; color: var(--muted); }
+/* つづり入力 */
+.sphint { font-size: 1.15rem; letter-spacing: .04em; margin: 6px 0; word-break: break-all; }
+.spform { display: flex; gap: 8px; margin: 8px 0; }
+.spform input { flex: 1; min-width: 0; font-size: 1.1rem; }
+.spform input.right { border-color: var(--ac); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ac) 30%, transparent); }
+.spform input.wrong { border-color: var(--wa); box-shadow: 0 0 0 2px color-mix(in srgb, var(--wa) 30%, transparent); }

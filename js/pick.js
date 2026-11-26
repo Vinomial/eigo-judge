@@ -100,7 +100,11 @@ function newSt(item, contest) {
 }
 const wordRight = (item, st, i) => (st.rev ? st.choices[i] === item.q.id : st.choices[i] === item.q.m);
 function isCorrect(item, st) {
+  if (item.dom === "spell") return spellRight(item, st); // つづり入力(js/modes.js)
   if (st.sel == null || st.sel < 0) return false; // 未解答・「わからない」は WA
+  if (item.dom === "root") return rootRight(item, st, st.sel);
   if (item.dom === "word") return wordRight(item, st, st.sel);
   return st.sel === item.q.a;
 }
+// 記録に使う id.つづり入力は単語の意味の問題と別に数える(sp_ + 単語の id)
+const itemId = item => (item.dom === "spell" ? SPELL(item.q.id) : item.q.id);

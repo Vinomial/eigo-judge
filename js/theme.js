@@ -79,9 +79,9 @@ function applyTheme(id) {
 function setTheme(id) { if (!ownsTheme(id)) return false; S.prefs.theme = id; previewTheme = null; save(); applyTheme(id); return true; }
 
 /* ---------------- コイン ----------------
- * 記録から数える:問題ごとにその日初めての AC で1枚,本番1回で10枚,1日に GOAL 問以上解いた日に10枚,実績1つで20枚.
+ * 記録から数える:問題ごとにその日初めての AC で1枚,本番1回で10枚,1日に GOAL 問以上解いた日に10枚,実績1つで20枚,今日の問題を解き終えた日に5枚.
  * 使ったコイン = 買ったテーマの値段の合計.残りが負になったら(記録を消したときなど)0 と表示し,買えない. */
-const COIN = { ac: 1, contest: 10, goalDay: 10, badge: 20 };
+const COIN = { ac: 1, contest: 10, goalDay: 10, badge: 20, daily: 5 };
 function coinParts() {
   const seen = new Set();
   for (const [id, t, ok] of S.att) if (ok) seen.add(id + "|" + dateKey(t));
@@ -90,7 +90,8 @@ function coinParts() {
     { name: "AC(問題ごとに1日1回)", n: seen.size, each: COIN.ac },
     { name: "本番", n: S.contests.length, each: COIN.contest },
     { name: `1日 ${GOAL} 問以上解いた日`, n: goalDays, each: COIN.goalDay },
-    { name: "実績", n: Object.keys(S.badges).length, each: COIN.badge }
+    { name: "実績", n: Object.keys(S.badges).length, each: COIN.badge },
+    { name: "今日の問題を解き終えた日", n: Object.keys(S.daily || {}).length, each: COIN.daily }
   ];
 }
 const coinsEarned = () => coinParts().reduce((a, x) => a + x.n * x.each, 0);

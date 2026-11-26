@@ -6,7 +6,7 @@ const { open } = require("./helpers");
 module.exports = T => {
   T.test("全画面が描けて,エラーが出ず,ログインしなければ Firebase に通信しない", async () => {
     const p = await open();
-    for (const v of ["home", "list", "contest", "record", "defs", "log"]) {
+    for (const v of ["home", "list", "contest", "record", "defs", "log", "modes", "drill"]) {
       await p.evaluate(v => go(v), v);
       assert.ok((await p.textContent("#main")).length > 50, `${v} の画面が空`);
     }
@@ -17,7 +17,7 @@ module.exports = T => {
   T.test("幅 375px で横スクロールが出ない", async () => {
     const p = await open({ width: 375 });
     await p.evaluate(() => { WORDS.slice(0, 30).forEach((w, i) => record(w.id, i % 2 === 0)); save(); });
-    for (const v of ["home", "list", "contest", "record", "defs", "log"]) {
+    for (const v of ["home", "list", "contest", "record", "defs", "log", "modes", "drill"]) {
       // 本文の枠は横にはみ出しても隠すだけなので,中身の幅(scrollWidth)が枠の幅を超えていないかを見る
       const w = await p.evaluate(v => { go(v); const sc = document.getElementById("scroller"); return [sc.scrollWidth, sc.clientWidth, document.documentElement.scrollWidth]; }, v);
       assert.ok(w[0] <= w[1] && w[2] <= 375, `${v} の画面の幅が ${w[0]}px(枠は ${w[1]}px)`);

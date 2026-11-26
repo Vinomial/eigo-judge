@@ -61,7 +61,7 @@ module.exports = T => {
       const out = []; S.owned = Object.fromEntries(THEMES.map(t => [t.id, 1]));
       for (const t of THEMES) {
         setTheme(t.id);
-        for (const v of ["home", "list", "contest", "record", "defs", "shop"]) { go(v); const sc = document.getElementById("scroller"); if (sc.scrollWidth > sc.clientWidth) out.push(t.id + ":" + v); }
+        for (const v of ["home", "list", "contest", "record", "defs", "shop", "modes"]) { go(v); const sc = document.getElementById("scroller"); if (sc.scrollWidth > sc.clientWidth) out.push(t.id + ":" + v); }
       }
       return out;
     });

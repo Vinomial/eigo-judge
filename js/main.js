@@ -8,8 +8,10 @@
 document.addEventListener("keydown", e => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
   if (e.target.closest && e.target.closest("svg")) return;
+  if (e.target.closest && e.target.closest("input, textarea, select")) return; // 文字を打っている間(つづり入力など)は選ばない
   const card = $("#qcard"); if (!card) return;
-  const single = (view === "list" && pState && pState.dom !== "reading") || (view === "contest" && contestRunning() && !pendingNav && !cState.confirming);
+  const single = (view === "list" && pState && pState.dom !== "reading") || (view === "contest" && contestRunning() && !pendingNav && !cState.confirming)
+    || (view === "speed" && spState && !spState.done && !spState.lock);
   if (!single) return;
   // 5(または 0)は「わからない」
   const k = e.key.toLowerCase(), idx = "12345".indexOf(k) >= 0 ? "12345".indexOf(k) : k === "0" ? 4 : "abcd".indexOf(k);

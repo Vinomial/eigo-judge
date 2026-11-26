@@ -42,13 +42,20 @@ function badgeCtx() {
     owned: Object.keys(S.owned || {}).length,
     earned: typeof coinsEarned === "function" ? coinsEarned() : 0,
     scores: (S.scores || []).length,
+    dailyDays: Object.keys(S.daily || {}).length,
+    dailyStreak: typeof dailyMaxStreak === "function" ? dailyMaxStreak() : 0,
+    speedRuns: (S.speed || []).length,
+    speedWord: Math.max(0, ...(S.speed || []).filter(x => x.dom === "word").map(x => x.ac - x.wa)),
+    rootAC: typeof ROOTQ !== "undefined" ? ROOTQ.filter(x => ac(x.id)).length : 0,
+    rootAll: typeof ROOTQ !== "undefined" && ROOTQ.every(x => ac(x.id)),
+    spellAC: WORDS.filter(w => ac("sp_" + w.id)).length,
     night: [0, 1, 2, 3].some(h => hours.has(h)),
     morning: [5, 6].some(h => hours.has(h))
   };
 }
 /* 実績.id は保存に使うので変えない(解除した時刻は S.badges[id]).
  * p: c => [今の数, 目標](進み具合の表示と判定に使う).分類 cat ごとに記録の画面に並べる. */
-const BADGE_CATS = ["本番", "レート", "継続", "問題数", "単語", "文法", "長文", "その他"];
+const BADGE_CATS = ["本番", "レート", "継続", "問題数", "単語", "文法", "長文", "いろいろな練習", "その他"];
 const mkBadge = (id, cat, name, desc, p) => ({ id, cat, name, desc, p, ok: c => { const [x, n] = p(c); return x >= n; } });
 const badgeN = (k, goal) => c => [c[k], goal];
 const badgeYes = k => c => [c[k] ? 1 : 0, 1];
@@ -117,6 +124,17 @@ const BADGES = [
   mkBadge("part6", "長文", "穴埋め上手", "Part 6(長文の穴埋め)を1題,全問 AC にする", badgeN("p6Done", 1)),
   mkBadge("fig", "長文", "図表を読む", "表やグラフのある長文を3題,全問 AC にする", badgeN("figDone", 3)),
   mkBadge("rall", "長文", "長文全 AC", "長文の全設問を AC の状態にする", badgeYes("readAll")),
+
+  mkBadge("daily1", "いろいろな練習", "今日の一題", "今日の問題を解き終える", badgeN("dailyDays", 1)),
+  mkBadge("daily7", "いろいろな練習", "毎日の精進", "今日の問題を7日続けて解き終える", badgeN("dailyStreak", 7)),
+  mkBadge("daily30", "いろいろな練習", "精進の鬼", "今日の問題を30日続けて解き終える", badgeN("dailyStreak", 30)),
+  mkBadge("speed1", "いろいろな練習", "よーいドン", "早解きに挑戦する", badgeN("speedRuns", 1)),
+  mkBadge("speedw20", "いろいろな練習", "反射神経", "単語の早解きで20点以上を取る", badgeN("speedWord", 20)),
+  mkBadge("speedw35", "いろいろな練習", "目にも止まらぬ", "単語の早解きで35点以上を取る", badgeN("speedWord", 35)),
+  mkBadge("rootq30", "いろいろな練習", "定義を知る", "語根の問題を30問 AC の状態にする", badgeN("rootAC", 30)),
+  mkBadge("rootqall", "いろいろな練習", "定義集の主", "語根・接辞の問題をすべて AC の状態にする", badgeYes("rootAll")),
+  mkBadge("spell50", "いろいろな練習", "書ける50語", "つづり入力で50語を AC の状態にする", badgeN("spellAC", 50)),
+  mkBadge("spell300", "いろいろな練習", "書ける300語", "つづり入力で300語を AC の状態にする", badgeN("spellAC", 300)),
 
   mkBadge("shop1", "その他", "おしゃれ", "ショップで品物を1つ買う(テーマ・フォント・アイコン・演出)", badgeN("owned", 1)),
   mkBadge("shop5", "その他", "コレクター", "ショップで品物を5つ買う", badgeN("owned", 5)),

@@ -68,11 +68,13 @@ function homeHTML() {
   <h2>今日のメニュー</h2>
   <div class="tiles">
     ${tile('data-go="contest"', "本番に挑戦する", "総合または分野別.レートが動く", "main")}
+    ${dailyCardHTML()}
     ${tile('data-go="auto" data-dom="word"', "単語", due ? `復習 ${due} 語がたまっています` : unseen ? `新しい単語(残り ${unseen} 語)` : "おまかせで復習")}
     ${tile('data-go="auto" data-dom="grammar"', "文法", gLeft ? `おまかせ(未 AC ${gLeft} 問)` : "全問 AC.おまかせで復習")}
     ${tile('data-go="auto" data-dom="reading"', "長文", rLeft ? `おまかせ(未 AC ${rLeft} 題)` : "全題 AC.おまかせで復習")}
     ${tile('data-go="drill"', "解き直し・未挑戦", [wa ? `間違えた問題 ${wa}` : "", gdue ? `文法の復習 ${gdue}` : "", `未挑戦 ${unseenCount("all")}`].filter(Boolean).join(" · "), wa ? "warn" : "")}
     ${tile('data-go="mock"', "ミニ模試", "TOEIC と同じ配分で50問・38分", "")}
+    ${tile('data-go="modes"', "早解き・語根・つづり", "時間との勝負,定義の確認,つづりを書く", "")}
   </div>
   <p class="small muted">練習ではレートは動きません.本番を解くとレートと推定スコアが変動します.</p>
   <h2>進捗(今 AC の問題)</h2>

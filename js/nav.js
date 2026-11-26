@@ -24,6 +24,7 @@ function go(to) { view = to; pendingNav = null; render(); toTop(); }
 function render() {
   $$("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === view ? "page" : "false"));
   endPreview();
+  if (view !== "speed") stopSpeed(); // 早解きの途中で画面を移ったら止める(記録しない)
   renderHeader();
   renderCoin();
   if (view === "home") $("#main").innerHTML = homeHTML();
@@ -33,6 +34,8 @@ function render() {
   else if (view === "log") renderLog();
   else if (view === "shop") renderShop();
   else if (view === "drill") { $("#main").innerHTML = drillHTML(); bindDrill(); }
+  else if (view === "modes") { $("#main").innerHTML = modesHTML(); bindModes(); }
+  else if (view === "speed") renderSpeed();
   else $("#main").innerHTML = defsHTML();
   bindGo();
 }
@@ -45,6 +48,7 @@ function bindGo() {
     else if (to === "wa") go("drill");
     else if (to === "mock") go("contest"); // 種類の選択から(ミニ模試は目立つ位置に出る)
     else if (to === "weak") startWeakWords();
+    else if (to === "daily") startDaily(from);
     else if (to === "thm") startTheorem(b.dataset.thm, from);
     else go(to);
   });
