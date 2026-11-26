@@ -46,7 +46,10 @@ function renderList() {
       const hi = TIERS[i + 1] ? TIERS[i + 1].min : Infinity;
       const inAll = all.filter(u => u.d >= t.min && u.d < hi), us = shown.filter(u => u.d >= t.min && u.d < hi);
       if (!inAll.length) return "";
-      return section(`<span class="dot" style="--rc:var(${t.color})"></span><span class="bname">${t.name}</span> <span class="muted small">${t.min}〜${hi === Infinity ? "" : hi - 1}</span>`, "", inAll, us, u => u.label, "", true);
+      // その色の未 AC からランダムに解く(押しても色帯は開閉しない)
+      const left = inAll.filter(u => unitStatus(dom, u.id) !== "AC").length;
+      const rnd = left ? `<button class="bt-rnd" data-rnd="${t.min}:${hi === Infinity ? 3200 : hi - 1}:${t.name}" title="この色の未 AC からランダムに解く">ランダム</button>` : "";
+      return section(`<span class="dot" style="--rc:var(${t.color})"></span><span class="bname">${t.name}</span> <span class="muted small">${t.min}〜${hi === Infinity ? "" : hi - 1}</span>${rnd}`, "", inAll, us, u => u.label, "", true);
     }).join("");
   }
   m.innerHTML = `
@@ -65,6 +68,11 @@ function renderList() {
   m.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { LIST.filter = b.dataset.f; savePref(); renderList(); });
   m.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { LIST.group = b.dataset.g; savePref(); renderList(); });
   m.querySelectorAll("[data-wd]").forEach(b => b.onclick = () => { S.prefs.wdir = b.dataset.wd; save(); renderList(); });
+  m.querySelectorAll("[data-rnd]").forEach(b => b.onclick = e => {
+    e.preventDefault(); e.stopPropagation();
+    const [lo, hi, name] = b.dataset.rnd.split(":");
+    startRandom(dom, +lo, +hi, "notac", "list", `${name}の未 AC からランダム`);
+  });
   m.querySelectorAll("[data-pid]").forEach(b => b.onclick = () => {
     const grp = b.dataset.grp; // 定理別のときは,その定理の中だけを順に解く
     const ids = filteredUnits().filter(u => !grp || GRAM_BY.get(u.id).t === grp).map(u => u.id);

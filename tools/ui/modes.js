@@ -41,7 +41,7 @@ module.exports = T => {
     await p.done();
   });
 
-  T.test("早解き:AC で +1,WA で −1,わからないは0点.時間が来ると結果が出て記録され,解答の履歴には入らない", async () => {
+  T.test("早解き:AC で +1,WA で −1,わからないは0点.時間が来ると結果が出て記録され,AC / WA は問題一覧に反映されるが解答の履歴には入らない", async () => {
     const p = await open();
     await p.evaluate(() => go("modes"));
     await p.click('[data-speed="word"]');
@@ -60,14 +60,18 @@ module.exports = T => {
     assert.deepStrictEqual(z, { ac: 2, wa: 1, idk: 2, att: 0 });
     await p.evaluate(() => { spState.start -= 61000; speedTick(); });
     assert.match(await p.textContent(".spscore"), /^1/);
-    const rec = await p.evaluate(() => ({ speed: S.speed, att: S.att.length, res: Object.keys(S.res).length }));
+    const rec = await p.evaluate(() => ({ speed: S.speed, att: S.att.length, res: Object.values(S.res).map(r => r.last).sort().join(","), today: S.days[dateKey(Date.now())] || 0 }));
     assert.strictEqual(rec.speed.length, 1); assert.strictEqual(rec.speed[0].ac - rec.speed[0].wa, 1);
-    assert.strictEqual(rec.att, 0, "早解きが解答の履歴に入った"); assert.strictEqual(rec.res, 0);
+    assert.strictEqual(rec.att, 0, "早解きが解答の履歴に入った(難易度の推定・コインが狂う)");
+    assert.strictEqual(rec.res, "AC,AC,WA,WA,WA", "早解きの AC / WA が問題の状態に反映されない(わからないは WA)");
+    assert.strictEqual(rec.today, 5, "早解きで解いた数が今日の数に入らない");
+    assert.match(await p.textContent(".spres"), /問題一覧に反映しました/);
     // 途中で画面を移ると止まり,記録しない
     await p.click("#sp-again");
     await p.evaluate(() => go("home"));
     await p.waitForTimeout(300);
     assert.strictEqual(await p.evaluate(() => S.speed.length), 1, "途中でやめたのに記録された");
+    assert.strictEqual(await p.evaluate(() => Object.keys(S.res).length), 5, "途中でやめた早解きの結果が問題の状態に入った");
     assert.strictEqual(await p.evaluate(() => spState.timer), null, "画面を移ってもタイマーが止まらない");
     await p.done();
   });

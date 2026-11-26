@@ -83,7 +83,7 @@ function speedNext() {
 }
 function startSpeed(dom) {
   stopSpeed();
-  spState = { dom, sec: SPEED[dom].sec, start: Date.now(), ac: 0, wa: 0, idk: 0, log: [], seen: new Set(), done: false };
+  spState = { dom, sec: SPEED[dom].sec, start: Date.now(), ac: 0, wa: 0, idk: 0, log: [], res: [], seen: new Set(), done: false };
   speedNext();
   view = "speed"; pendingNav = null; render(); toTop();
   spState.timer = setInterval(speedTick, 200);
@@ -101,6 +101,8 @@ function finishSpeed() {
   const z = spState; stopSpeed(); z.done = true;
   const best = speedBest(z.dom), score = speedScore(z);
   S.speed = [...(S.speed || []), { t: Date.now(), dom: z.dom, sec: z.sec, ac: z.ac, wa: z.wa }];
+  // 解いた問題の AC / WA を問題一覧などに反映する(「わからない」は WA).解答の履歴には入れない(recordQuick)
+  z.res.forEach(([id, ok, t]) => recordQuick(id, !!ok, t));
   save(); render(); checkBadges();
   if (score > best && best > -Infinity) toast(`<b>自己ベスト更新</b> ${SPEED[z.dom].name}の早解きで ${score} 点(前は ${best} 点)`);
 }
@@ -113,6 +115,7 @@ function renderSpeed() {
     m.innerHTML = `<div class="shophead"><div><div class="lab">早解き · ${SPEED[z.dom].name}</div><b class="dtitle">結果</b></div><button class="btn ghost sm" data-go="modes">← もどる</button></div>
       <div class="card spres"><div class="spscore">${score} <span>点</span></div>
         <p class="small">AC ${z.ac} · WA ${z.wa} · わからない ${z.idk}(${fmtSec(z.sec)})· 自己ベスト ${best} 点</p>
+        <p class="small muted">解いた ${z.res.length} 問の AC / WA は問題一覧に反映しました(「わからない」は WA.難易度の推定とコインには使いません).</p>
         <div class="row"><button class="btn grow" id="sp-again">もう一度</button></div></div>
       ${wrong.length ? `<section class="rsec"><h2>間違えた問題</h2><div class="cwlist">${wrong.map(x => `<div class="cwrow"><b class="en">${esc(x.w)}</b><span>${esc(x.m)}</span></div>`).join("")}</div></section>` : ""}`;
     $("#sp-again").onclick = () => startSpeed(z.dom);
@@ -129,6 +132,7 @@ function renderSpeed() {
     z.lock = true;
     const ok = isCorrect(z.item, z.st), idk = z.st.sel === IDK;
     if (ok) z.ac++; else if (idk) z.idk++; else z.wa++;
+    z.res.push([z.item.q.id, ok ? 1 : 0, Date.now()]);
     const q = z.item.q;
     if (!ok) z.log.push({ ok, w: z.dom === "word" ? q.w : q.q.replace("____", q.c[q.a].toUpperCase()), m: z.dom === "word" ? q.m : q.ja });
     markChoices(card, z.item, z.st);

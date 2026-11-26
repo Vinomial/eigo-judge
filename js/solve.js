@@ -103,13 +103,35 @@ function renderSolve() {
 function judgeSingle(item, st) {
   st.done = true;
   const ok = isCorrect(item, st), id = itemId(item);
+  const q0 = Q_BY.get(id), before = q0 ? q0.q.d : null;
   pState.sess.n++; if (ok) pState.sess.ac++;
   record(id, ok);
   updateSrs(id, ok);
   dailyTick(id, ok);
   save(); checkBadges();
   const se = $("#sess"); if (se) se.innerHTML = sessText();
+  // 難易度の推定は,判定を出したあとに裏で行う(show の中.解答が多いと数十ミリ秒かかるため,押してすぐ判定を出す)
+  st.dBefore = before; st.dId = id;
   return ok;
+}
+// 判定を出したあとに難易度を推定し直し,変わったら知らせる(最初の解答だけが推定に使われるので,変わるのは初めて解いた問題だけ)
+function afterJudgeEst(st) {
+  if (st.dBefore == null) return;
+  setTimeout(() => {
+    refreshEst();
+    const q = Q_BY.get(st.dId);
+    if (!q || q.q.d === st.dBefore) return;
+    st.dMove = [st.dBefore, q.q.d];
+    const r = $("#result");
+    const v = r && r.querySelector("#verdict");
+    if (v && pState && pState.st === st && !r.querySelector(".dmove")) v.insertAdjacentHTML("afterend", dMoveHTML(st));
+  }, 30);
+}
+// 判定のあとに出す「難易度の推定」の変化
+function dMoveHTML(st) {
+  if (!st.dMove) return "";
+  const [a, b] = st.dMove, up = b > a;
+  return `<p class="small dmove">難易度 <span style="${rc(a)}" class="rate">${a}</span> → <b style="${rc(b)}" class="rate">${b}</b> <span class="${up ? "down" : "up"}">${up ? "↑" : "↓"}${Math.abs(b - a)}</span> <span class="muted">あなたの解答で推定し直しました(${up ? "WA なので難しめに" : "AC なので易しめに"})</span></p>`;
 }
 function renderSolveSingle() {
   const item = pState.item, st = pState.st, card = $("#qcard");
@@ -118,6 +140,7 @@ function renderSolveSingle() {
     const ok = isCorrect(item, st);
     const idk = st.sel === IDK || st.idk;
     $("#result").innerHTML = `<p style="margin-top:16px" id="verdict"><span class="verdict ${ok ? "ac" : "wa"}">${ok ? "AC" : "WA"}</span>${idk ? ` <span class="small muted">「わからない」を選びました.解説で確認しましょう.</span>` : ""}</p>` + editorialHTML(item, st);
+    if (st.dMove) $("#verdict").insertAdjacentHTML("afterend", dMoveHTML(st));
     if (item.dom === "spell") markSpell(card, item, st); else markChoices(card, item, st);
     // 次へ進むボタンは,解説を読んでいる間も画面の下に残す
     const a = $("#actions");
@@ -130,6 +153,7 @@ function renderSolveSingle() {
     if (bar && pState.queue) bar.style.width = (100 * (queuePos() + 1) / pState.queue.length).toFixed(1) + "%";
     if (fresh) $("#verdict").scrollIntoView({ block: "nearest", behavior: "smooth" });
     if (fresh && ok) playFx(); // ショップで買った正解の演出(js/shop.js)
+    if (fresh) afterJudgeEst(st);
     if (fresh && ok && S.prefs.autoNext) {
       const me = pState;
       clearTimeout(autoT);

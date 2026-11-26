@@ -54,7 +54,16 @@ function record(id, ok, t = Date.now()) {
   const k = dateKey(t); S.days[k] = (S.days[k] || 0) + 1;
   if (ok) S.dayAc[k] = (S.dayAc[k] || 0) + 1;
   S.att.push([id, t, ok ? 1 : 0]);
-  D_EST = null;
+  D_EST = null; EST_STALE = true; // 難易度は次に画面を描くとき(または refreshEst)に推定し直す
+}
+// 早解きの結果:問題の状態(AC / WA)と日ごとの数には入れるが,解答の履歴(att)には入れない.
+// 時間に追われた解答で,難易度の推定(最初の解答を使う)やコイン(att の AC から数える)が狂わないように
+function recordQuick(id, ok, t = Date.now()) {
+  const r = S.res[id] || (S.res[id] = { ac: 0, wa: 0 });
+  ok ? r.ac++ : r.wa++;
+  r.last = ok ? "AC" : "WA"; r.t = t;
+  const k = dateKey(t); S.days[k] = (S.days[k] || 0) + 1;
+  if (ok) S.dayAc[k] = (S.dayAc[k] || 0) + 1;
 }
 const statusOf = id => (S.res[id] && S.res[id].last) || null;
 function passageStatus(p) {

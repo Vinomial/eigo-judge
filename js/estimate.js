@@ -29,6 +29,14 @@ function mapShift(obs, c, sd) {
   return (lo + hi) / 2;
 }
 let D_EST = null;
+// 解答が増えて推定が古くなったか(record が立てる).refreshEst で問題の d に反映する
+let EST_STALE = false;
+// 解いたらすぐ難易度に反映する.本番の途中は出題やパフォーマンスが変わらないよう,終わるまで待つ.
+// 戻り値:反映したら true
+function refreshEst() {
+  if (!EST_STALE || (typeof contestRunning === "function" && contestRunning())) return false;
+  EST_STALE = false; applyEstD(); return true;
+}
 /* みんなの解答(ログインした人どうしで共有する.js/sync.js が Firestore の stats から取ってきて localStorage に置く)
  * POOL_KEY: { t: 取ってきた時刻, mine: 自分の uid, users: { uid: "id:正誤:実力,..." } }.進捗(S)とは別で,同期しない. */
 const POOL_KEY = "eigo-judge-pool";

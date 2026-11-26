@@ -25,6 +25,7 @@ function render() {
   $$("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === view ? "page" : "false"));
   endPreview();
   if (view !== "speed") stopSpeed(); // 早解きの途中で画面を移ったら止める(記録しない)
+  refreshEst();
   renderHeader();
   renderCoin();
   if (view === "home") $("#main").innerHTML = homeHTML();
