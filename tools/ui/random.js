@@ -96,6 +96,20 @@ module.exports = T => {
     const shown = await p.evaluate(id => [+document.querySelector(`.chip[data-pid="${id}"] .cd`).textContent, WORD_BY.get(id).d], a);
     assert.strictEqual(shown[0], shown[1], "問題一覧の難易度が今の推定と違う");
     assert.ok(shown[0] < before, "問題一覧で難易度が元に戻っている");
+    // 履歴に残り,問題の解説(難易度の推移)と記録の画面(分析)で見られる
+    const log = await p.evaluate(([a, b]) => dlogRead().filter(r => r[0] === a || r[0] === b).map(r => r[4]), [a, b]);
+    assert.deepStrictEqual(log, ["ac", "wa"], "自分の解答で動いた難易度が履歴に残らない");
+    await p.evaluate(id => startSolve("word", id, null), a);
+    await p.evaluate(() => { const it = pState.item, st = pState.st; [...document.querySelectorAll("#qcard .choice")].find(x => +x.dataset.i >= 0 && wordRight(it, st, +x.dataset.i)).click(); });
+    assert.match(await p.textContent(".dhist"), /難易度の推移[\s\S]*作成時[\s\S]*AC/);
+    await p.evaluate(() => { pState = null; recTab = "est"; go("record"); });
+    assert.match(await p.textContent("#main"), /難易度の変化の履歴/);
+    assert.ok(await p.evaluate(id => !!document.querySelector(`.dlrow[data-estq="${id}"]`), a), "履歴の一覧に出ない");
+    await p.click(`.dlrow[data-estq="${a}"]`);
+    assert.ok(await p.evaluate(id => pState && pState.id === id, a), "履歴から問題を開けない");
+    // 問題の結果を消すと履歴も消える
+    await p.evaluate(() => { pState = null; deleteData("results"); });
+    assert.strictEqual(await p.evaluate(() => dlogRead().length), 0, "結果を消しても履歴が残った");
     // 本番の途中は変えない(出題・パフォーマンスが変わらないように)
     const frozen = await p.evaluate(() => {
       go("contest"); startContest("word");

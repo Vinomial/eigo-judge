@@ -28,6 +28,7 @@ document.addEventListener("keydown", e => {
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* noop */ }
 applyLook(); // テーマ・フォント・タブのアイコン(js/shop.js)
 applyEstD();
+EST_SEEN = S.att.length; // これより後の解答で動いた難易度を「自分の解答で動いた」として履歴に残す
 restoreContest();
 render();
 if (window.Sync) { Sync.on(onSyncChange); Sync.start(); }

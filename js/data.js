@@ -87,9 +87,9 @@ const DELETE = {
   contests: { name: "本番の記録", desc: "本番の履歴を消します.レート・推定 TOEIC スコア・グラフも消えます.問題ごとの AC / WA と,実際の TOEIC の点数は残ります.",
     run: () => { clearFields("contests"); cState = null; S.wipe = Object.assign({}, S.wipe, { contests: Date.now() }); } },
   results: { name: "問題の結果", desc: "問題ごとの AC / WA,解答の履歴(草と難易度の推定に使う),復習の予定,長文の所要時間,今日の問題と早解きの記録を消します.すべて未挑戦に戻ります.レートと買ったテーマは残ります(コインはその分減ります).",
-    run: () => { clearFields("results"); D_EST = null; applyEstD(); S.wipe = Object.assign({}, S.wipe, { results: Date.now() }); } },
+    run: () => { clearFields("results"); dlogClear(); D_EST = null; applyEstD(); S.wipe = Object.assign({}, S.wipe, { results: Date.now() }); } },
   all: { name: "すべてのデータ", desc: "本番の記録,問題の結果,学習日数,実績,買ったテーマ,設定をすべて消して,最初の状態に戻します.",
-    run: () => { S = freshState(); S.wipe = { all: Date.now() }; cState = null; D_EST = null; applyEstD(); } }
+    run: () => { S = freshState(); S.wipe = { all: Date.now() }; cState = null; dlogClear(); D_EST = null; applyEstD(); } }
 };
 function deleteData(k) {
   const d = DELETE[k];

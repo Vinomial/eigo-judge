@@ -31,11 +31,48 @@ function mapShift(obs, c, sd) {
 let D_EST = null;
 // 解答が増えて推定が古くなったか(record が立てる).refreshEst で問題の d に反映する
 let EST_STALE = false;
+/* 難易度の変化の履歴(この端末の localStorage の eigo-judge-dlog.推定から作れる値なので同期しない)
+ * 1行は [問題の id, 時刻, 前の難易度, 後の難易度, 理由].理由は "ac" / "wa"(自分の解答で動いた),"est"(ほかの解答やみんなの解答で動いた),
+ * "bulk"(ほかの問題がまとめて少しずつ動いた.id は "*",前の難易度の欄に問題数).
+ * 1問解くと実力の推定も少し動き,多くの問題が 1〜2 ずつ動くので,自分の解答で動いた問題と,DLOG_MIN 以上動いた問題だけを残す. */
+const DLOG_KEY = "eigo-judge-dlog", DLOG_MAX = 1500, DLOG_MIN = 10, DLOG_BULK = 40;
+function dlogRead() { try { const a = JSON.parse(localStorage.getItem(DLOG_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function dlogAdd(rows) {
+  if (!rows.length) return;
+  try { localStorage.setItem(DLOG_KEY, JSON.stringify(dlogRead().concat(rows).slice(-DLOG_MAX))); } catch (e) { /* 保存できなくても動く */ }
+}
+function dlogClear() { try { localStorage.removeItem(DLOG_KEY); } catch (e) { /* noop */ } }
+// 前に反映したときの解答の件数(それより後の解答が「自分の解答で動いた」理由になる)
+let EST_SEEN = 0;
 // 解いたらすぐ難易度に反映する.本番の途中は出題やパフォーマンスが変わらないよう,終わるまで待つ.
-// 戻り値:反映したら true
+// 変わった問題は履歴に残す.戻り値:反映したら true
 function refreshEst() {
   if (!EST_STALE || (typeof contestRunning === "function" && contestRunning())) return false;
-  EST_STALE = false; applyEstD(); return true;
+  EST_STALE = false;
+  const before = new Map(ALLQ.map(([, q]) => [q.id, q.d]));
+  const mine = new Map();
+  for (const [id, , ok] of S.att.slice(Math.min(EST_SEEN, S.att.length))) mine.set(id, ok);
+  EST_SEEN = S.att.length;
+  applyEstD();
+  const t = Date.now(), own = [], other = [];
+  for (const [, q] of ALLQ) {
+    const a = before.get(q.id), b = q.d;
+    if (a === b) continue;
+    if (mine.has(q.id)) own.push([q.id, t, a, b, mine.get(q.id) ? "ac" : "wa"]);
+    else if (Math.abs(b - a) >= DLOG_MIN) other.push([q.id, t, a, b, "est"]);
+  }
+  // ほかの問題が一度にたくさん動いたときは1行にまとめる(履歴が埋まらないように)
+  dlogAdd(own.concat(other.length > DLOG_BULK ? [["*", t, other.length, 0, "bulk"]] : other));
+  return true;
+}
+// 1問の難易度の推移(作った人の見積もり → 変化 → 今).履歴がなければ空
+function dHistHTML(id) {
+  const x = Q_BY.get(id); if (!x) return "";
+  const rows = dlogRead().filter(r => r[0] === id);
+  if (!rows.length) return "";
+  const why = { ac: "AC", wa: "WA", est: "推定" };
+  const step = (d, note) => `<span class="dh"><b class="rate" style="${rc(d)}">${d}</b><span class="muted">${note}</span></span>`;
+  return `<div class="dhist"><h3>難易度の推移</h3><p class="small">${[step(x.q.d0, "作成時"), ...rows.map(r => step(r[3], `${fmtDate(r[1])} ${why[r[4]] || ""}`))].join(" → ")}</p></div>`;
 }
 /* みんなの解答(ログインした人どうしで共有する.js/sync.js が Firestore の stats から取ってきて localStorage に置く)
  * POOL_KEY: { t: 取ってきた時刻, mine: 自分の uid, users: { uid: "id:正誤:実力,..." } }.進捗(S)とは別で,同期しない. */

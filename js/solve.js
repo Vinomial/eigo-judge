@@ -125,6 +125,8 @@ function afterJudgeEst(st) {
     const r = $("#result");
     const v = r && r.querySelector("#verdict");
     if (v && pState && pState.st === st && !r.querySelector(".dmove")) v.insertAdjacentHTML("afterend", dMoveHTML(st));
+    // 解説の下の「難易度の推移」も,今の変化を入れて書き直す
+    if (r && pState && pState.st === st) { const h = r.querySelector(".dhist"); if (h) h.remove(); r.insertAdjacentHTML("beforeend", dHistHTML(st.dId)); }
   }, 30);
 }
 // 判定のあとに出す「難易度の推定」の変化
@@ -290,7 +292,9 @@ function itemHTML(item, st) {
   const k = item.p.qs.indexOf(q);
   return metaHTML("reading", q.d) + passageHTML(item.p, null, { cur: k + 1, box: true }) + `<p class="qtext en"><b>${qLabel(item.p, k)}</b></p>` + choicesHTML(q.c, st, true);
 }
-function editorialHTML(item, st) {
+// 解説(問題ごとの難易度の推移を最後に付ける)
+function editorialHTML(item, st) { return editorialMain(item, st) + dHistHTML(itemId(item)); }
+function editorialMain(item, st) {
   if (item.dom === "root") return rootEditorialHTML(item);
   if (item.dom === "spell") {
     const q = item.q, mine = st && normSpell(st.ans) && !spellRight(item, st) ? `<p class="small">あなたの解答:<span class="en down">${esc(st.ans)}</span></p>` : "";

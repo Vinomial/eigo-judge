@@ -66,7 +66,7 @@ function renderRecord() {
     ${sec("進捗(今 AC の問題)", progressHTML())}
     ${sec("苦手な定理", weakHTML)}`;
   else if (recTab === "badge") body = badgesHTML();
-  else if (recTab === "est") body = sec("難易度の推定", estHTML());
+  else if (recTab === "est") body = sec("難易度の推定", estHTML()) + sec("難易度の変化の履歴", dlogHTML());
   else body = `
     ${sec("端末間の同期", `<div id="sync-box">${syncHTML()}</div>`)}
     ${sec("データの引き継ぎ", `<div class="row"><button class="btn ghost" id="exp-btn">書き出す</button><label class="btn ghost" for="imp-file">読み込む</label><input type="file" id="imp-file" accept="application/json,.json" hidden></div>`, "進捗はこの端末のブラウザに保存されます.ログインしない場合は,書き出したファイルを別の端末で読み込むと,その端末の記録と合わせられます.")}
@@ -88,6 +88,7 @@ function renderRecord() {
   const sh = $("#share-toggle");
   if (sh) sh.onchange = () => { S.prefs.share = sh.checked; save(); if (window.Sync) Sync.stats(true); toast(sh.checked ? "最初の解答をみんなの推定に使ってもらいます." : "最初の解答を送るのをやめ,送った分も消しました."); };
   if (est) est.onchange = () => { S.prefs.estD = est.checked; save(); applyEstD(); renderRecord(); toast(est.checked ? "推定した難易度を使います." : "元の難易度に戻しました."); };
+  const more = $("#dlog-more"); if (more) more.onclick = () => { dlogN += 100; renderRecord(); };
   m.querySelectorAll("[data-estq]").forEach(b => b.onclick = () => { const x = Q_BY.get(b.dataset.estq); startSolve(x.dom, x.dom === "reading" ? Q_PASSAGE.get(x.q.id).id : x.q.id, null, "", "record"); });
   on("#sc-add", () => {
     const v = Math.round(+$("#sc-score").value / 5) * 5, d = $("#sc-date").value;
@@ -231,6 +232,22 @@ function heatmapHTML() {
     <div class="hm" style="grid-template-columns:repeat(${HM_WEEKS},1fr)">${cells.join("")}</div>
     <div class="hmleg"><span class="small muted" id="hm-info">マスを押すと,その日の数が出ます.</span><span class="small muted"><i class="l0 dly"></i> 今日の問題 · 少 <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> 多</span></div></div>
     <p class="small muted">直近${HM_WEEKS}週で ${total} ${hmKey === "ac" ? "AC" : "問"} · ${active} 日 · 1日の最高 ${best}.${hmKey === "ac" ? "色の濃さは 1 / 5 / 10 / 20 問以上." : ""}</p>`;
+}
+/* 難易度の変化の履歴(新しい順.日ごとにまとめる).押すとその問題を解ける */
+let dlogN = 60;
+function dlogHTML() {
+  const rows = dlogRead().slice().reverse();
+  if (!rows.length) return `<p class="small muted">まだありません.推定した難易度を使っているとき,解いた問題の難易度が動くとここに残ります(この端末だけの記録です).</p>`;
+  const name = id => { const x = Q_BY.get(id); if (!x) return id; const { dom, q } = x; return dom === "word" ? `<span class="en">${esc(q.w)}</span>` : dom === "grammar" ? `G${id.slice(1)} ${esc(THM[q.t].name)}` : `${id.toUpperCase()}`; };
+  const why = { ac: ["AC", "up"], wa: ["WA", "down"], est: ["推定", "muted"] };
+  const shown = rows.slice(0, dlogN), byDay = new Map();
+  shown.forEach(r => { const k = dateKey(r[1]); (byDay.get(k) || byDay.set(k, []).get(k)).push(r); });
+  const own = rows.filter(r => r[4] === "ac" || r[4] === "wa"), down = own.filter(r => r[3] < r[2]).length;
+  return `<p class="small muted">自分の解答で動いた問題と,${DLOG_MIN} 以上動いた問題を残しています(この端末だけの記録).自分の解答で動いたのは ${own.length} 回(下がった ${down} · 上がった ${own.length - down}).</p>
+    ${[...byDay].map(([k, rs]) => `<h3 class="esth">${fmtDate(rs[0][1])}</h3><div class="dlog">${rs.map(r => r[4] === "bulk"
+      ? `<div class="dlrow muted small">ほかの ${r[2]} 問の難易度が少しずつ動きました</div>`
+      : `<button class="dlrow" data-estq="${r[0]}"><span class="dln">${name(r[0])}</span><span class="dlv"><span class="rate" style="${rc(r[2])}">${r[2]}</span> → <b class="rate" style="${rc(r[3])}">${r[3]}</b> <span class="${r[3] < r[2] ? "up" : "down"}">${r[3] < r[2] ? "↓" : "↑"}${Math.abs(r[3] - r[2])}</span></span><span class="small ${why[r[4]][1]}">${why[r[4]][0]}</span></button>`).join("")}</div>`).join("")}
+    ${rows.length > dlogN ? `<button class="btn ghost sm" id="dlog-more">もっと見る(残り ${rows.length - dlogN} 件)</button>` : ""}`;
 }
 function estHTML() {
   const E = estimateD(), rows = [];
